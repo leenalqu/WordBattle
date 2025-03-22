@@ -1,7 +1,2 @@
-# Python-Card-Game-Project
-[insert description]
-#edited by hasan
 
 
-#edited by Jiaxi_2
-#Raghad
