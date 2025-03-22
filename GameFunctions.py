@@ -1,10 +1,13 @@
 import random
 from collections import deque
+# 1 function class game created by Raghad
 
-#function class game created by Raghad
+# class functions
 class Game:
     def __init__(self):
         self.words = self.load_letter_words("words_alpha.txt")
+        # Filter out only the three-letter words
+        self.words = {word for word in self.words if len(word) == 3}
 
     # Loading the words from a file
     def load_letter_words(self, filename):
@@ -16,12 +19,7 @@ class Game:
             print("File not found.")
             return set()
 
-    # Check if two words differ by exactly one letter
-    def just_one_letter_diff(self, word1, word2):
-        diff_count = sum(1 for a, b in zip(word1, word2) if a != b)
-        return diff_count == 1
-
-    # Generate all valid transformations using BFS
+    # Generate all valid transformations using BFS    (not finshed)
     def get_valid_transformations(self, start_word):
         queue = deque([start_word])  #  the start word
         visited = set([start_word])  # Keep track of visited words
@@ -49,41 +47,85 @@ class Game:
             letters[i], letters[j] = letters[j], letters[i]
         return letters  # Returns the shuffled letters
 
-    #Function star card (random u might or might not get one)
+    #Function star card (random u might or might not get one if you dont get a star card you will be given a random letter)
     def star_card(self):
-        value=random.randint(0, 2)
+        value = random.randint(0, 2)
+        if value == 0:
+            return "Star card"
+        else:
+            letters = self.shuffling_letter()
+            return random.choice(letters)
+
+
+    # it will return a list of 10 cards
+    def card(self):
+        letters = self.shuffling_letter()
+        cards = []
+        for i in range(1,10):
+            random_letter = random.choice(letters)
+            cards.append(random_letter)
+        cards.append(self.star_card())
+        print(cards)
+        return cards
+
+
+    #soriting player cards in alphpitc order
+
+    def quick_sort(self, list1):
+        # if the list has 1 or 0 elements, it sorted
+        if len(list1) <= 1:
+            return list1
+
+        # pivot is the middle element
+        pivot = list1[len(list1) // 2]
+
+        # three parts:
+        less_than_pivot = [x for x in list1 if x < pivot]
+        equal_to_pivot = [x for x in list1 if x == pivot]
+        greater_than_pivot = [x for x in list1 if x > pivot]
+
+        # sort the parts and combine togother
+        return self.quick_sort(less_than_pivot) + equal_to_pivot + self.quick_sort(greater_than_pivot)
+
+    # generate a three letter or four word
+    def word_generater(self):
+        while True:
+            random_word = random.choice(self.words)
+            list1=self.get_valid_transformations(random_word)
+            if len(list1) >=2:
+                return random_word
+
+
+
+    # it can be romoved by interface
+    # Check if two words differ by exactly one letter
+    def just_one_letter_diff(self, word1, word2):
+        diff_count = sum(1 for a, b in zip(word1, word2) if a != b)
+        return diff_count == 1
+
+    # check if the word has been changed (is it real or not)
+    def check_exists(self,user_word):
+        if user_word in self.words:
+            return True
+        else:
+            return False
+
+
+    #decide who play first
+    def coin(self):
+        value = random.randint(0, 2)
         if value == 0:
             print("Head")
         else:
             print("Tail")
 
-    # it will return a list of 10 cards
-    def cards(self):
-        print("it will call the 2 function above")
-
-
-    #soriting palyer cards in assending order
-    def sorting_cards(self,unsorted_list):
-        print("NOTHING")
-
-    # generate a three letter or four word
-    def word_generater(self):
-        print("NOTHING")
-
-    #return true or false if the pesron onlu changed one letter it can be romoved by interface
-    def changed_one(self,prevuos,after):
-        print("NOTHING")
-    # chek if the  the word has been changed is it real or not
-    def check_exists(self):
-        print("NOTHING")
-    #decide wich palyer start fisrt
-    def coin(self):
-        print("NOTHING")
-
 
 
 #test
 a=Game()
+a.card()
+
+
 
 
 
