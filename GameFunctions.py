@@ -4,7 +4,7 @@ from collections import deque
 #function class game created by Raghad
 class Game:
     def __init__(self):
-        self.words = self.load_letter_words("words_alpha 1")
+        self.words = self.load_letter_words("words_alpha.txt")
 
     # Loading the words from a file
     def load_letter_words(self, filename):
