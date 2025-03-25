@@ -45,8 +45,11 @@ while running:
     #Draw Background
     screen.fill(BACKGROUND_COLOR)
 
-    # Draw sections
+    #Draw sections
     draw_current_word()
+
+    #Refresh
+    pygame.display.flip()
 
 #Quit
 pygame.quit()
