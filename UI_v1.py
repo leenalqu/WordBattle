@@ -1,7 +1,10 @@
-#Coded by Jiaxi Huang
+#Coded by Jiaxi Huang (5670238)
+
+#Import libraries
 import pygame
 import sys
 
+#Initialize Pygame
 pygame.init()
 
 #Config_Settings
@@ -35,6 +38,12 @@ def draw_current_word():
     text = font.render(CURRENT_WORD_TITLE, True, TEXT_COLOR)
     screen.blit(text, (CURRENT_WORD_TITLE_POS[0] - text.get_width() // 2, CURRENT_WORD_TITLE_POS[1]))
 
+    # Draw Boxes
+    for i in range(CURRENT_WORD_BOXES):
+        x = CURRENT_WORD_BOX_START_X + i * CURRENT_WORD_BOX_SPACING
+        y = CURRENT_WORD_BOX_Y
+        pygame.draw.rect(screen, BORDER_COLOR, (x, y, CURRENT_WORD_BOX_WIDTH, CURRENT_WORD_BOX_HEIGHT), 2)
+
 #Main Loop
 running = True
 while running:
@@ -45,12 +54,12 @@ while running:
     #Draw Background
     screen.fill(BACKGROUND_COLOR)
 
-    #Draw sections
+    #Draw Sections
     draw_current_word()
 
-    #Refresh
+    #Refresh Screen
     pygame.display.flip()
 
-#Quit
+#Quit Pygame
 pygame.quit()
 sys.exit()
