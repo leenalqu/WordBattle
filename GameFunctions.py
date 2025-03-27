@@ -7,7 +7,7 @@ class Game:
     def __init__(self):
         self.words = self.load_letter_words("words_alpha.txt")
         # Filter out only the three-letter words
-        self.words = {word for word in self.words if len(word) == 3}
+        self.words = set(filter(lambda word : len(word) == 3, self.words)) # Using a set for faster lookup
 
     # Loading the words from a file
     def load_letter_words(self, filename):
