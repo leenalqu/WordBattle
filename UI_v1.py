@@ -60,6 +60,7 @@ elif MODE == 1:
 #Config_Font
 font = pygame.font.Font(None, FONT_SIZE)
 
+#Function Section
 def draw_current_word():
     #Draw Title
     text = font.render(CURRENT_WORD_TITLE, True, TEXT_COLOR)
