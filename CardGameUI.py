@@ -10,6 +10,9 @@ pygame.init()
 #Config_Settings
 show_popup = False
 game_paused = False
+show_welcome_page = True
+show_game_paused_page = False
+show_homepage = False
 
 #Config_Screen
 screen_width = 800
@@ -23,6 +26,18 @@ text_color_coordinate = (0, 49, 82)
 #Config_Background
 background = pygame.image.load("data/image/background.png")
 background = pygame.transform.scale(background, (screen_width, screen_height))
+
+#Config_Welcome_Page
+image_welcome_page = pygame.image.load("data/image/welcome_page.png")
+image_welcome_page = pygame.transform.scale(image_welcome_page, (screen_width, screen_height))
+
+#Config_Pause_Page
+image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
+image_game_paused_page = pygame.transform.scale(image_game_paused_page, (screen_width, screen_height))
+
+#Config_HomePage
+image_homepage = pygame.image.load("data/image/homepage.png")
+image_homepage = pygame.transform.scale(image_homepage, (screen_width, screen_height))
 
 #Config_Font
 font_size_default = 24
@@ -68,6 +83,24 @@ elif side_status == 1:
 side_text_box_pos = (screen_width // 2, 5)
 side_text_box_color = (0, 49, 82)
 
+#Coodinate Checker
+
+#Homepage_Button
+x_min_homepage, y_min_homepage = 146, 563
+x_max_homepage, y_max_homepage = 176, 593
+
+#Game_Paused_Button
+x_min_game_paused_page, y_min_game_paused_page = 181, 563
+x_max_game_paused_page, y_max_game_paused_page = 211, 593
+
+#Game_Continued_Button
+x_min_game_continued_page, y_min_game_continued_page = 216, 563
+x_max_game_continued_page, y_max_game_continued_page = 246, 593
+
+#Quit_Button
+x_min_quit, y_min_quit = 251, 563
+x_max_quit, y_max_quit = 281, 593
+
 #Function Section
 def draw_timer():
     global timer_seconds, side_status
@@ -85,9 +118,52 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
         #Ban Mousewheel
         elif event.type == pygame.MOUSEWHEEL:
             continue
+
+        #Detect the coordinate range of mouse clicks
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            #Homepage_Button
+            if x_min_homepage <= mouse_x <= x_max_homepage and y_min_homepage <= mouse_y <= y_max_homepage:
+                show_homepage = True
+            #Quit_Button
+            if x_min_quit <= mouse_x <= x_max_quit and y_min_quit <= mouse_y <= y_max_quit:
+                print("Quit")
+                running = False
+            #Game_Paused_Button
+            if x_min_game_paused_page <= mouse_x <= x_max_game_paused_page and y_min_game_paused_page <= mouse_y <= y_max_game_paused_page:
+                show_game_paused_page = True
+                game_paused = True
+            #Game_Continued_Button
+            if x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
+                show_game_paused_page = False
+                show_homepage = False
+                game_paused = False
+
+        #Welcome_Page_Interaction
+        elif show_welcome_page:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                show_welcome_page = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN and show_welcome_page:
+                show_welcome_page = False
+                game_paused = False
+
+        #HomePage_Interaction
+        elif show_homepage:
+            if event.type == pygame.MOUSEBUTTONDOWN and x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
+                show_homepage = False
+                game_paused = False
+
+        #Game_Paused_Page_Interaction
+        elif show_game_paused_page:
+            if event.type == pygame.MOUSEBUTTONDOWN and x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
+                show_game_paused_page = False
+                game_paused = False
+
         #Pause Game when Popup
         elif event.type == timer_event:
             if timer_seconds > 0 and not game_paused:
@@ -102,12 +178,15 @@ while running:
                 show_popup = True
                 game_paused = True
                 pygame.time.set_timer(timer_event, 0)
+
         #Continue Game when no Popup
         elif event.type == pygame.MOUSEBUTTONDOWN and show_popup:
             if button_rect.collidepoint(event.pos):
                 show_popup = False
                 game_paused = False
                 pygame.time.set_timer(timer_event, 1000)
+
+
 
     #Obtain Mouse Coordinate
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -124,6 +203,20 @@ while running:
     if not game_paused:
         draw_side_text_box()
         draw_timer()
+
+    if show_welcome_page:
+        screen.blit(image_welcome_page, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                show_welcome_page = False
+        pygame.display.flip()
+        continue
+
+    if show_game_paused_page:
+        screen.blit(image_game_paused_page, (0, 0))
+
+    if show_homepage:
+        screen.blit(image_homepage, (0, 0))
 
     if show_popup:
         s = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
