@@ -7,10 +7,10 @@ import sys
 #Initialize Pygame
 pygame.init()
 
-#Config_Mode
-MODE = -1
-ANSWER_STATUS = 2
-TURN_STATUS = 0
+#Config_mode
+mode = -1
+answer_status = 2
+turn_status = 0
 
 #Config_Settings
 SCREEN_WIDTH = 800
@@ -40,15 +40,15 @@ CURRENT_WORD_TITLE_POS = (SCREEN_WIDTH // 2, 100)
 CURRENT_WORD_BOX_WIDTH = 81.9
 CURRENT_WORD_BOX_HEIGHT = 114.4
 CURRENT_WORD_BOX_SPACING = 100
-if MODE == 0:
+if mode == 0:
     CURRENT_WORD_BOX_START_X = 260
     CURRENT_WORD_BOX_Y = 135
     CURRENT_WORD_BOXES = 3
-elif MODE == 1:
+elif mode == 1:
     CURRENT_WORD_BOX_START_X = 210
     CURRENT_WORD_BOX_Y = 135
     CURRENT_WORD_BOXES = 4
-elif MODE == -1:
+elif mode == -1:
     CURRENT_WORD_BOX_START_X = 210
     CURRENT_WORD_BOX_Y = 135
     CURRENT_WORD_BOXES = 4
@@ -64,9 +64,9 @@ PLAYER_CARDS_BOX_Y = 330
 PLAYER_CARDS_BOXES = 15
 
 #Config_Table
-if TURN_STATUS == 0:
+if turn_status == 0:
     PLAYER_TURN_TITLE = "YOUR TURN"
-elif TURN_STATUS == 1:
+elif turn_status == 1:
     PLAYER_TURN_TITLE = "COMPUTER'S TURN"
 PLAYER_TURN_TITLE_POS = (SCREEN_WIDTH // 2, 415)
 RIGHT_BUTTON_POS = (240, 450)
@@ -84,11 +84,11 @@ SKIP_BUTTON_TEXT = "SKIP"
 
 #Config_Screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-if MODE == 0:
+if mode == 0:
     pygame.display.set_caption("Three-Letter Card Game")
-elif MODE == 1:
+elif mode == 1:
     pygame.display.set_caption("Four-Letter Card Game")
-elif MODE == -1:
+elif mode == -1:
     pygame.display.set_caption("Debug")
 
 #Config_Font
@@ -124,7 +124,7 @@ BUTTON_TEXT = "OK"
 
 #Function Section
 def draw_timer():
-    global TIMER_SECONDS, TURN_STATUS
+    global TIMER_SECONDS, turn_status
     timer_text = font.render(f"00:{TIMER_SECONDS:02d}", True, TEXT_COLOR)
     screen.blit(timer_text, (TIMER_X, TIMER_Y))
 
@@ -155,7 +155,7 @@ def draw_player_table():
     text = font.render(PLAYER_TURN_TITLE, True, TEXT_COLOR)
     screen.blit(text, (PLAYER_TURN_TITLE_POS[0] - text.get_width() // 2, PLAYER_TURN_TITLE_POS[1]))
 
-    if ANSWER_STATUS == -1:
+    if answer_status == -1:
         #Draw RIGHT_BUTTON
         RIGHT_BUTTON = pygame.Rect(RIGHT_BUTTON_POS[0], RIGHT_BUTTON_POS[1], RIGHT_BUTTON_WIDTH, RIGHT_BUTTON_HEIGHT)
         pygame.draw.rect(screen, BUTTON_COLOR_INACTIVE, RIGHT_BUTTON)
@@ -174,7 +174,7 @@ def draw_player_table():
         text = font.render(SKIP_BUTTON_TEXT, True, TEXT_COLOR_BUTTON_SKIP)
         screen.blit(text, (skip_button.centerx - text.get_width() // 2, skip_button.centery - text.get_height() // 2))
 
-    if ANSWER_STATUS == 0:
+    if answer_status == 0:
         # Draw RIGHT_BUTTON
         RIGHT_BUTTON = pygame.Rect(RIGHT_BUTTON_POS[0], RIGHT_BUTTON_POS[1], RIGHT_BUTTON_WIDTH, RIGHT_BUTTON_HEIGHT)
         pygame.draw.rect(screen, BUTTON_COLOR_INACTIVE, RIGHT_BUTTON)
@@ -193,7 +193,7 @@ def draw_player_table():
         text = font.render(SKIP_BUTTON_TEXT, True, TEXT_COLOR_BUTTON_SKIP)
         screen.blit(text, (skip_button.centerx - text.get_width() // 2, skip_button.centery - text.get_height() // 2))
 
-    if ANSWER_STATUS == 1:
+    if answer_status == 1:
         # Draw RIGHT_BUTTON
         RIGHT_BUTTON = pygame.Rect(RIGHT_BUTTON_POS[0], RIGHT_BUTTON_POS[1], RIGHT_BUTTON_WIDTH, RIGHT_BUTTON_HEIGHT)
         pygame.draw.rect(screen, BUTTON_COLOR_ACTIVE_RIGHT, RIGHT_BUTTON)
@@ -212,7 +212,7 @@ def draw_player_table():
         text = font.render(SKIP_BUTTON_TEXT, True, TEXT_COLOR_BUTTON_SKIP)
         screen.blit(text, (skip_button.centerx - text.get_width() // 2, skip_button.centery - text.get_height() // 2))
 
-    if ANSWER_STATUS == 2:
+    if answer_status == 2:
         # Draw RIGHT_BUTTON
         RIGHT_BUTTON = pygame.Rect(RIGHT_BUTTON_POS[0], RIGHT_BUTTON_POS[1], RIGHT_BUTTON_WIDTH, RIGHT_BUTTON_HEIGHT)
         pygame.draw.rect(screen, BUTTON_COLOR_ACTIVE_RIGHT, RIGHT_BUTTON)
@@ -246,9 +246,9 @@ while running:
             if TIMER_SECONDS > 0 and not GAME_PAUSED:
                 TIMER_SECONDS -= 1
             else:
-                TURN_STATUS = 1 - TURN_STATUS
+                turn_status = 1 - turn_status
                 TIMER_SECONDS = TIMER_DURATION
-                if TURN_STATUS == 0:
+                if turn_status == 0:
                     PLAYER_TURN_TITLE = "YOUR TURN"
                 else:
                     PLAYER_TURN_TITLE = "COMPUTER'S TURN"
