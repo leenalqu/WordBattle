@@ -38,7 +38,7 @@ class Bot:
         ...
     def answer_or_not(self):
         ...
-    def answer_time(self):
+    def answer_time(self): # function that returns how long the bot will take to play its turn
         average_answer_time = self.difficulty_settings[self.difficulty_level]["average_answer_time"]
         variance_answer_time = self.difficulty_settings[self.difficulty_level]["variance_answer_time"]
         answer_time = random.normalvariate(average_answer_time, variance_answer_time)
