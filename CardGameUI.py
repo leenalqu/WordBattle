@@ -4,236 +4,341 @@
 import pygame
 import sys
 
-#Initialize Pygame
-pygame.init()
+class CardGameUI:
+    def __init__(self):
+        #Initialize Pygame
+        pygame.init()
 
-#Config_Settings
-show_popup = False
-game_paused = False
-show_welcome_page = True
-show_game_paused_page = False
-show_homepage = False
+        #Config_Settings
+        self.show_popup = False
+        self.game_paused = False
+        self.show_welcome_page = True
+        self.show_game_paused_page = False
+        self.show_homepage = False
 
-#Config_Screen
-screen_width = 800
-screen_height = 600
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Debug Mode")
+        #Config_Screen
+        self.screen_width = 800
+        self.screen_height = 600
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        pygame.display.set_caption("Debug Mode")
 
-#Config_Coordinate_Box
-text_color_coordinate = (0, 49, 82)
+        #Config_Coordinate_Box
+        self.text_color_coordinate = (0, 49, 82)
 
-#Config_Background
-background = pygame.image.load("data/image/background.png")
-background = pygame.transform.scale(background, (screen_width, screen_height))
+        #Config_Background
+        self.background = pygame.image.load("data/image/background.png")
+        self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
 
-#Config_Welcome_Page
-image_welcome_page = pygame.image.load("data/image/welcome_page.png")
-image_welcome_page = pygame.transform.scale(image_welcome_page, (screen_width, screen_height))
+        #Config_Welcome_Page
+        self.image_welcome_page = pygame.image.load("data/image/welcome_page.png")
+        self.image_welcome_page = pygame.transform.scale(self.image_welcome_page, (self.screen_width, self.screen_height))
 
-#Config_Pause_Page
-image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
-image_game_paused_page = pygame.transform.scale(image_game_paused_page, (screen_width, screen_height))
+        #Config_Pause_Page
+        self.image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
+        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page, (self.screen_width, self.screen_height))
 
-#Config_HomePage
-image_homepage = pygame.image.load("data/image/homepage.png")
-image_homepage = pygame.transform.scale(image_homepage, (screen_width, screen_height))
+        #Config_HomePage
+        self.image_homepage = pygame.image.load("data/image/homepage.png")
+        self.image_homepage = pygame.transform.scale(self.image_homepage, (self.screen_width, self.screen_height))
 
-#Config_Font
-font_size_default = 24
-font_size_timer = 88
-font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", font_size_default)
-font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", font_size_timer)
+        #Config_Font
+        self.font_size_default = 24
+        self.font_size_timer = 88
+        self.font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default)
+        self.font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer)
 
-#Config_Timer
-timer_event = pygame.USEREVENT + 1
-timer_duration = 15
-timer_seconds = timer_duration
-timer_x = 301
-timer_y = 282
-text_color_timer = (228, 222, 215)
-pygame.time.set_timer(timer_event, 1000)
-popup_rect = pygame.Rect(screen_width // 2 - 150, screen_height // 2 - 75, 300, 150)
-button_rect = pygame.Rect(screen_width // 2 - 50, screen_height // 2 + 25, 100, 30)
+        #Config_Timer
+        self.timer_event = pygame.USEREVENT + 1
+        self.timer_duration = 15
+        self.timer_seconds = self.timer_duration
+        self.timer_x = 301
+        self.timer_y = 282
+        self.text_color_timer = (228, 222, 215)
+        pygame.time.set_timer(self.timer_event, 1000)
+        self.popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
+        self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
 
-#Config_Popup
-popup_side_changer_width = 350
-popup_side_changer_height = 150
-popup_side_changer_width_button = 100
-popup_side_changer_height_button = 30
-popup_side_changer_pos_x = screen_width // 2 - popup_side_changer_width // 2
-popup_side_changer_pos_y = screen_width // 2 - popup_side_changer_height // 2
-popup_side_changer_pos_x_button = screen_width // 2 - popup_side_changer_width_button // 2
-popup_side_changer_pos_y_button = screen_width // 2 + 25
-popup_side_changer_color_background = (228, 222, 215)
-popup_side_changer_color_border = (228, 222, 215)
-popup_side_changer_color_button = (0, 49, 82)
-popup_side_changer_color_button_border = (0, 49, 82)
-popup_side_changer_color_text = (228, 222, 215)
-popup_side_changer_color_text_button = (0, 49, 82)
-popup_side_changer_text = "Side has changed"
-popup_side_changer_text_button = "OK"
+        #Config_Popup
+        self.popup_side_changer_width = 350
+        self.popup_side_changer_height = 150
+        self.popup_side_changer_width_button = 100
+        self.popup_side_changer_height_button = 30
+        self.popup_side_changer_pos_x = self.screen_width // 2 - self.popup_side_changer_width // 2
+        self.popup_side_changer_pos_y = self.screen_width // 2 - self.popup_side_changer_height // 2
+        self.popup_side_changer_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
+        self.popup_side_changer_pos_y_button = self.screen_width // 2 + 25
+        self.popup_side_changer_color_background = (228, 222, 215)
+        self.popup_side_changer_color_border = (228, 222, 215)
+        self.popup_side_changer_color_button = (0, 49, 82)
+        self.popup_side_changer_color_button_border = (0, 49, 82)
+        self.popup_side_changer_color_text = (228, 222, 215)
+        self.popup_side_changer_color_text_button = (0, 49, 82)
+        self.popup_side_changer_text = "Side has changed"
+        self.popup_side_changer_text_button = "OK"
 
-#Config_Side_Status
-side_status = 0
-if side_status == 0:
-    side_text_box = "YOUR TURN"
-elif side_status == 1:
-    side_text_box = "COMPUTER'S TURN"
-side_text_box_pos = (screen_width // 2, 5)
-side_text_box_color = (0, 49, 82)
+        #Config_Side_Status
+        self.side_status = 0
+        self.update_side_text()
+        self.side_text_box_pos = (self.screen_width // 2, 5)
+        self.side_text_box_color = (0, 49, 82)
 
-#Coodinate Checker
+        #Config_Current_Word
+        self.current_word_font_size = 88
+        self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.current_word_font_size)
+        self.current_word_letter_1 = 'C'
+        self.current_word_letter_2 = 'A'
+        self.current_word_letter_3 = 'T'
+        self.current_word_letters = [
+            self.current_word_letter_1, self.current_word_letter_2, self.current_word_letter_3
+        ]
+        self.current_word_text_color = (228, 222, 215)
+        self.current_word_positions = []
+        current_word_start_x = 256
+        current_word_width = 95
+        current_word_spacing = 5
+        current_word_y = 147
+        for i in range(3):
+            self.current_word_positions.append(
+                (current_word_start_x + i * (current_word_width + current_word_spacing), current_word_y))
 
-#Homepage_Button
-x_min_homepage, y_min_homepage = 146, 563
-x_max_homepage, y_max_homepage = 176, 593
+        #Config_Card_Letters
+        self.card_font_size = 52
+        self.card_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.card_font_size)
+        self.visible_card_count = 15
+        self.card_letter_1 = 'C'
+        self.card_letter_2 = 'O'
+        self.card_letter_3 = 'M'
+        self.card_letter_4 = 'P'
+        self.card_letter_5 = 'U'
+        self.card_letter_6 = 'T'
+        self.card_letter_7 = 'E'
+        self.card_letter_8 = 'R'
+        self.card_letter_9 = 'S'
+        self.card_letter_10 = 'C'
+        self.card_letter_11 = 'I'
+        self.card_letter_12 = 'E'
+        self.card_letter_13 = 'N'
+        self.card_letter_14 = 'C'
+        self.card_letter_15 = 'E'
+        self.card_letters = [
+            self.card_letter_1, self.card_letter_2, self.card_letter_3,
+            self.card_letter_4, self.card_letter_5, self.card_letter_6,
+            self.card_letter_7, self.card_letter_8, self.card_letter_9,
+            self.card_letter_10, self.card_letter_11, self.card_letter_12,
+            self.card_letter_13, self.card_letter_14, self.card_letter_15
+        ]
+        self.card_text_color = (228, 222, 215)
+        self.card_positions = []
+        card_start_x = 27
+        card_width = 49
+        card_spacing = 1
+        card_y = 463
+        for i in range(15):
+            self.card_positions.append((card_start_x + i * (card_width + card_spacing), card_y))
 
-#Game_Paused_Button
-x_min_game_paused_page, y_min_game_paused_page = 181, 563
-x_max_game_paused_page, y_max_game_paused_page = 211, 593
+        #Config_Card_Clickers
+        self.card_click_areas = []
+        for i in range(15):
+            x = card_start_x + i * (card_width + card_spacing)
+            y = card_y
+            self.card_click_areas.append((x, y, card_width, card_width))
 
-#Game_Continued_Button
-x_min_game_continued_page, y_min_game_continued_page = 216, 563
-x_max_game_continued_page, y_max_game_continued_page = 246, 593
+        #Config_Selected_Letters
+        self.selected_letters = []
 
-#Quit_Button
-x_min_quit, y_min_quit = 251, 563
-x_max_quit, y_max_quit = 281, 593
+        #Coodinate Checker
+        self.setup_button_coordinates()
 
-#Function Section
-def draw_timer():
-    global timer_seconds, side_status
-    timer_text = font_timer.render(f"00:{timer_seconds:02d}", True, text_color_timer)
-    screen.blit(timer_text, (timer_x, timer_y))
+    def setup_button_coordinates(self):
+        #Homepage_Button
+        self.x_min_homepage, self.y_min_homepage = 146, 563
+        self.x_max_homepage, self.y_max_homepage = 176, 593
 
-def draw_side_text_box():
-    #Draw Title
-    text = font_default.render(side_text_box, True, side_text_box_color)
-    screen.blit(text, (side_text_box_pos[0] - text.get_width() // 2, side_text_box_pos[1]))
+        #Game_Paused_Button
+        self.x_min_game_paused_page, self.y_min_game_paused_page = 181, 563
+        self.x_max_game_paused_page, self.y_max_game_paused_page = 211, 593
 
-#Main Loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        #Game_Continued_Button
+        self.x_min_game_continued_page, self.y_min_game_continued_page = 216, 563
+        self.x_max_game_continued_page, self.y_max_game_continued_page = 246, 593
 
-        #Ban Mousewheel
-        elif event.type == pygame.MOUSEWHEEL:
-            continue
+        #Quit_Button
+        self.x_min_quit, self.y_min_quit = 251, 563
+        self.x_max_quit, self.y_max_quit = 281, 593
 
-        #Detect the coordinate range of mouse clicks
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            #Homepage_Button
-            if x_min_homepage <= mouse_x <= x_max_homepage and y_min_homepage <= mouse_y <= y_max_homepage:
-                show_homepage = True
-            #Quit_Button
-            if x_min_quit <= mouse_x <= x_max_quit and y_min_quit <= mouse_y <= y_max_quit:
-                print("Quit")
-                running = False
-            #Game_Paused_Button
-            if x_min_game_paused_page <= mouse_x <= x_max_game_paused_page and y_min_game_paused_page <= mouse_y <= y_max_game_paused_page:
-                show_game_paused_page = True
-                game_paused = True
-            #Game_Continued_Button
-            if x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
-                show_game_paused_page = False
-                show_homepage = False
-                game_paused = False
+    def update_side_text(self):
+        if self.side_status == 0:
+            self.side_text_box = "YOUR TURN"
+        elif self.side_status == 1:
+            self.side_text_box = "COMPUTER'S TURN"
 
-        #Welcome_Page_Interaction
-        elif show_welcome_page:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                show_welcome_page = False
+    def draw_timer(self):
+        timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.text_color_timer)
+        self.screen.blit(timer_text, (self.timer_x, self.timer_y))
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and show_welcome_page:
-                show_welcome_page = False
-                game_paused = False
+    def draw_side_text_box(self):
+        #Draw Title
+        text = self.font_default.render(self.side_text_box, True, self.side_text_box_color)
+        self.screen.blit(text, (self.side_text_box_pos[0] - text.get_width() // 2, self.side_text_box_pos[1]))
 
-        #HomePage_Interaction
-        elif show_homepage:
-            if event.type == pygame.MOUSEBUTTONDOWN and x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
-                show_homepage = False
-                game_paused = False
+    def draw_current_word_letters(self):
+        for i, pos in enumerate(self.current_word_positions):
+            letter_text = self.current_word_font.render(self.current_word_letters[i], True, self.current_word_text_color)
+            text_x = pos[0] + 47 - letter_text.get_width() // 2
+            text_y = pos[1] + 47 - letter_text.get_height() // 2
+            self.screen.blit(letter_text, (text_x, text_y))
 
-        #Game_Paused_Page_Interaction
-        elif show_game_paused_page:
-            if event.type == pygame.MOUSEBUTTONDOWN and x_min_game_continued_page <= mouse_x <= x_max_game_continued_page and y_min_game_continued_page <= mouse_y <= y_max_game_continued_page:
-                show_game_paused_page = False
-                game_paused = False
+    def draw_card_letters(self):
+        for i, pos in enumerate(self.card_positions[:self.visible_card_count]):
+            letter_text = self.card_font.render(self.card_letters[i], True, self.card_text_color)
+            text_x = pos[0] + 25 - letter_text.get_width() // 2
+            text_y = pos[1] + 25 - letter_text.get_height() // 2
+            self.screen.blit(letter_text, (text_x, text_y))
 
-        #Pause Game when Popup
-        elif event.type == timer_event:
-            if timer_seconds > 0 and not game_paused:
-                timer_seconds -= 1
-            else:
-                side_status = 1 - side_status
-                timer_seconds = timer_duration
-                if side_status == 0:
-                    side_text_box = "YOUR TURN"
-                else:
-                    side_text_box = "COMPUTER'S TURN"
-                show_popup = True
-                game_paused = True
-                pygame.time.set_timer(timer_event, 0)
+    def draw_coordinate_display(self):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        text = self.font_default.render(f"X: {mouse_x}, Y: {mouse_y}", True, self.text_color_coordinate)
+        text_rect = text.get_rect()
+        text_rect.topleft = (10, 5)
+        self.screen.blit(text, text_rect)
 
-        #Continue Game when no Popup
-        elif event.type == pygame.MOUSEBUTTONDOWN and show_popup:
-            if button_rect.collidepoint(event.pos):
-                show_popup = False
-                game_paused = False
-                pygame.time.set_timer(timer_event, 1000)
-
-
-
-    #Obtain Mouse Coordinate
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    text = font_default.render(f"X: {mouse_x}, Y: {mouse_y}", True, text_color_coordinate)
-    text_rect = text.get_rect()
-    text_rect.topleft = (10, 5)
-
-    #Draw Sections
-    screen.blit(background, (0, 0))
-    draw_timer()
-    draw_side_text_box()
-    screen.blit(text, text_rect)
-
-    if not game_paused:
-        draw_side_text_box()
-        draw_timer()
-
-    if show_welcome_page:
-        screen.blit(image_welcome_page, (0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                show_welcome_page = False
-        pygame.display.flip()
-        continue
-
-    if show_game_paused_page:
-        screen.blit(image_game_paused_page, (0, 0))
-
-    if show_homepage:
-        screen.blit(image_homepage, (0, 0))
-
-    if show_popup:
-        s = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+    def draw_popup(self):
+        s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
-        screen.blit(s, (0, 0))
-        pygame.draw.rect(screen, popup_side_changer_color_background, popup_rect)
-        pygame.draw.rect(screen, popup_side_changer_color_border, popup_rect, 2)
-        popup_text_render = font_default.render(popup_side_changer_text, True, popup_side_changer_color_text_button)
-        screen.blit(popup_text_render, (popup_rect.centerx - popup_text_render.get_width() // 2, popup_rect.centery - 40))
-        pygame.draw.rect(screen, popup_side_changer_color_button, button_rect)
-        pygame.draw.rect(screen,popup_side_changer_color_button_border, button_rect, 2)
-        button_text_render = font_default.render(popup_side_changer_text_button, True, popup_side_changer_color_text)
-        screen.blit(button_text_render, (button_rect.centerx - button_text_render.get_width() // 2, button_rect.centery - button_text_render.get_height() // 2))
+        self.screen.blit(s, (0, 0))
+        pygame.draw.rect(self.screen, self.popup_side_changer_color_background, self.popup_rect)
+        pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 2)
+        popup_text_render = self.font_default.render(self.popup_side_changer_text, True, self.popup_side_changer_color_text_button)
+        self.screen.blit(popup_text_render,  (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
+        pygame.draw.rect(self.screen, self.popup_side_changer_color_button, self.button_rect)
+        pygame.draw.rect(self.screen, self.popup_side_changer_color_button_border, self.button_rect, 2)
+        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True, self.popup_side_changer_color_text)
+        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2, self.button_rect.centery - button_text_render.get_height() // 2))
 
-    #Refresh Screen
-    pygame.display.flip()
+    def handle_button_click(self, mouse_x, mouse_y):
+        #Homepage_Button
+        if self.x_min_homepage <= mouse_x <= self.x_max_homepage and self.y_min_homepage <= mouse_y <= self.y_max_homepage:
+            self.show_homepage = True
+            #Pause Timer
+            pygame.time.set_timer(self.timer_event, 0)
+        #Quit_Button
+        if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit:
+            print("Quit")
+            return False
+        #Game_Paused_Button
+        if self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
+            self.show_game_paused_page = True
+            self.game_paused = True
+            #Pause Timer
+            pygame.time.set_timer(self.timer_event, 0)
+        #Game_Continued_Button
+        if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
+            self.show_game_paused_page = False
+            self.show_homepage = False
+            self.game_paused = False
+            #Continue Timer
+            pygame.time.set_timer(self.timer_event, 1000)
+        return True
 
-#Quit Pygame
-pygame.quit()
-sys.exit()
+    def handle_card_click(self, mouse_x, mouse_y):
+        if self.side_status != 0 or self.game_paused:
+            return
+        for i, (x, y, width, height) in enumerate(self.card_click_areas):
+            if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
+                selected_letter = self.card_letters[i]
+                self.selected_letters.append(selected_letter)
+                print(f"选中字母: {selected_letter}")
+                return True
+        return False
+
+    def handle_timer_event(self):
+        if self.timer_seconds > 0 and not self.game_paused:
+            self.timer_seconds -= 1
+        else:
+            self.side_status = 1 - self.side_status
+            self.timer_seconds = self.timer_duration
+            self.update_side_text()
+            self.show_popup = True
+            self.game_paused = True
+            pygame.time.set_timer(self.timer_event, 0)
+
+    def handle_popup_click(self, pos):
+        if self.button_rect.collidepoint(pos):
+            self.show_popup = False
+            self.game_paused = False
+            pygame.time.set_timer(self.timer_event, 1000)
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            #Ban Mousewheel
+            elif event.type == pygame.MOUSEWHEEL:
+                continue
+            #Detect the coordinate range of mouse clicks
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if not self.handle_button_click(mouse_x, mouse_y):
+                    return False
+                #Welcome_Page_Interaction
+                if self.show_welcome_page:
+                    self.show_welcome_page = False
+                #HomePage_Interaction
+                elif self.show_homepage:
+                    if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
+                        self.show_homepage = False
+                        self.game_paused = False
+                #Game_Paused_Page_Interaction
+                elif self.show_game_paused_page:
+                    if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
+                        self.show_game_paused_page = False
+                        self.game_paused = False
+                #Continue Game when no Popup
+                elif self.show_popup:
+                    self.handle_popup_click(event.pos)
+                else:
+                    self.handle_card_click(mouse_x, mouse_y)
+            #Pause Game when Popup
+            elif event.type == self.timer_event:
+                self.handle_timer_event()
+        return True
+
+    def draw(self):
+        #Draw Sections
+        self.screen.blit(self.background, (0, 0))
+        self.draw_timer()
+        self.draw_side_text_box()
+        self.draw_coordinate_display()
+        self.draw_current_word_letters()
+        self.draw_card_letters()
+        if not self.game_paused:
+            self.draw_side_text_box()
+            self.draw_timer()
+        if self.show_welcome_page:
+            self.screen.blit(self.image_welcome_page, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.show_welcome_page = False
+            pygame.display.flip()
+            return
+        if self.show_game_paused_page:
+            self.screen.blit(self.image_game_paused_page, (0, 0))
+        if self.show_homepage:
+            self.screen.blit(self.image_homepage, (0, 0))
+        if self.show_popup:
+            self.draw_popup()
+        #Refresh Screen
+        pygame.display.flip()
+
+    def run(self):
+        running = True
+        while running:
+            running = self.handle_events()
+            self.draw()
+        #Quit Pygame
+        pygame.quit()
+        sys.exit()
+
+if __name__ == "__main__":
+    game = CardGameUI()
+    game.run()
