@@ -1,6 +1,9 @@
 #functions for the bot player, by Hasan Alwazzan (5640356)
-import random
+
+#importing libraries and modules
 import time
+import random
+from GameFunctions import Game # MIGHT CHANGE BASED ON GAMEFUNCTIONS CODE
 
 class Bot:
     '''
@@ -27,17 +30,53 @@ class Bot:
                 "variance_answer_time": 1.5
             },
         }
-        self.letter_distribution = { # dictionary to store all how often each letter is used
-            "a": float("inf"), "b": float("inf"), "c": float("inf"), "d": float("inf"), "e": float("inf"), "f": float("inf"), "g": float("inf"),
-            "h": float("inf"), "i": float("inf"), "j": float("inf"), "k": float("inf"), "l": float("inf"), "m": float("inf"), "n": float("inf"),
-            "o": float("inf"), "p": float("inf"), "q": 1, "r": float("inf"), "s": float("inf"), "t" : float("inf"), "u" : float("inf"),
-            "v": float("inf"), "w": float("inf"), "x": 0.5, "y": float("inf"), "z": 0
-        } # NOTE: CURRENT DICTIONARY IS NOT CORRECT, JUST A TEST
+        self.letter_distribution = { # dictionary to store all how often each letter is used (%)
+            "a": 8.12, "b": 1.49, "c": 2.71, "d": 4.32, "e": 12.02,
+            "f": 2.30, "g": 2.03, "h": 5.92, "i": 7.31, "j": 0.10,
+            "k": 0.69, "l": 3.98, "m": 2.61, "n": 6.95, "o": 7.68,
+            "p": 1.82, "q": 0.11, "r": 6.02, "s": 6.28, "t": 9.10,
+            "u": 2.88, "v": 1.11, "w": 2.09, "x": 0.17, "y": 2.11,
+            "z": 0.07
+        }
 
     def play_turn(self, current_word, card_stack, discard=False):
         ...
-    def find_next_answer(self):
-        ...
+
+    def next_word(self, current_word, words=Game().words): # .words -> NAME MIGHT CHANGE
+        neighbor_suggestions = []
+        cards_list = self.cards
+        if self.difficulty_level == "hard":
+            cards_list = self.letter_distribution_sort(cards_list) # MIGHT CHANGE
+
+        for i in cards_list:
+            for j in range(len(current_word)):
+                new_word = list(current_word)
+                new_word[j] = i
+                new_word = "".join(new_word)
+                if new_word in words and new_word != current_word and new_word not in neighbor_suggestions:
+                    neighbor_suggestions.append(new_word)
+                    break
+
+        if not neighbor_suggestions: #if no suggestions are found (meaning if the neighbor_suggestions list has items)
+            return None # MIGHT CHANGE
+        elif self.difficulty_level == "hard":
+            return neighbor_suggestions[0]
+        else:
+            random_index = random.randint(0, len(neighbor_suggestions) - 1)
+            return neighbor_suggestions[random_index]
+
+    def letter_distribution_sort(self, cards_list): # insertion sort to sort the cards based on letter distribution
+        for i in range(1, len(cards_list)): # loops from the 2nd position to the end
+            key = cards_list[i] # current letter that is being inserted into position
+            j = i - 1 # previous index
+
+            # loop to find position of the current letter
+            while j >= 0 and self.letter_distribution[key] < self.letter_distribution[cards_list[j]]: # compare letter distributions
+                cards_list[j + 1] = cards_list[j] # move card at index j forward
+                j -= 1 # move j index back
+            cards_list[j + 1] = key # insert card in correct position
+        return cards_list
+
     def discard_card(self): # MIGHT CHANGE BASED ON IMPLEMENTATION
         worst_card = self.cards[0]
         for letter in self.cards:
@@ -45,7 +84,7 @@ class Bot:
                 worst_card = letter
         self.cards.remove(worst_card)
 
-    def draw_card(self, card_stack): # IMPORT STACK
+    def draw_card(self, card_stack): # CARD STACK IS NOT IMPLEMENTED YET
         top_card = card_stack.pop()
         self.cards.append(top_card)
 
@@ -69,3 +108,12 @@ class Bot:
             return 15
         else:
             return answer_time
+
+#testing
+if __name__ == "__main__":
+    t1 = time.time()
+    b = Bot("hard", ['a', 'b', 'z'])
+    c = b.next_word("pop")
+    t2 = time.time()
+    print(c)
+    print(t2-t1)
