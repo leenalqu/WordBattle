@@ -3,7 +3,7 @@
 #importing libraries and modules
 import time
 import random
-from GameFunctions import Game # MIGHT CHANGE BASED ON GAMEFUNCTIONS CODE
+from GameFunctions import Game # MIGHT CHANGE BASED ON GAMEFUNCTIONS CODE ALSO MIGHT CHANGE CUS OF INITIALIZAITION ISSUE
 
 class Bot:
     '''
@@ -38,11 +38,26 @@ class Bot:
             "u": 2.88, "v": 1.11, "w": 2.09, "x": 0.17, "y": 2.11,
             "z": 0.07
         }
+        self.ran_current_turn_code = False
+        self.current_turn_answer_time = 0
+        self.current_turn_answer = 0
+        self.current_turn_answer_or_not = False
 
-    def play_turn(self, current_word, card_stack, discard=False):
-        ...
+    def play_turn(self, current_word, current_timer):
+        if not self.ran_current_turn_code:
+            self.current_turn_answer_or_not = self.answer_or_not()
+            self.current_turn_answer_time = self.answer_time()
+            self.current_turn_answer = self.next_word(current_word)
+            self.ran_current_turn_code = True # NEEDS TO BE SET BACK TO FALSE
+            return "thinking"
+        elif not self.current_turn_answer_or_not:
+            return "thinking"
+        elif 15 - current_timer >= self.current_turn_answer_time: # MIGHT CHANGE HARDCODE 15
+            return self.current_turn_answer
+        else:
+            return "thinking"
 
-    def next_word(self, current_word, words=Game().words): # .words -> NAME MIGHT CHANGE
+    def next_word(self, current_word, words=Game().words): # Game().words -> NAME MIGHT CHANGE
         neighbor_suggestions = []
         cards_list = self.cards
         if self.difficulty_level == "hard":
@@ -104,16 +119,13 @@ class Bot:
         answer_time = random.normalvariate(average_answer_time, variance_answer_time) # randomly setting the answer time based on a normal distribution
         if answer_time <= 0: # avoiding negative values for answer_time
             return 0
-        if answer_time >= 15: #avoiding answer_time going over the time limit
-            return 15
+        if answer_time >= 15 - 1: #avoiding answer_time going over the time limit (subtracting 1 to give leeway to answer)
+            return 15 - 1 # MIGHT CHANGE CUZ HARD CODING 15
         else:
             return answer_time
 
 #testing
 if __name__ == "__main__":
-    t1 = time.time()
-    b = Bot("hard", ['a', 'b', 'z'])
-    c = b.next_word("pop")
-    t2 = time.time()
-    print(c)
-    print(t2-t1)
+    b = Bot()
+    from CardGameUI import game
+    print(game.timer_duration - game.timer_seconds >= b.current_turn_answer_time)
