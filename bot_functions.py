@@ -1,9 +1,8 @@
 #functions for the bot player, by Hasan Alwazzan (5640356)
 
 #importing libraries and modules
-import time
 import random
-from GameFunctions import Game # MIGHT CHANGE BASED ON GAMEFUNCTIONS CODE ALSO MIGHT CHANGE CUS OF INITIALIZAITION ISSUE
+from GameFunctions import Game # MIGHT CHANGE BASED ON GAMEFUNCTIONS CODE ALSO MIGHT CHANGE CUS OF INNITIALIZATION ISSUE
 
 class Bot:
     '''
