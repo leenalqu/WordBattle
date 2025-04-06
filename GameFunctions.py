@@ -1,119 +1,145 @@
 import random
+import string
 from collections import deque
-# 1 function class game created by Raghad
 
-# class functions
+# function class game created by Raghad
+
+# class Game is full of functions that will be called in the main game class
 class Game:
     def __init__(self):
         self.words = self.load_letter_words("words_alpha.txt")
         # Filter out only the three-letter words
-        self.words = self.words = {word for word in self.words if len(word) == 3}
+        self.words = list((filter(lambda word: len(word) == 3, self.words)))
 
     # Loading the words from a file
     def load_letter_words(self, filename):
         try:
             with open(filename, 'r') as file:
                 words = {line.strip().lower() for line in file.readlines()}  # Using a set for faster lookup
-            return words
+            return wordsfixed the valied transformation function
         except FileNotFoundError:
             print("File not found.")
             return set()
 
-    # Generate all valid transformations using BFS    (not finshed)
-    def get_valid_transformations(self, start_word):
-        queue = deque([start_word])  #  the start word
-        visited = set([start_word])  # Keep track of visited words
+    # Generate all valid transformations using BFS
+    def valid_transformations(self, random_word):
+        queue = deque([random_word])  #  the start word
+        visited = set([random_word])  # Keep track of  words who we vistied
         valid_transformations = []
 
         while queue:
             word = queue.popleft()
 
-            # Check all possible neighbors (one letter change)
-            for candidate in self.words:
-                if candidate not in visited and self.is_one_letter_diff(word, candidate):
-                    valid_transformations.append(candidate)
-                    visited.add(candidate)
-                    queue.append(candidate)
+            # Check every possible neighbor with a one letter change
+            for n in self.words:
+                if n not in visited and self.is_one_letter_dif(word, n):
+                    valid_transformations.append(n)
+                    visited.add(n)
+                    queue.append(n)
 
         return valid_transformations
 
+    # Check if two words differ by exactly one letter
+    def is_one_letter_dif(self, word1, word2):
+        if len(word1) != len(word2):
+            return False
+        c = 0
+        for a, b in zip(word1, word2):
+            if a != b:
+                c += 1
+            if c > 1:
+                return False
+        return c == 1
 
-    #Random letter shuffling generator
-    def shuffling_letter(self):
-        letters = [chr(i) for i in range(65, 91)]  # Generates letters from A to z
-        n = len(letters)
-        for i in range(n - 1, 0, -1):  # Shuffle Algorithm  (Fisher-Yates)
-            j = random.randint(0, i)
-            letters[i], letters[j] = letters[j], letters[i]
-        return letters  # Returns the shuffled letters
+    #Random letter shuffling generator using fisher yates shuffle
+    def card_list_and_fisher_shuffle(self):
+        letters_list = list(string.ascii_lowercase)
+        list_range = range(0, len(letters_list))
+        for i in list_range:
+            j = random.randint(list_range[0], list_range[-1])
+            letters_list[i], letters_list[j] = letters_list[j], letters_list[i]
+        return letters_list
 
-    #Function star card (random u might or might not get one if you dont get a star card you will be given a random letter)
+    #Function star card (random u might or might not get one if you dont get a star card you will be given a usefil letter)
     def star_card(self):
-        value = random.randint(0, 2)
+        value = random.randint(0, 1)
         if value == 0:
             return "Star card"
         else:
-            letters = self.shuffling_letter()
-            return random.choice(letters)
+            l=random.randint(1, 3)
+            if l == 1:
+                return "e"
+            elif l == 2:
+                return "a"
+            else:
+                return "t"
 
 
-    # it will return a list of 10 cards
+
+    # it will return a list of 10 cards to be used in the stack
     def card(self):
-        letters = self.shuffling_letter()
+        letters = self.card_list_and_fisher_shuffle()
         cards = []
-        for i in range(1,10):
+        for i in range(0,10):
             random_letter = random.choice(letters)
             cards.append(random_letter)
-        cards.append(self.star_card())
-        print(cards)
+        cards.append(self.star_card()) # it adds a star card you might not get one instaed a letter
         return cards
 
+    def create_card_stack(self):
+        stack = []
+        count=40
+        while len(stack) < count:
+            cards = self.card()  # gets 10 cards including maybe a star
+            for c in cards:
+                if len(stack) < count:
+                    stack.append(c)
+        return stack
 
-    #soriting player cards in alphpitc order
 
-    def quick_sort(self, list1):
-        # if the list has 1 or 0 elements, it sorted
-        if len(list1) <= 1:
-            return list1
+    #soriting player cards in alphpitc order using quick_sort (need to be called in the main loop)
+    def partition(self,list1, low, high):
 
-        # pivot is the middle element
-        pivot = list1[len(list1) // 2]
+        pivot = list1[high]
+        i = low - 1
 
-        # three parts:
-        less_than_pivot = [x for x in list1 if x < pivot]
-        equal_to_pivot = [x for x in list1 if x == pivot]
-        greater_than_pivot = [x for x in list1 if x > pivot]
+        for j in range(low, high):
+            if list1[j] <= pivot:
+                i += 1
+                list1[i], list1[j] = list1[j], list1[i]
 
-        # sort the parts and combine togother
-        return self.quick_sort(less_than_pivot) + equal_to_pivot + self.quick_sort(greater_than_pivot)
+        list1[i + 1], list1[high] = list1[high], list1[i + 1]
+        return i + 1
 
-    # generate a three letter or four word
+    def quicksort(self,list1, low=0, high=None):
+        if high is None:
+            high = len(list1) - 1
+
+        if low < high:
+            pivot_index = self.partition(list1, low, high)
+            self.quicksort(list1, low, pivot_index - 1)
+            self.quicksort(list1, pivot_index + 1, high)
+
+
+    # generate a three letter random word with valied transformations check
     def word_generater(self):
         while True:
             random_word = random.choice(self.words)
-            list1=self.get_valid_transformations(random_word)
-            if len(list1) >=2:
+            word_check=self.valid_transformations(random_word)
+            if len(word_check) >=2:
                 return random_word
 
 
-
-    # it can be romoved by interface
-    # Check if two words differ by exactly one letter
-    def just_one_letter_diff(self, word1, word2):
-        diff_count = sum(1 for a, b in zip(word1, word2) if a != b)
-        return diff_count == 1
-
-    # check if the word has been changed (is it real or not)
+    # check if the word real or not
     def check_exists(self,user_word):
         if user_word in self.words:
             return True
         else:
             return False
 
-
     #decide who play first
     def coin(self):
-        value = random.randint(0, 2)
+        value = random.randint(0, 1)
         if value == 0:
             print("Head")
         else:
@@ -123,7 +149,7 @@ class Game:
 
 #test
 a=Game()
-a.card()
+
 
 
 
