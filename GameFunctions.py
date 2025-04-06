@@ -16,7 +16,7 @@ class Game:
         try:
             with open(filename, 'r') as file:
                 words = {line.strip().lower() for line in file.readlines()}  # Using a set for faster lookup
-            return wordsfixed the valied transformation function
+            return words
         except FileNotFoundError:
             print("File not found.")
             return set()
@@ -149,7 +149,7 @@ class Game:
 
 #test
 a=Game()
-
+print(a. word_generater())
 
 
 
