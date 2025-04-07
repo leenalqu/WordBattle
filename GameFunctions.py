@@ -1,8 +1,30 @@
 import random
 import string
-from collections import deque
+
 
 # function class game created by Raghad
+
+#class Queue to be used in the class Game
+
+class Queue:
+    def __init__(self):
+        self.items=[]
+
+    def append(self, item):
+        self.items.append(item)
+
+    def popleft(self):
+        if self.items:
+            return self.items.pop(0)
+        else:
+            raise IndexError("the queue is empty")
+
+    def __len__(self):
+        return len(self.items)
+
+    def printer(self):
+        print(self.items)
+
 
 # class Game is full of functions that will be called in the main game class
 class Game:
@@ -23,7 +45,8 @@ class Game:
 
     # Generate all valid transformations using BFS
     def valid_transformations(self, random_word):
-        queue = deque([random_word])  #  the start word
+        queue = Queue()
+        queue.append(random_word)
         visited = set([random_word])  # Keep track of  words who we vistied
         valid_transformations = []
 
