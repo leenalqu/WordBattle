@@ -1,4 +1,4 @@
-#functions for the bot player, by Hasan Alwazzan (5640356)
+# functions for the bot player, by Hasan Alwazzan (5640356)
 
 #importing libraries and modules
 import random
@@ -108,7 +108,8 @@ class Bot:
         neighbor_suggestions = [] # list for suggestions (neighbor meaning a word with 1 letter changed from the current word)
         cards_list = self.cards # the bots cards
         if self.difficulty_level == "hard": # if the bot is in hard mode
-            cards_list = self.letter_distribution_sort(cards_list) # MIGHT CHANGE # sort cards by least frequency (gets rid hard letters)
+            # sort cards by least frequency to use hard cards first
+            cards_list = self.letter_distribution_sort(cards_list)
 
         for letter in cards_list: # loops through the bots cards
             for j in range(len(current_word)): # loops the amount of letters in the current word
@@ -128,7 +129,8 @@ class Bot:
             random_index = random.randint(0, len(neighbor_suggestions) - 1) # random suggestion index
             return neighbor_suggestions[random_index] # return suggestion
 
-    def letter_distribution_sort(self, cards_list: list[str]) -> list[str]: # insertion sort to sort the cards based on letter distribution
+    # insertion sort to sort the cards based on letter distribution
+    def letter_distribution_sort(self, cards_list: list[str]) -> list[str]:
         for i in range(1, len(cards_list)): # loops from the 2nd position to the end
             key = cards_list[i] # current letter that is being inserted into position
             j = i - 1 # previous index
