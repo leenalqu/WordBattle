@@ -13,14 +13,14 @@ class GameSettings:
         self.default_difficulty = "medium" # MIGHT REMOVE
         self.words_file_name = "word_frequencies_json.txt"
         self.words_and_frequencies = self.load_words_and_frequencies()
-        self.words_set = self.get_words_set()
+        self.words = self.get_words()
 
-    def load_words_and_frequencies(self):
+    def load_words_and_frequencies(self) -> dict[str, int]:
         with open(self.words_file_name, "r") as file:
             words_and_frequencies = json.loads(file.readline())
             return words_and_frequencies
 
-    def get_words_set(self):
+    def get_words(self) -> set[str]:
         #............. # using a set for faster lookup
-        word_set = set((filter(lambda word: len(word) == self.word_length, self.words_and_frequencies.keys())))
-        return word_set
+        words = set((filter(lambda word: len(word) == self.word_length, self.words_and_frequencies.keys())))
+        return words
