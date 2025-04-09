@@ -4,7 +4,6 @@
 import pygame
 import sys
 
-
 class CardGameUI:
     def __init__(self):
         #Initialize Pygame
@@ -30,6 +29,9 @@ class CardGameUI:
         #Config_Background
         self.background = pygame.image.load("data/image/background.png")
         self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
+        self.background_mute = pygame.image.load("data/image/background_mute.png")
+        self.background_mute = pygame.transform.scale(self.background_mute, (self.screen_width, self.screen_height))
+        self.current_background = self.background
 
         #Config_Welcome_Page
         self.image_welcome_page = pygame.image.load("data/image/welcome_page.png")
@@ -45,7 +47,8 @@ class CardGameUI:
 
         #Config_Pause_Page
         self.image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
-        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page,  (self.screen_width, self.screen_height))
+        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page,
+                                                             (self.screen_width, self.screen_height))
 
         #Config_Rules_Page
         self.image_rules_page = pygame.image.load("data/image/rules_page.png")
@@ -92,18 +95,15 @@ class CardGameUI:
         self.side_status = 0
         self.update_side_text()
         self.side_text_box_pos = (self.screen_width // 2, 5)
-        self.side_text_box_color = (0, 49, 82)
+        self.side_text_box_color = (228, 222, 215)
 
         #Config_Current_Word
         self.current_word_font_size = 88
-        self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf",
-                                                  self.current_word_font_size)
+        self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.current_word_font_size)
         self.current_word_letter_1 = 'C'
         self.current_word_letter_2 = 'A'
         self.current_word_letter_3 = 'T'
-        self.current_word_letters = [
-            self.current_word_letter_1, self.current_word_letter_2, self.current_word_letter_3
-        ]
+        self.current_word_letters = [self.current_word_letter_1, self.current_word_letter_2, self.current_word_letter_3]
         self.current_word_text_color = (228, 222, 215)
         self.current_word_positions = []
         current_word_start_x = 256
@@ -113,6 +113,13 @@ class CardGameUI:
         for i in range(3):
             self.current_word_positions.append(
                 (current_word_start_x + i * (current_word_width + current_word_spacing), current_word_y))
+
+            self.current_word_click_areas = []
+            for i in range(3):
+                x = current_word_start_x + i * (current_word_width + current_word_spacing)
+                y = current_word_y
+                self.current_word_click_areas.append((x, y, current_word_width, current_word_width))
+                self.selected_current_word_letters = []
 
         #Config_Card_Letters
         self.card_font_size = 52
@@ -145,7 +152,7 @@ class CardGameUI:
         card_start_x = 28
         card_width = 49
         card_spacing = 1
-        card_y = 446
+        card_y = 449
         for i in range(15):
             self.card_positions.append((card_start_x + i * (card_width + card_spacing), card_y))
 
@@ -158,12 +165,14 @@ class CardGameUI:
 
         #Config_Selected_Letters
         self.selected_letters = []
+        self.last_swapped_position = None
+        self.original_letters = []
+        self.used_card_positions = []
 
         #Config_Sound
         pygame.mixer.music.load("data/sound/background_music.wav")
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
-
         self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
         self.sound_enabled = True
 
@@ -172,7 +181,6 @@ class CardGameUI:
         self.round_text_pos = (119, 559)
         self.round_text_color = (228, 222, 215)
 
-        #Coodinate Checker
         #Game_Paused_Button
         self.x_min_game_paused_page, self.y_min_game_paused_page = 472, 563
         self.x_max_game_paused_page, self.y_max_game_paused_page = 502, 593
@@ -201,7 +209,7 @@ class CardGameUI:
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
         elif self.side_status == 1:
-            self.side_text_box = "COMPUTER'S TURN"
+            self.side_text_box = "WORDIUS'S TURN"
 
     def draw_timer(self):
         timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.text_color_timer)
@@ -214,17 +222,20 @@ class CardGameUI:
 
     def draw_current_word_letters(self):
         for i, pos in enumerate(self.current_word_positions):
-            letter_text = self.current_word_font.render(self.current_word_letters[i], True, self.current_word_text_color)
+            letter_text = self.current_word_font.render(self.current_word_letters[i], True,
+                                                        self.current_word_text_color)
             text_x = pos[0] + 47 - letter_text.get_width() // 2
             text_y = pos[1] + 47 - letter_text.get_height() // 2
             self.screen.blit(letter_text, (text_x, text_y))
 
     def draw_card_letters(self):
         for i, pos in enumerate(self.card_positions[:self.visible_card_count]):
-            letter_text = self.card_font.render(self.card_letters[i], True, self.card_text_color)
-            text_x = pos[0] + 25 - letter_text.get_width() // 2
-            text_y = pos[1] + 25 - letter_text.get_height() // 2
-            self.screen.blit(letter_text, (text_x, text_y))
+            #Only draw unused cards
+            if i not in self.used_card_positions:
+                letter_text = self.card_font.render(self.card_letters[i], True, self.card_text_color)
+                text_x = pos[0] + 25 - letter_text.get_width() // 2
+                text_y = pos[1] + 25 - letter_text.get_height() // 2
+                self.screen.blit(letter_text, (text_x, text_y))
 
     def draw_coordinate_display(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -240,13 +251,11 @@ class CardGameUI:
         pygame.draw.rect(self.screen, self.popup_side_changer_color_background, self.popup_rect)
         pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 2)
         popup_text_render = self.font_default.render(self.popup_side_changer_text, True,  self.popup_side_changer_color_text_button)
-        self.screen.blit(popup_text_render,
-                         (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
+        self.screen.blit(popup_text_render, (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
         pygame.draw.rect(self.screen, self.popup_side_changer_color_button, self.button_rect)
         pygame.draw.rect(self.screen, self.popup_side_changer_color_button_border, self.button_rect, 2)
-        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True,  self.popup_side_changer_color_text)
-        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,
-                                              self.button_rect.centery - button_text_render.get_height() // 2))
+        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True, self.popup_side_changer_color_text)
+        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,  self.button_rect.centery - button_text_render.get_height() // 2))
 
     def handle_button_click(self, mouse_x, mouse_y):
         #Back_Button
@@ -255,6 +264,8 @@ class CardGameUI:
                 if pygame.mouse.get_pressed()[0]:
                     self.button_sound.play()
                     self.show_rules_page = False
+                    self.game_paused = False
+                    pygame.time.set_timer(self.timer_event, 1000)
 
         #Rules_Button
         if self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
@@ -278,7 +289,7 @@ class CardGameUI:
                 if self.show_game_paused_page:
                     self.show_game_paused_page = False
                     self.game_paused = False
-                    pygame.time.set_timer(self.timer_event, 1000)
+                    pygame.time.set_timer(self.timer_event, 0)
                 else:
                     self.show_game_paused_page = True
                     self.game_paused = True
@@ -297,27 +308,66 @@ class CardGameUI:
                 if self.sound_enabled:
                     pygame.mixer.music.set_volume(0)
                     self.sound_enabled = False
+                    self.current_background = self.background_mute
                 else:
                     pygame.mixer.music.set_volume(0.3)
                     self.sound_enabled = True
+                    self.current_background = self.background
                 self.button_sound.play()
-
-        #Rules_Button
-        if self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
-            if pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
-                self.button_sound.play()
-                self.show_rules_page = True
 
         return True
 
+    #Handle_Card_Click
     def handle_card_click(self, mouse_x, mouse_y):
         if self.side_status != 0 or self.game_paused:
             return
         for i, (x, y, width, height) in enumerate(self.card_click_areas):
             if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
-                selected_letter = self.card_letters[i]
-                self.selected_letters.append(selected_letter)
-                print(f"Selected Letter: {selected_letter}")
+                if i not in self.used_card_positions:
+                    selected_letter = self.card_letters[i]
+                    self.selected_letters = [(i, selected_letter)]
+                    print(f"Selected Letter: {selected_letter}")
+                    return True
+        return False
+
+    #Handle_Current_Word_Click
+    def handle_current_word_click(self, mouse_x, mouse_y):
+        if self.side_status != 0 or self.game_paused:
+            return
+        for i, (x, y, width, height) in enumerate(self.current_word_click_areas):
+            if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
+                if self.selected_letters:
+                    card_position, card_letter = self.selected_letters[0]
+                    current_letter = self.current_word_letters[i]
+
+                    #Handle_Previous_Swap
+                    if self.last_swapped_position is not None:
+                        #Same_Position_Swap
+                        if self.last_swapped_position == i:
+                            if self.used_card_positions:
+                                last_card_position = self.used_card_positions.pop()
+                                print(f"Restored previous card at position {last_card_position}")
+                        #Different_Position_Swap
+                        else:
+                            self.current_word_letters[self.last_swapped_position] = self.original_letters[
+                                self.last_swapped_position]
+                            if self.used_card_positions:
+                                last_card_position = self.used_card_positions.pop()
+                                print(f"Restored card at position {last_card_position}")
+                            print(f"Restored position {self.last_swapped_position} to {self.original_letters[self.last_swapped_position]}")
+
+                    #Store_Original_Letters
+                    if not self.original_letters:
+                        self.original_letters = self.current_word_letters.copy()
+
+                    #Update_Current_Word
+                    self.current_word_letters[i] = card_letter
+                    print(f"Swapped letters: {current_letter} -> {card_letter}")
+
+                    #Update_Swap_Status
+                    self.last_swapped_position = i
+                    self.used_card_positions.append(card_position)
+                    self.selected_letters = []
                 return True
         return False
 
@@ -382,6 +432,7 @@ class CardGameUI:
                 #Game_Card_Click
                 else:
                     self.handle_card_click(mouse_x, mouse_y)
+                    self.handle_current_word_click(mouse_x, mouse_y)
             #Timer_Event
             elif event.type == self.timer_event:
                 self.handle_timer_event()
@@ -395,7 +446,7 @@ class CardGameUI:
     #Draw_Game_Screen
     def draw(self):
         #Draw_Background
-        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.current_background, (0, 0))
         self.draw_timer()
         self.draw_side_text_box()
         self.draw_coordinate_display()
@@ -439,7 +490,6 @@ class CardGameUI:
         pygame.mixer.music.stop()
         pygame.quit()
         sys.exit()
-
 
 if __name__ == "__main__":
     game = CardGameUI()
