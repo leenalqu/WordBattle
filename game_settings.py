@@ -54,7 +54,7 @@ class GameSettings:
         self.word_length = 3 # the length of the word that the players have to change
         self.start_cards_number = 7 # how many cards each player starts with
         self.default_difficulty = "medium" # the default difficulty of the game # MIGHT NOT NEED THIS AND REMV FROM DOC STR
-        self.words_file_name = "word_frequencies_json.txt" # name of the file that contains the data for the words
+        self.words_file_name = "data/word_frequencies_json.txt"  # name of the file that contains the data for the words
         # dictionary for all words & their relative frequencies in % (i.e. how common they are in the English language)
         self.word_frequencies = self.load_word_frequencies()
         # all real words that can be played in the game (all are of the length specified in self.word_length)

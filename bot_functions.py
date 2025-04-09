@@ -80,8 +80,8 @@ class Bot:
             - The cards that the bot can play.
         """
         self.difficulty_level = difficulty_level  # chosen difficulty setting of the bot
+        if cards is None: cards = []  # if no cards list is given set cards to empty list
         self.cards = cards  # the letter cards the bot can use
-        if cards is None: self.cards = []  # if no cards list is given set cards to empty list
 
         self.ran_current_turn_code = False  # whether the initial code of the turn has run
         self.current_turn_answer_or_not = False  # whether the bot will answer this turn
