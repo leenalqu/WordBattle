@@ -4,17 +4,19 @@
 import pygame
 import sys
 
+
 class CardGameUI:
     def __init__(self):
         #Initialize Pygame
         pygame.init()
+        pygame.mixer.init()
 
         #Config_Settings
         self.show_popup = False
         self.game_paused = False
         self.show_welcome_page = True
         self.show_game_paused_page = False
-        self.show_homepage = False
+        self.show_rules_page = False
 
         #Config_Screen
         self.screen_width = 800
@@ -33,26 +35,36 @@ class CardGameUI:
         self.image_welcome_page = pygame.image.load("data/image/welcome_page.png")
         self.image_welcome_page = pygame.transform.scale(self.image_welcome_page, (self.screen_width, self.screen_height))
 
+        #Config_Story_Pages
+        self.current_story_page = 0
+        self.story_images = []
+        for i in range(6):
+            image = pygame.image.load(f"data/image/story_{i}.png")
+            image = pygame.transform.scale(image, (self.screen_width, self.screen_height))
+            self.story_images.append(image)
+
         #Config_Pause_Page
         self.image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
-        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page, (self.screen_width, self.screen_height))
+        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page,  (self.screen_width, self.screen_height))
 
-        #Config_HomePage
-        self.image_homepage = pygame.image.load("data/image/homepage.png")
-        self.image_homepage = pygame.transform.scale(self.image_homepage, (self.screen_width, self.screen_height))
+        #Config_Rules_Page
+        self.image_rules_page = pygame.image.load("data/image/rules_page.png")
+        self.image_rules_page = pygame.transform.scale(self.image_rules_page, (self.screen_width, self.screen_height))
 
         #Config_Font
         self.font_size_default = 24
         self.font_size_timer = 88
+        self.font_size_round = 34
         self.font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default)
         self.font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer)
+        self.font_round = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_round)
 
         #Config_Timer
         self.timer_event = pygame.USEREVENT + 1
         self.timer_duration = 15
         self.timer_seconds = self.timer_duration
         self.timer_x = 301
-        self.timer_y = 282
+        self.timer_y = 248
         self.text_color_timer = (228, 222, 215)
         pygame.time.set_timer(self.timer_event, 1000)
         self.popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
@@ -84,7 +96,8 @@ class CardGameUI:
 
         #Config_Current_Word
         self.current_word_font_size = 88
-        self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.current_word_font_size)
+        self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf",
+                                                  self.current_word_font_size)
         self.current_word_letter_1 = 'C'
         self.current_word_letter_2 = 'A'
         self.current_word_letter_3 = 'T'
@@ -96,7 +109,7 @@ class CardGameUI:
         current_word_start_x = 256
         current_word_width = 95
         current_word_spacing = 5
-        current_word_y = 147
+        current_word_y = 110
         for i in range(3):
             self.current_word_positions.append(
                 (current_word_start_x + i * (current_word_width + current_word_spacing), current_word_y))
@@ -129,10 +142,10 @@ class CardGameUI:
         ]
         self.card_text_color = (228, 222, 215)
         self.card_positions = []
-        card_start_x = 27
+        card_start_x = 28
         card_width = 49
         card_spacing = 1
-        card_y = 463
+        card_y = 446
         for i in range(15):
             self.card_positions.append((card_start_x + i * (card_width + card_spacing), card_y))
 
@@ -146,25 +159,43 @@ class CardGameUI:
         #Config_Selected_Letters
         self.selected_letters = []
 
+        #Config_Sound
+        pygame.mixer.music.load("data/sound/background_music.wav")
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1)
+
+        self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
+        self.sound_enabled = True
+
+        #Config_Round_Counter
+        self.current_round = 1
+        self.round_text_pos = (119, 559)
+        self.round_text_color = (228, 222, 215)
+
         #Coodinate Checker
-        self.setup_button_coordinates()
-
-    def setup_button_coordinates(self):
-        #Homepage_Button
-        self.x_min_homepage, self.y_min_homepage = 146, 563
-        self.x_max_homepage, self.y_max_homepage = 176, 593
-
         #Game_Paused_Button
-        self.x_min_game_paused_page, self.y_min_game_paused_page = 181, 563
-        self.x_max_game_paused_page, self.y_max_game_paused_page = 211, 593
-
-        #Game_Continued_Button
-        self.x_min_game_continued_page, self.y_min_game_continued_page = 216, 563
-        self.x_max_game_continued_page, self.y_max_game_continued_page = 246, 593
+        self.x_min_game_paused_page, self.y_min_game_paused_page = 472, 563
+        self.x_max_game_paused_page, self.y_max_game_paused_page = 502, 593
 
         #Quit_Button
-        self.x_min_quit, self.y_min_quit = 251, 563
-        self.x_max_quit, self.y_max_quit = 281, 593
+        self.x_min_quit, self.y_min_quit = 508, 563
+        self.x_max_quit, self.y_max_quit = 538, 593
+
+        #Sound_Button
+        self.x_min_sound_button, self.y_min_sound_button = 436, 563
+        self.x_max_sound_button, self.y_max_sound_button = 466, 593
+
+        #Confirm_Button
+        self.x_min_confirm_button, self.y_min_confirm_button = 666, 563
+        self.x_max_confirm_button, self.y_max_confirm_button = 794, 593
+
+        #Rules_Button
+        self.x_min_rules_button, self.y_min_rules_button = 547, 563
+        self.x_max_rules_button, self.y_max_rules_button = 660, 593
+
+        #Back_Button
+        self.x_min_back_button, self.y_min_back_button = 547, 563
+        self.x_max_back_button, self.y_max_back_button = 660, 593
 
     def update_side_text(self):
         if self.side_status == 0:
@@ -208,36 +239,75 @@ class CardGameUI:
         self.screen.blit(s, (0, 0))
         pygame.draw.rect(self.screen, self.popup_side_changer_color_background, self.popup_rect)
         pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 2)
-        popup_text_render = self.font_default.render(self.popup_side_changer_text, True, self.popup_side_changer_color_text_button)
-        self.screen.blit(popup_text_render,  (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
+        popup_text_render = self.font_default.render(self.popup_side_changer_text, True,  self.popup_side_changer_color_text_button)
+        self.screen.blit(popup_text_render,
+                         (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
         pygame.draw.rect(self.screen, self.popup_side_changer_color_button, self.button_rect)
         pygame.draw.rect(self.screen, self.popup_side_changer_color_button_border, self.button_rect, 2)
-        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True, self.popup_side_changer_color_text)
-        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2, self.button_rect.centery - button_text_render.get_height() // 2))
+        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True,  self.popup_side_changer_color_text)
+        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,
+                                              self.button_rect.centery - button_text_render.get_height() // 2))
 
     def handle_button_click(self, mouse_x, mouse_y):
-        #Homepage_Button
-        if self.x_min_homepage <= mouse_x <= self.x_max_homepage and self.y_min_homepage <= mouse_y <= self.y_max_homepage:
-            self.show_homepage = True
-            #Pause Timer
-            pygame.time.set_timer(self.timer_event, 0)
+        #Back_Button
+        if self.show_rules_page:
+            if self.x_min_back_button <= mouse_x <= self.x_max_back_button and self.y_min_back_button <= mouse_y <= self.y_max_back_button:
+                if pygame.mouse.get_pressed()[0]:
+                    self.button_sound.play()
+                    self.show_rules_page = False
+
+        #Rules_Button
+        if self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
+            if pygame.mouse.get_pressed()[0]:
+                self.button_sound.play()
+                if self.show_game_paused_page and not self.show_rules_page:
+                    self.show_rules_page = True
+                    self.show_game_paused_page = False
+
         #Quit_Button
         if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit:
-            print("Quit")
-            return False
+            if pygame.mouse.get_pressed()[0]:
+                self.button_sound.play()
+                print("Quit")
+                return False
+
         #Game_Paused_Button
         if self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
-            self.show_game_paused_page = True
-            self.game_paused = True
-            #Pause Timer
-            pygame.time.set_timer(self.timer_event, 0)
-        #Game_Continued_Button
-        if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
-            self.show_game_paused_page = False
-            self.show_homepage = False
-            self.game_paused = False
-            #Continue Timer
-            pygame.time.set_timer(self.timer_event, 1000)
+            if pygame.mouse.get_pressed()[0]:
+                self.button_sound.play()
+                if self.show_game_paused_page:
+                    self.show_game_paused_page = False
+                    self.game_paused = False
+                    pygame.time.set_timer(self.timer_event, 1000)
+                else:
+                    self.show_game_paused_page = True
+                    self.game_paused = True
+                    pygame.time.set_timer(self.timer_event, 0)
+
+        #Confirm_Button
+        if self.x_min_confirm_button <= mouse_x <= self.x_max_confirm_button and self.y_min_confirm_button <= mouse_y <= self.y_max_confirm_button:
+            if pygame.mouse.get_pressed()[0] and self.side_status == 0:
+                self.button_sound.play()
+                self.timer_seconds = 0
+
+        #Sound_Button
+        if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button:
+            if pygame.mouse.get_pressed()[0]:
+                self.button_sound.play()
+                if self.sound_enabled:
+                    pygame.mixer.music.set_volume(0)
+                    self.sound_enabled = False
+                else:
+                    pygame.mixer.music.set_volume(0.3)
+                    self.sound_enabled = True
+                self.button_sound.play()
+
+        #Rules_Button
+        if self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
+            if pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
+                self.button_sound.play()
+                self.show_rules_page = True
+
         return True
 
     def handle_card_click(self, mouse_x, mouse_y):
@@ -247,7 +317,7 @@ class CardGameUI:
             if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
                 selected_letter = self.card_letters[i]
                 self.selected_letters.append(selected_letter)
-                print(f"选中字母: {selected_letter}")
+                print(f"Selected Letter: {selected_letter}")
                 return True
         return False
 
@@ -256,6 +326,8 @@ class CardGameUI:
             self.timer_seconds -= 1
         else:
             self.side_status = 1 - self.side_status
+            if self.side_status == 0:
+                self.current_round += 1
             self.timer_seconds = self.timer_duration
             self.update_side_text()
             self.show_popup = True
@@ -270,64 +342,92 @@ class CardGameUI:
 
     def handle_events(self):
         for event in pygame.event.get():
+            #Quit_Event
             if event.type == pygame.QUIT:
                 return False
-            #Ban Mousewheel
+            #Mouse_Wheel_Event
             elif event.type == pygame.MOUSEWHEEL:
                 continue
-            #Detect the coordinate range of mouse clicks
+            #Mouse_Click_Event
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if not self.handle_button_click(mouse_x, mouse_y):
                     return False
-                #Welcome_Page_Interaction
+                #Welcome_Page_Click
                 if self.show_welcome_page:
-                    self.show_welcome_page = False
-                #HomePage_Interaction
-                elif self.show_homepage:
-                    if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
-                        self.show_homepage = False
-                        self.game_paused = False
-                #Game_Paused_Page_Interaction
-                elif self.show_game_paused_page:
-                    if self.x_min_game_continued_page <= mouse_x <= self.x_max_game_continued_page and self.y_min_game_continued_page <= mouse_y <= self.y_max_game_continued_page:
-                        self.show_game_paused_page = False
-                        self.game_paused = False
-                #Continue Game when no Popup
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        self.button_sound.play()
+                        self.show_welcome_page = False
+                        self.current_story_page = 0
+                        pygame.time.set_timer(self.timer_event, 0)
+                #Story_Page_Click
+                elif self.current_story_page >= 0:
+                    #Left_Click_Next_Page
+                    if event.button == 1:
+                        self.button_sound.play()
+                        if self.current_story_page == 5:
+                            self.current_story_page = -1
+                            self.game_paused = False
+                            pygame.time.set_timer(self.timer_event, 1000)
+                        else:
+                            self.current_story_page += 1
+                    #Right_Click_Previous_Page
+                    elif event.button == 3:
+                        self.button_sound.play()
+                        if self.current_story_page > 0:
+                            self.current_story_page -= 1
+                #Popup_Click
                 elif self.show_popup:
                     self.handle_popup_click(event.pos)
+                #Game_Card_Click
                 else:
                     self.handle_card_click(mouse_x, mouse_y)
-            #Pause Game when Popup
+            #Timer_Event
             elif event.type == self.timer_event:
                 self.handle_timer_event()
         return True
 
+    #Draw_Round_Counter
+    def draw_round_counter(self):
+        round_text = self.font_round.render(str(self.current_round), True, self.round_text_color)
+        self.screen.blit(round_text, self.round_text_pos)
+
+    #Draw_Game_Screen
     def draw(self):
-        #Draw Sections
+        #Draw_Background
         self.screen.blit(self.background, (0, 0))
         self.draw_timer()
         self.draw_side_text_box()
         self.draw_coordinate_display()
         self.draw_current_word_letters()
         self.draw_card_letters()
+
+        #Draw_Game_Status
         if not self.game_paused:
             self.draw_side_text_box()
             self.draw_timer()
+
+        #Draw_Welcome_Page    
         if self.show_welcome_page:
             self.screen.blit(self.image_welcome_page, (0, 0))
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.show_welcome_page = False
             pygame.display.flip()
             return
+
+        #Draw_Story_Page
+        elif self.current_story_page >= 0:
+            self.screen.blit(self.story_images[self.current_story_page], (0, 0))
+            pygame.display.flip()
+            return
+
+        #Draw_Game_Pages
         if self.show_game_paused_page:
             self.screen.blit(self.image_game_paused_page, (0, 0))
-        if self.show_homepage:
-            self.screen.blit(self.image_homepage, (0, 0))
         if self.show_popup:
             self.draw_popup()
-        #Refresh Screen
+        if self.show_rules_page:
+            self.screen.blit(self.image_rules_page, (0, 0))
+
+        #Update_Screen
         pygame.display.flip()
 
     def run(self):
@@ -336,8 +436,10 @@ class CardGameUI:
             running = self.handle_events()
             self.draw()
         #Quit Pygame
+        pygame.mixer.music.stop()
         pygame.quit()
         sys.exit()
+
 
 if __name__ == "__main__":
     game = CardGameUI()
