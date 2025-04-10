@@ -62,9 +62,13 @@ class GameSettings:
 
     def load_word_frequencies(self) -> dict[str, int]:
         """Return a dictionary of all words and their frequencies from the words file (i.e. self.words_file_name)."""
-        with open(self.words_file_name, "r") as file: # opens the words file in read mode (and closes it when it's done)
-            word_frequencies = json.loads(file.readline()) # loads the file from json format to a python dictionary
-            return word_frequencies
+        try: # attempt the following code
+            with open(self.words_file_name, "r") as file: # opens the words file in read mode (& closes it when done)
+                word_frequencies = json.loads(file.readline()) # loads the file from json format to a python dictionary
+                return word_frequencies
+        except FileNotFoundError: # checks for the error that happens when the program can't find the file
+            raise FileNotFoundError(f"\nThe file {self.words_file_name} was not found. " # stop program & display error
+                                    f"Please make sure all game files are downloaded and in the correct folder.")
 
     def get_words(self) -> set[str]:
         """Return all the words that are allowed to be played in the game as a set."""
