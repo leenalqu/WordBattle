@@ -27,23 +27,26 @@ class Queue:
 
 # class Game is full of functions that will be called in the main game class
 class Game:
+    # Initializes the Game class
     def __init__(self):
+        #loding all the words in english from a file by calling load letter words function
         self.words = self.load_letter_words("words_alpha.txt")
-        # Filter out only the three-letter words
+        # filter out only the three letter words
         self.words = list((filter(lambda word: len(word) == 3, self.words)))
 
-    # Loading the words from a file
+    # Loading the words from a file with error handeling
     def load_letter_words(self, filename):
         try:
             with open(filename, 'r') as file:
-                words = {line.strip().lower() for line in file.readlines()}  # Using a set for faster lookup
+                words = {line.strip().lower () for line in file.readlines()}  # Using a set for faster lookup
             return words
         except FileNotFoundError:
             print("File not found.")
             return set()
 
-    # Generate all valid transformations using BFS
+    # Generate all valid transformations for a word using BFS
     def valid_transformations(self, random_word):
+        #using class queue
         queue = Queue()
         queue.append(random_word)
         visited = set([random_word])  # Keep track of  words who we vistied
@@ -58,10 +61,10 @@ class Game:
                     valid_transformations.append(n)
                     visited.add(n)
                     queue.append(n)
-
+        #return a list of valid transformations
         return valid_transformations
 
-    # Check if two words differ by exactly one letter
+    # Check if two words differ by exactly one letter (this function is used in the valid transformations function
     def is_one_letter_dif(self, word1, word2):
         if len(word1) != len(word2):
             return False
@@ -73,7 +76,7 @@ class Game:
                 return False
         return c == 1
 
-    #Random letter shuffling generator using fisher yates shuffle
+    #Random letter shuffling generator using fisher yates shuffle it return a list of the 28 letters shuffled
     def card_list_and_fisher_shuffle(self):
         letters_list = list(string.ascii_lowercase)
         list_range = range(0, len(letters_list))
@@ -82,7 +85,7 @@ class Game:
             letters_list[i], letters_list[j] = letters_list[j], letters_list[i]
         return letters_list
 
-    #Function star card (random u might or might not get one if you dont get a star card you will be given a usefil letter)
+    #Function star card (random u might or might not get one if you don't get a star card you will be given a useful letter)
     def star_card(self):
         value = random.randint(0, 1)
         if value == 0:
@@ -97,8 +100,7 @@ class Game:
                 return "t"
 
 
-
-    # it will return a list of 10 cards to be used in the stack
+    # it will return a list of 10 cards to be used in the stack function
     def card(self):
         letters = self.card_list_and_fisher_shuffle()
         cards = []
@@ -108,7 +110,8 @@ class Game:
         cards.append(self.star_card()) # it adds a star card you might not get one instaed a letter
         return cards
 
-    def create_card_stack(self):
+    #card stack function returns a list of 40 cards for the game
+    def card_stack(self):
         stack = []
         count=40
         while len(stack) < count:
@@ -119,7 +122,7 @@ class Game:
         return stack
 
 
-    #soriting player cards in alphpitc order using quick_sort (need to be called in the main loop)
+    #soriting player cards in alphpitc order using quick_sort (need to be called in the main loop every time a new letter is added)
     def partition(self,list1, low, high):
 
         pivot = list1[high]
@@ -143,7 +146,7 @@ class Game:
             self.quicksort(list1, pivot_index + 1, high)
 
 
-    # generate a three letter random word with valied transformations check
+    # generate a three letter random word
     def word_generater(self):
         while True:
             random_word = random.choice(self.words)
@@ -152,7 +155,7 @@ class Game:
                 return random_word
 
 
-    # check if the word real or not
+    # check if the word real or not after the player change it
     def check_exists(self,user_word):
         if user_word in self.words:
             return True
