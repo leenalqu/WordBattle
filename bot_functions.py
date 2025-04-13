@@ -202,22 +202,33 @@ class Bot:
     def letter_frequencies_sort(self, cards_list: list[str]) -> list[str]:  # variation of insertion sort
         """
         Sort cards based on the letter frequency distribution in the English language.
+        Any Special cards (e.g. Star cards) are placed at the end of the sorted list.
 
         Parameters
         ----------
         cards_list: list[str]
             - The current word in the game that the bot must change.
         """
-        for i in range(1, len(cards_list)):  # loops from the 2nd position to the end
-            key = cards_list[i]  # current letter that is being inserted into position
-            j = i - 1  # previous index
+        letter_cards, special_cards = [], []  # initiate empty lists to separate the letter cards from special ones
+        for card in cards_list:  # loop through cards
+            # if a card is a letter (the keys of letter_frequencies are the letters)
+            if card in self.letter_frequencies.keys():
+                letter_cards.append(card)  # add it to the letter cards list
+            else: # otherwise
+                special_cards.append(card)  # add it to the special cards list
 
+        #sort the letter cards using insertion sort
+        for i in range(1, len(letter_cards)):  # loops from the 2nd position to the end
+            key = letter_cards[i]  # current letter that is being inserted into position
+            j = i - 1  # previous index
             # loop to find position of the current letter (by comparing letter frequencies)
-            while j >= 0 and self.letter_frequencies[key] < self.letter_frequencies[cards_list[j]]:
-                cards_list[j + 1] = cards_list[j]  # move card at index j forward
+            while j >= 0 and self.letter_frequencies[key] < self.letter_frequencies[letter_cards[j]]:
+                letter_cards[j + 1] = letter_cards[j]  # move card at index j forward
                 j -= 1  # move j index back
-            cards_list[j + 1] = key  # insert card in correct position
-        return cards_list
+            letter_cards[j + 1] = key  # insert card in correct position
+
+        sorted_cards_list = letter_cards + special_cards  # join the two lists into one list after sorting the letters
+        return sorted_cards_list
 
     def discard_card(self) -> None:
         """
@@ -284,8 +295,8 @@ class Bot:
         """
         Return the set of words that the bot can use to find a new word.
         """
-        word_frequencies = game_settings.word_frequencies  # dictionary of words and how common they are
-        game_words = game_settings.words  # all the words that can be played in the game
+        word_frequencies = game_settings.WORD_FREQUENCIES  # dictionary of words and how common they are
+        game_words = game_settings.WORDS  # all the words that can be played in the game
         # cut-off that determines which words are included in the bots dictionary of words
         frequency_cutoff = self.difficulty_settings[self.difficulty_level]["WORD_FREQUENCY_CUTOFF"]
 
@@ -296,17 +307,17 @@ class Bot:
     def end_turn(self) -> None:
         self.ran_current_turn_code = False
 
-    def add_card(self, letter): # adds a letter to player's stack of cards
+    def add_card(self, letter) -> None: # adds a letter to player's stack of cards
         self.cards.append(letter)
 
-    def remove_cards(self, letter): # removes a letter from player's stack of cards
+    def remove_cards(self, letter) -> None: # removes a letter from player's stack of cards
         if letter in self.cards: # makes sure the letter exists
             self.cards.remove(letter)
 
-    def won_game(self):
+    def won_game(self) -> bool:
         return len(self.cards) == 0 # the winner is announced when they finish all their cards
 
 #testing
 if __name__ == "__main__":
-    b = Bot(Bot.Difficulty.HARD, ['i', 'f', 'k', 'h', 'h', 'c', 'o', 'l', 'n', 't', 'a'])
-    print(b.next_word("cod"))
+    b = Bot(Bot.Difficulty.HARD, ['i', 'f', "Star card", 'k', 'h', 'h'])
+    print(b.letter_frequencies_sort(b.cards))

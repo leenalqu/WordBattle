@@ -24,9 +24,6 @@ class GameSettings:
     start_cards_number: int
         - How many cards each player starts with.
 
-    default_difficulty: str
-        - The default difficulty of the game.
-
     words_file_name: str
         - The name of the file that contains the data for the words.
 
@@ -49,32 +46,31 @@ class GameSettings:
         """
         Construct all the necessary attributes for the GameSettings object.
         """
-        self.turn_time_limit = 15 # the maximum amount of time a player can take to play their turn
-        self.max_cards = 15 # the amount of cards that if you exceed, you lose the game
-        self.word_length = 3 # the length of the word that the players have to change
-        self.start_cards_number = 7 # how many cards each player starts with
-        self.default_difficulty = "medium" # the default difficulty of the game # MIGHT NOT NEED THIS AND REMV FROM DOC STR
-        self.words_file_name = "data/word_frequencies_json.txt"  # name of the file that contains the data for the words
+        self.TURN_TIME_LIMIT = 15 # the maximum amount of time a player can take to play their turn
+        self.MAX_CARDS = 15 # the amount of cards that if you exceed, you lose the game
+        self.WORD_LENGTH = 3 # the length of the word that the players have to change
+        self.START_CARDS_AMOUNT = 7 # how many cards each player starts with
+        self.WORDS_FILE_NAME = "data/word_frequencies_json.txt"  # name of the file that contains the data for the words
         # dictionary for all words & their relative frequencies in % (i.e. how common they are in the English language)
-        self.word_frequencies = self.load_word_frequencies()
+        self.WORD_FREQUENCIES = self.load_word_frequencies()
         # all real words that can be played in the game (all are of the length specified in self.word_length)
-        self.words = self.get_words()
+        self.WORDS = self.get_words()
 
     def load_word_frequencies(self) -> dict[str, int]:
         """Return a dictionary of all words and their frequencies from the words file (i.e. self.words_file_name)."""
         try: # attempt the following code
-            with open(self.words_file_name, "r") as file: # opens the words file in read mode (& closes it when done)
+            with open(self.WORDS_FILE_NAME, "r") as file: # opens the words file in read mode (& closes it when done)
                 word_frequencies = json.loads(file.readline()) # loads the file from json format to a python dictionary
                 return word_frequencies
         except FileNotFoundError: # checks for the error that happens when the program can't find the file
-            raise FileNotFoundError(f"\nThe file {self.words_file_name} was not found. " # stop program & display error
+            raise FileNotFoundError(f"\nThe file {self.WORDS_FILE_NAME} was not found. " # stop program & display error
                                     f"Please make sure all game files are downloaded and in the correct folder.")
 
     def get_words(self) -> set[str]:
         """Return all the words that are allowed to be played in the game as a set."""
         # from the words in the word_frequency dictionary, filter out all words that are not of the specified length
         # using a set for faster lookup
-        words = set((filter(lambda word: len(word) == self.word_length, self.word_frequencies.keys())))
+        words = set((filter(lambda word: len(word) == self.WORD_LENGTH, self.WORD_FREQUENCIES.keys())))
         return words
 
 
