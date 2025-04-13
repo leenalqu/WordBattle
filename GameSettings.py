@@ -12,25 +12,25 @@ class GameSettings:
 
     Attributes
     ----------
-    turn_time_limit: int
+    TURN_TIME_LIMIT: int
         - The maximum amount of time a player can take to play their turn.
 
-    max_cards: int
+    MAX_CARDS: int
         - The amount of cards that if you exceed, you lose the game.
 
-    word_length: int
+    WORD_LENGTH: int
         - The length of the word that the players have to change.
 
-    start_cards_number: int
+    START_CARDS_AMOUNT: int
         - How many cards each player starts with.
 
-    words_file_name: str
+    WORDS_FILE_NAME: str
         - The name of the file that contains the data for the words.
 
-    word_frequencies: dict[str, int]
+    WORD_FREQUENCIES: dict[str, int]
         - All words & their relative frequencies in % (i.e. how common they are in the English language).
 
-    words: set[str]
+    WORDS: set[str]
         - All words that can be played in the game (i.e. words that are of the specified length in word_length).
 
     Methods
