@@ -2,7 +2,7 @@
 
 #importing libraries and modules
 import random
-from game_settings import game_settings
+from GameSettings import game_settings
 from enum import Enum
 
 
