@@ -2,7 +2,7 @@
 
 #importing libraries and modules
 import random
-from game_settings import game_settings
+from GameSettings import game_settings
 from enum import Enum
 
 
@@ -96,7 +96,6 @@ class Bot:
         self.cards = cards  # the letter cards the bot can use
 
         self.streak = 0  # the number of continuous wins # MIGHT CHANGE COMMENT
-        self.used_words = set()  # a set of the words that have been used by the player # MIGHT CHANGE COMMENT
 
         self.ran_current_turn_code = False  # whether the initial code of the turn has run
         self.current_turn_answer_or_not = False  # whether the bot will answer this turn
@@ -167,57 +166,96 @@ class Bot:
 
     def next_word(self, current_word: str) -> str | None:
         """
-        Return the bots answer.
+        Return the bots answer as a string (if no word is found Return None).
 
         Parameters
         ----------
         current_word: str
             - The current word in the game that the bot must change.
         """
-        # list for suggestions (a neighbor is a word with 1 letter changed from the current word)
-        neighbor_suggestions = []
+        def swap_character(word: str, character: str, index: int) -> str:
+            characters = list(word)  # list of characters of the current word
+            characters[index] = character  # replace one of the letters of the current word to create a new word
+            updated_word = "".join(characters)  # join back the list into a string
+            return updated_word
+
+        # declaring variables
+        neighbor_suggestions = []  # word suggestions (neighbor is a word with 1 letter changed from the current word)
+        alphabet = self.letter_frequencies.keys()
         cards_list = self.cards  # the bots cards
         if self.difficulty_level == Bot.Difficulty.HARD:  # if the bot is in hard mode
             # sort cards by least frequency to use hard cards first
             cards_list = self.letter_frequencies_sort(cards_list)
 
-        for letter in cards_list:  # loops through the bots cards
-            for j in range(len(current_word)):  # loops the amount of letters in the current word
-                new_word = list(current_word)  # list of characters of the current word
-                new_word[j] = letter  # replace the letters of the current word to create a new word
-                new_word = "".join(new_word)  # join back the list into a string
-                # make sure the word is a real word, & it is not the current word, & not one of the suggestions
-                if new_word in self.bot_words and new_word != current_word and new_word not in neighbor_suggestions:
-                    neighbor_suggestions.append(new_word)  # add to suggestions list
-                    break  # stop looking for words using this card (only takes the first suggestion)
+        # getting neighbor suggestions
+        for card in cards_list:  # loops through the bots cards #CHANGE
+            if card in alphabet:
+                for j in range(len(current_word)):  # loops the amount of letters in the current word
+                    new_word = swap_character(current_word, card, j)
+                    # make sure the word is a real word, & it is not the current word, & not one of the suggestions
+                    if new_word in self.bot_words and new_word != current_word and new_word not in neighbor_suggestions:
+                        neighbor_suggestions.append(new_word)  # add to suggestions list
+                        break # stop looking for words using this card (only takes the first suggestion)
+            elif card == "*":
+                found_star_card_suggestion = False
+                for letter in alphabet:
+                    for k in range(len(current_word)):  # loops the amount of letters in the current word
+                        new_word = swap_character(current_word, letter, k)
+                        # make sure the word is a real word, & it is not the current word, & not one of the suggestions
+                        if (new_word in self.bot_words and new_word != current_word
+                                and new_word not in neighbor_suggestions):
+                            new_star_card_word = swap_character(new_word, "*", k)
+                            neighbor_suggestions.append(new_star_card_word)  # add to suggestions list
+                            found_star_card_suggestion = True
+                            break  # stop looking for words using this card (only takes the first suggestion)
+                    if found_star_card_suggestion:
+                        break
+            else:
+                raise Exception("\nError: Unknown card was found in Bot's card list")
 
-        if not neighbor_suggestions:  #if no suggestions are found (meaning if the neighbor_suggestions list is empty)
+        # selecting the next word from neighbor suggestions
+        if not neighbor_suggestions:  # if no suggestions are found (meaning if the neighbor_suggestions list is empty)
             return None  # MIGHT CHANGE # ADD COMMENT
         elif self.difficulty_level == Bot.Difficulty.HARD:  # when the bot is in hard mode
-            return neighbor_suggestions[0]  # uses first suggestion (because it is the one that uses the hardest card)
-        else:  # easy and medium modes
+            next_word = neighbor_suggestions[0]  # uses first suggestion because it's the one that uses the hardest card
+            return next_word
+        elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.EASY):  # if bot in easy or medium modes
             random_index = random.randint(0, len(neighbor_suggestions) - 1)  # random suggestion index
-            return neighbor_suggestions[random_index]  # return suggestion
+            next_word = neighbor_suggestions[random_index]  # choose random suggestion
+            return next_word
+        else:
+            raise Exception("\nError: Unknown difficulty mode was set for Bot")
 
     def letter_frequencies_sort(self, cards_list: list[str]) -> list[str]:  # variation of insertion sort
         """
         Sort cards based on the letter frequency distribution in the English language.
+        Any Special cards (e.g. Star cards) are placed at the end of the sorted list.
 
         Parameters
         ----------
         cards_list: list[str]
             - The current word in the game that the bot must change.
         """
-        for i in range(1, len(cards_list)):  # loops from the 2nd position to the end
-            key = cards_list[i]  # current letter that is being inserted into position
-            j = i - 1  # previous index
+        letter_cards, special_cards = [], []  # initiate empty lists to separate the letter cards from special ones
+        for card in cards_list:  # loop through cards
+            # if a card is a letter (the keys of letter_frequencies are the letters)
+            if card in self.letter_frequencies.keys():
+                letter_cards.append(card)  # add it to the letter cards list
+            else: # otherwise
+                special_cards.append(card)  # add it to the special cards list
 
+        #sort the letter cards using insertion sort
+        for i in range(1, len(letter_cards)):  # loops from the 2nd position to the end
+            key = letter_cards[i]  # current letter that is being inserted into position
+            j = i - 1  # previous index
             # loop to find position of the current letter (by comparing letter frequencies)
-            while j >= 0 and self.letter_frequencies[key] < self.letter_frequencies[cards_list[j]]:
-                cards_list[j + 1] = cards_list[j]  # move card at index j forward
+            while j >= 0 and self.letter_frequencies[key] < self.letter_frequencies[letter_cards[j]]:
+                letter_cards[j + 1] = letter_cards[j]  # move card at index j forward
                 j -= 1  # move j index back
-            cards_list[j + 1] = key  # insert card in correct position
-        return cards_list
+            letter_cards[j + 1] = key  # insert card in correct position
+
+        sorted_cards_list = letter_cards + special_cards  # join the two lists into one list after sorting the letters
+        return sorted_cards_list
 
     def discard_card(self) -> None:
         """
@@ -284,8 +322,8 @@ class Bot:
         """
         Return the set of words that the bot can use to find a new word.
         """
-        word_frequencies = game_settings.word_frequencies  # dictionary of words and how common they are
-        game_words = game_settings.words  # all the words that can be played in the game
+        word_frequencies = game_settings.WORD_FREQUENCIES  # dictionary of words and how common they are
+        game_words = game_settings.WORDS  # all the words that can be played in the game
         # cut-off that determines which words are included in the bots dictionary of words
         frequency_cutoff = self.difficulty_settings[self.difficulty_level]["WORD_FREQUENCY_CUTOFF"]
 
@@ -296,17 +334,19 @@ class Bot:
     def end_turn(self) -> None:
         self.ran_current_turn_code = False
 
-    def add_card(self, letter): # adds a letter to player's stack of cards
+    def add_card(self, letter) -> None: # adds a letter to player's stack of cards
         self.cards.append(letter)
 
-    def remove_cards(self, letter): # removes a letter from player's stack of cards
+    def remove_cards(self, letter) -> None: # removes a letter from player's stack of cards
         if letter in self.cards: # makes sure the letter exists
             self.cards.remove(letter)
 
-    def won_game(self):
+    def won_game(self) -> bool:
         return len(self.cards) == 0 # the winner is announced when they finish all their cards
 
 #testing
 if __name__ == "__main__":
-    b = Bot(Bot.Difficulty.HARD, ['i', 'f', 'k', 'h', 'h', 'c', 'o', 'l', 'n', 't', 'a'])
-    print(b.next_word("cod"))
+    b = Bot(Bot.Difficulty.MEDIUM, ["*", 'k', 'h', 'h', 'a'])
+    out = b.next_word("lol")
+    print(out)
+    ...

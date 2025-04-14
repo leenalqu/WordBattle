@@ -1,7 +1,7 @@
 # Main loop and game setup, by Leen (5663960)
 
 from GameFunctions import Game #  importing functions
-from bot_functions import Bot # importing the bot to use as player 2
+from BotFunctions import Bot # importing the bot to use as player 2
 import time
 class Player:
     def __init__(self, name, cards=None, streak=0):
