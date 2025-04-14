@@ -1,7 +1,27 @@
 import random
 import string
 
-# function class game created by Raghad
+# function class game created by Raghad Aljubran (5635869)
+
+"""
+this file contains two classes 
+1- class game contain 12 functions :
+    1-(__init__): for storing the three letter words by using filter
+    2-(load_letter_words) take the words from the file and put them in a list with error hadaling
+    3-(valid_transformations): returns a list of valid transformations of a word 
+    4-(is_one_letter_dif): used in the validation function
+    5-(card_list_and_fisher_shuffle): makes a list of the 28 letters in english and shuffle them
+    6-(star_card): returns a star card or a useful letter random for the stack
+    7-(card) : uses (card_list_and_fisher_shuffle) and (star_card) to generate 10 cards for the stack
+    8-(card_stack): uses (card) to generate a list of 40 cards
+    9,10-( partition),(quicksort): algorithm to sort player cards
+    11-(word_generator): generates a word for the game and uses (valid_transformations) to check if the word can be changed 2 or more
+    12-(check_exists): checks if the word that the player changed is in the words list
+    13-(coin) : decide who play first human or bot
+    
+ 2-class Queue : used in the validation function in class Game
+
+"""
 
 #class Queue to be used in the class Game
 
@@ -64,7 +84,7 @@ class Game:
         #return a list of valid transformations
         return valid_transformations
 
-    # Check if two words differ by exactly one letter (this function is used in the valid transformations function
+    # Check if two words differ by exactly one letter (this function is used in the valid transformations function only)
     def is_one_letter_dif(self, word1, word2):
         if len(word1) != len(word2):
             return False
@@ -147,7 +167,7 @@ class Game:
 
 
     # generate a three letter random word
-    def word_generater(self):
+    def word_generator(self):
         while True:
             random_word = random.choice(self.words)
             word_check=self.valid_transformations(random_word)
@@ -174,7 +194,7 @@ class Game:
 
 #test
 a=Game()
-print(a. word_generater())
+
 
 
 
