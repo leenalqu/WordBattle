@@ -2,12 +2,11 @@ import random
 import string
 
 # function class game created by Raghad Aljubran (5635869)
-
 """
 this file contains two classes 
 1- class game contain 12 functions :
     1-(__init__): for storing the three letter words by using filter
-    2-(load_letter_words) take the words from the file and put them in a list with error hadaling
+    2-(load_letter_words) take the  words from the file and put them in a list with error hadaling
     3-(valid_transformations): returns a list of valid transformations of a word 
     4-(is_one_letter_dif): used in the validation function
     5-(card_list_and_fisher_shuffle): makes a list of the 28 letters in english and shuffle them
