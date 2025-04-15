@@ -15,7 +15,7 @@ this file contains two classes
     8,9-( partition),(quicksort): algorithm to sort player cards
     10-(word_generator): generates a word for the game and uses (valid_transformations) to check if the word can be changed 2 or more
     11-(check_exists): checks if the word that the player changed is in the words list
-    12-(coin) : decide who play first human or bot
+    12-(coin_flip) : decide who play first human or bot
     
  2-class Queue : used in the validation function in class Game
 
@@ -174,12 +174,12 @@ class Game:
             return False
 
     #decide who play first
-    def coin(self):
+    def coin_flip(self):
         value = random.randint(0, 1)
         if value == 0:
-            print("Head")
+            return "Head"
         else:
-            print("Tail")
+            return "Tail"
 
 
 
