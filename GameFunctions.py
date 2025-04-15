@@ -8,15 +8,14 @@ this file contains two classes
     1-(__init__): for storing the three letter words by using filter
     2-(load_letter_words) take the  words from the file and put them in a list with error hadaling
     3-(valid_transformations): returns a list of valid transformations of a word 
-    4-(is_one_letter_dif): used in the validation function
-    5-(card_list_and_fisher_shuffle): makes a list of the 28 letters in english and shuffle them
+    4-(is_one_letter_dif): takes two words and compare them if they differ by one letter only
+    5-(fisher_shuffle):  shuffles a list using fisher algorithm
     6-(star_card): returns a star card or a useful letter random for the stack
-    7-(card) : uses (card_list_and_fisher_shuffle) and (star_card) to generate 10 cards for the stack
-    8-(card_stack): uses (card) to generate a list of 40 cards
-    9,10-( partition),(quicksort): algorithm to sort player cards
-    11-(word_generator): generates a word for the game and uses (valid_transformations) to check if the word can be changed 2 or more
-    12-(check_exists): checks if the word that the player changed is in the words list
-    13-(coin) : decide who play first human or bot
+    7-(card_stack): generate a stack of 40 cards uses two functions (fisher_shuffle and star_card)
+    8,9-( partition),(quicksort): algorithm to sort player cards
+    10-(word_generator): generates a word for the game and uses (valid_transformations) to check if the word can be changed 2 or more
+    11-(check_exists): checks if the word that the player changed is in the words list
+    12-(coin) : decide who play first human or bot
     
  2-class Queue : used in the validation function in class Game
 
@@ -83,9 +82,11 @@ class Game:
         #return a list of valid transformations
         return valid_transformations
 
-    # Check if two words differ by exactly one letter (this function is used in the valid transformations function only)
+    # Check if two words differ by exactly one letter
     def is_one_letter_dif(self, word1, word2):
         if len(word1) != len(word2):
+            return False
+        if word1 == word2:
             return False
         c = 0
         for a, b in zip(word1, word2):
@@ -93,22 +94,20 @@ class Game:
                 c += 1
             if c > 1:
                 return False
-        return c == 1
+        return True
 
-    #Random letter shuffling generator using fisher yates shuffle it return a list of the 28 letters shuffled
-    def card_list_and_fisher_shuffle(self):
-        letters_list = list(string.ascii_lowercase)
-        list_range = range(0, len(letters_list))
-        for i in list_range:
-            j = random.randint(list_range[0], list_range[-1])
-            letters_list[i], letters_list[j] = letters_list[j], letters_list[i]
-        return letters_list
+    #shuffling generator using fisher yates shuffle
+    def fisher_shuffle(self,cards):
+        for i in range(len(cards) - 1, 0, -1):
+            j = random.randint(0,i)
+            cards[i], cards[j] = cards[j], cards[i]
+        return cards
 
-    #Function star card (random u might or might not get one if you don't get a star card you will be given a useful letter)
+    #Function star card (random u might or might not get a * if you don't get a star card you will be given a useful letter)
     def star_card(self):
         value = random.randint(0, 1)
         if value == 0:
-            return "Star card"
+            return "*"
         else:
             l=random.randint(1, 3)
             if l == 1:
@@ -119,26 +118,19 @@ class Game:
                 return "t"
 
 
-    # it will return a list of 10 cards to be used in the stack function
-    def card(self):
-        letters = self.card_list_and_fisher_shuffle()
+    # it will return a list of 40 cards shuffled
+    def card_stack(self):
+        letters = list(string.ascii_lowercase)
+        list_range = range(0, len(letters))
         cards = []
-        for i in range(0,10):
+        for i in range(0,35):
             random_letter = random.choice(letters)
             cards.append(random_letter)
-        cards.append(self.star_card()) # it adds a star card you might not get one instaed a letter
-        return cards
+        for i in range(0,5):
+            cards.append(self.star_card()) # it adds a * card you might  get * or useful letter
+        return self.fisher_shuffle(cards)
 
-    #card stack function returns a list of 40 cards for the game
-    def card_stack(self):
-        stack = []
-        count=40
-        while len(stack) < count:
-            cards = self.card()  # gets 10 cards including maybe a star
-            for c in cards:
-                if len(stack) < count:
-                    stack.append(c)
-        return stack
+
 
 
     #soriting player cards in alphpitc order using quick_sort (need to be called in the main loop every time a new letter is added)
@@ -193,6 +185,8 @@ class Game:
 
 #test
 a=Game()
+print(a.card_stack())
+
 
 
 
