@@ -24,22 +24,22 @@ class GameSettings:
     START_CARDS_AMOUNT: int
         - How many cards each player starts with.
 
-    WORDS_FILE_NAME: str
-        - The name of the file that contains the data for the words.
+    BOT_WORDS_FILE_NAME: str
+        - The name of the file that contains the data for word frequencies and the bot's words
 
     WORD_FREQUENCIES: dict[str, int]
-        - All words & their relative frequencies in % (i.e. how common they are in the English language).
+        - Words and their relative frequencies in % (i.e. how common they are in the English language).
 
-    WORDS: set[str]
-        - All words that can be played in the game (i.e. words that are of the specified length in word_length).
+    ALL_BOT_WORDS: set[str]
+        - All the words that the bot can play. All are of the length specified by self.word_length (e.g. 3 letters long)
 
     Methods
     -------
     load_word_frequencies():
-        - Return a dictionary of all words & their relative frequencies (i.e. how common they are) from words_file_name.
+        - Return a dictionary of all words and their frequencies from the bot's words file (self.words_file_name).
 
-    get_words():
-        - Return a set of all the words that are allowed to be played in the game.
+    get_all_bot_words():
+        - Return a set of all the words that the bot is allowed to play.
     """
 
     def __init__(self):
@@ -50,25 +50,27 @@ class GameSettings:
         self.MAX_CARDS = 15 # the amount of cards that if you exceed, you lose the game
         self.WORD_LENGTH = 3 # the length of the word that the players have to change
         self.START_CARDS_AMOUNT = 7 # how many cards each player starts with
-        self.WORDS_FILE_NAME = "data/word_frequencies_json.txt"  # name of the file that contains the data for the words
-        # dictionary for all words & their relative frequencies in % (i.e. how common they are in the English language)
+
+        # The name of the file that contains the data for word frequencies and the bot's words
+        self.BOT_WORDS_FILE_NAME = "data/word_frequencies_json.txt"
+        # dictionary for words & their relative frequencies in % (i.e. how common they are in the English language)
         self.WORD_FREQUENCIES = self.load_word_frequencies()
-        # all real words that can be played in the game (all are of the length specified in self.word_length)
-        self.WORDS = self.get_words()
+        # set of all words that the bot can use (all are of the length specified by word_length e.g. 3 letters long)
+        self.ALL_BOT_WORDS = self.get_all_bot_words()
 
     def load_word_frequencies(self) -> dict[str, int]:
-        """Return a dictionary of all words and their frequencies from the words file (i.e. self.words_file_name)."""
+        """Return a dictionary of all words and their frequencies from the bot's words file (self.words_file_name)."""
         try: # attempt the following code
-            with open(self.WORDS_FILE_NAME, "r") as file: # opens the words file in read mode (& closes it when done)
+            with open(self.BOT_WORDS_FILE_NAME, "r") as file: # opens the words file in read mode & closes it when done
                 word_frequencies = json.loads(file.readline()) # loads the file from json format to a python dictionary
                 return word_frequencies
         except FileNotFoundError: # checks for the error that happens when the program can't find the file
-            raise FileNotFoundError(f"\nThe file {self.WORDS_FILE_NAME} was not found. " # stop program & display error
+            raise FileNotFoundError(f"\nThe file {self.BOT_WORDS_FILE_NAME} was not found. " # stop program & show error
                                     f"Please make sure all game files are downloaded and in the correct folder.")
 
-    def get_words(self) -> set[str]:
-        """Return all the words that are allowed to be played in the game as a set."""
-        # from the words in the word_frequency dictionary, filter out all words that are not of the specified length
+    def get_all_bot_words(self) -> set[str]:
+        """Return a set of all the words that the bot is allowed to play."""
+        # from the words in the word frequency dictionary, filter out all words that are not of the specified length
         # using a set for faster lookup
         words = set((filter(lambda word: len(word) == self.WORD_LENGTH, self.WORD_FREQUENCIES.keys())))
         return words

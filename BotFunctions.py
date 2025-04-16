@@ -72,10 +72,8 @@ class Bot:
         MEDIUM: str = "medium"
         HARD: str = "hard"
 
-
     class Output(Enum):
         THINKING: str = "thinking"
-
 
     # initialising cards with default value to avoid errors
     def __init__(self, difficulty_level: Difficulty, cards: list[str] = None):
@@ -271,25 +269,15 @@ class Bot:
         if self.difficulty_level == Bot.Difficulty.EASY:  # when the bot is in easy mode
             card_to_remove_index = random.randint(0, len(self.cards) - 1)  # pick a random index from the cards list
             self.cards.pop(card_to_remove_index)  # remove the card from the bots cards
-        else:  # when the bot is in medium or hard mode
+        elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.EASY):  # if bot is in medium or hard mode
             worst_card = self.cards[0]  # initiate variable for the worst card as the bots first card
             for letter in self.cards:  # loops through the bots cards
                 # checks if the current letter is less common
                 if self.letter_frequencies[letter] < self.letter_frequencies[worst_card]:
                     worst_card = letter  # sets the current letter as the worst
             self.cards.remove(worst_card)  # remove the worst card from bots cards
-
-    def draw_card(self, card_deck: list[str]) -> None:  # CARD STACK IS NOT IMPLEMENTED YET
-        """
-        Draw a card from the deck.
-        
-        Parameters
-        ----------
-        card_deck: list[str]
-            - The current deck of cards.
-        """
-        top_card = card_deck.pop()  # FUNCTION MIGHT BE WRONG # take top card
-        self.cards.append(top_card)  # add to bots list of cards
+        else:
+            raise Exception("\nError: Unknown difficulty mode was set for Bot")
 
     def will_answer_or_not(self) -> bool:
         """
@@ -330,12 +318,12 @@ class Bot:
         Return the set of words that the bot can use to find a new word.
         """
         word_frequencies = game_settings.WORD_FREQUENCIES  # dictionary of words and how common they are
-        game_words = game_settings.WORDS  # all the words that can be played in the game
+        all_bot_words = game_settings.ALL_BOT_WORDS  # all the words that can be played in the game
         # cut-off that determines which words are included in the bots dictionary of words
         frequency_cutoff = self.difficulty_settings[self.difficulty_level]["WORD_FREQUENCY_CUTOFF"]
 
         # filter function to remove words that are uncommon (under the frequency cutoff) based on the difficulty setting
-        bot_words = set((filter(lambda word: word_frequencies[word] > frequency_cutoff, game_words)))
+        bot_words = set((filter(lambda word: word_frequencies[word] > frequency_cutoff, all_bot_words)))
         return bot_words
 
     def add_card(self, letter: str) -> None: # adds a letter to player's stack of cards
@@ -369,7 +357,7 @@ class Bot:
 
 #testing
 if __name__ == "__main__":
-    b = Bot(Bot.Difficulty.MEDIUM, ["*", 'k', 'h', 'h', 'a'])
-    out = type(b.Difficulty.EASY)
+    b = Bot(Bot.Difficulty.HARD, ['t', 'u', 'l', 'a', 'x', 'w', 'y', 'p', 'd', 'y'])
+    out = Bot.Difficulty("hard")
     print(out)
     ...
