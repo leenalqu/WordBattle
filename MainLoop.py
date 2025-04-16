@@ -21,7 +21,7 @@ class Player:
 
 # game setup
 game = Game() #creating a game interface
-player1 = Player(input("Your name: "), game.card()) # asking player 1 for their name
+player1 = Player(input("Your name: "), game.card_stack()) # asking player 1 for their name
 # keeps asking for a difficulty level until a valid answer is given
 while True:
     difficulty_input= input("Your difficulty level (easy/medium/hard): ").lower()
@@ -30,17 +30,17 @@ while True:
         break
     else:
         print("Invalid choice. Please enter the right difficulty level. ")
-player2 = Bot(difficulty_enum, game.card()) # creating bot player with its cards
+player2 = Bot(difficulty_enum, game.card_stack()) # creating bot player with its cards
 
 # starting the game
-result = game.coin() # toss a coin to decide who goes first
+result = game.coin_flip() # toss a coin to decide who goes first
 if result == "Head":
     current_player = player1
     print(f"{current_player.name} starts the game!") # player starts
 else:
     current_player = player2
     print("Bot starts the game!")  # bot starts
-current_word = game.word_generater().title() # generates the starting word
+current_word = game.word_generator().title() # generates the starting word
 print(f"The starting word is: {current_word}")
 
 # main game loop
