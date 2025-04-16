@@ -1,31 +1,30 @@
 #Coded by Jiaxi Huang (5670238)
 
 #Instructions for Reserved Interface：
-#1. For is_one_letter_dif in GameFunction.py, I have created a code in the UI that only allows the replacement of one word, which may have the possibility of duplication or conflict
-#1.1 My code allows:
-#1.1.1 Only different letters can be replaced
-#1.1.2 efore replacing letters, the selected letter will be checked to see if it is the same as the letter in the target position.
-#1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
-
-#2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
-#2.1 In terminal output, the output format is: "Round X ended. Current word: XXX"
-#3. For word_generater in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFnction.py.
-#4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
+    #1. For is_one_letter_dif in GameFunction.py, I have created a code in the UI that only allows the replacement of one word, which may have the possibility of duplication or conflict
+        #1.1 My code allows:
+            #1.1.1 Only different letters can be replaced
+            #1.1.2 Before replacing letters, the selected letter will be checked to see if it is the same as the letter in the target position.
+            #1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
+    #2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
+        #2.1 In terminal output, the output format is: "Round X ended. Current word: XXX"
+    #3. For word_generater in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
+    #4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
 
 #The Function I am still developing:
-#1. Prepare to connect bot_function-py.
-#2. Points function and card removal function.
-#3. Card centering and dynamic quantity of cards.
-#4. Star Card.
+    #1. Prepare to connect bot_function-py.
+    #2. Points function and card removal function (Done).
+    #3. Card centering and dynamic quantity of cards (Done).
+    #4. Star Card.
 
 #Things need attention:
-#1. My UI interaction is based on detecting whether there are clicks within a specified coordinate range.
-#2. The order of element drawing should not be changed without testing fully.
+    #1. My UI interaction is based on detecting whether there are clicks within a specified coordinate range.
+    #2. The order of element drawing should not be changed without testing fully.
 
 #Import libraries
 import pygame
 import sys
-
+import os
 
 class CardGameUI:
     """
@@ -92,6 +91,12 @@ class CardGameUI:
         #Config_Rules_Page
         self.image_rules_page = pygame.image.load("data/image/rules_page.png")
         self.image_rules_page = pygame.transform.scale(self.image_rules_page, (self.screen_width, self.screen_height))
+
+        #Config_Win_Lose_Page
+        self.image_win_page = pygame.image.load("data/image/win_page.png")
+        self.image_win_page = pygame.transform.scale(self.image_win_page, (self.screen_width, self.screen_height))
+        self.image_lose_page = pygame.image.load("data/image/lose_page.png")
+        self.image_lose_page = pygame.transform.scale(self.image_lose_page, (self.screen_width, self.screen_height))
 
         #Config_Remove_Page
         self.image_remove_page = pygame.image.load("data/image/remove_page.png")
@@ -446,6 +451,32 @@ class CardGameUI:
             if self.used_card_positions:
                 self.used_cards_history[self.current_round] = self.used_card_positions.copy()
 
+            #Check remaining cards
+            all_used_cards = set()
+            for used_cards in self.used_cards_history.values():
+                all_used_cards.update(used_cards)
+            unused_cards = [i for i in range(self.visible_card_count)
+                            if i not in all_used_cards and i not in self.used_card_positions]
+            if len(unused_cards) == 0:
+                print("Win")
+                self.screen.blit(self.image_win_page, (0, 0))
+                pygame.display.flip()
+            if len(unused_cards) >= 16:
+                print("Lose")
+                self.screen.blit(self.image_lose_page, (0, 0))
+                pygame.display.flip()
+
+                waiting = True
+                while waiting:
+                    for event in pygame.event.get():
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            pygame.quit()
+                            python = sys.executable
+                            os.execl(python, python, *sys.argv)
+                        elif event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+
             #Reset the usage record of the current round (keep the historical cards)
             self.used_card_positions = []
             self.last_swapped_position = None
@@ -590,7 +621,8 @@ class CardGameUI:
                 self.button_sound.play()
 
         #Remove_Button
-        if (self.x_min_remove_button <= mouse_x <= self.x_max_remove_button and self.y_min_remove_button <= mouse_y <= self.y_max_remove_button):
+        if (
+                self.x_min_remove_button <= mouse_x <= self.x_max_remove_button and self.y_min_remove_button <= mouse_y <= self.y_max_remove_button):
             if pygame.mouse.get_pressed()[0] and not self.show_game_paused_page and not self.show_rules_page:
                 if self.side_status == 0:
                     if self.remove_used_this_round:
@@ -607,52 +639,6 @@ class CardGameUI:
                 return True
 
         return True
-
-    def draw(self):
-        #Draw_Background
-        self.screen.blit(self.current_background, (0, 0))
-        self.draw_side_text_box()
-        self.draw_coordinate_display()
-        self.draw_current_word_letters()
-        self.draw_card_letters()
-        self.draw_points()
-        self.draw_round_counter()
-
-        #Draw_Game_Status
-        if not self.game_paused:
-            self.draw_side_text_box()
-            self.draw_timer()
-
-        #Draw_Welcome_Page
-        if self.show_welcome_page:
-            self.screen.blit(self.image_welcome_page, (0, 0))
-            pygame.display.flip()
-            return
-
-        #Draw_Story_Page
-        elif self.current_story_page >= 0:
-            self.screen.blit(self.story_images[self.current_story_page], (0, 0))
-            pygame.display.flip()
-            return
-
-        #Draw_Game_Pages
-        if self.show_game_paused_page:
-            self.screen.blit(self.image_game_paused_page, (0, 0))
-        if self.show_popup:
-            self.draw_popup()
-        if self.show_rules_page:
-            self.screen.blit(self.image_rules_page, (0, 0))
-
-        #Draw Remove Mode Page
-        if self.remove_mode:
-            self.screen.blit(self.image_remove_page, (0, 0))
-
-        #Draw Remove Popup
-        if self.show_remove_popup:
-            self.draw_remove_popup()
-
-        #Update_Screen
-        pygame.display.flip()
 
     def handle_card_click(self, mouse_x, mouse_y):
         """
@@ -962,5 +948,4 @@ class CardGameUI:
 if __name__ == "__main__":
     game = CardGameUI()
     game.run()
-
 
