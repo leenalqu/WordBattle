@@ -1,7 +1,7 @@
 # Main loop and game setup, by Leen (5663960)
 
 from GameFunctions import Game #  importing functions
-from bot_functions import Bot # importing the bot to use as player 2
+from BotFunctions import Bot # importing the bot to use as player 2
 import time # importing time to be able to time players
 class Player:
     def __init__(self, name, cards=None, streak=0):
@@ -24,12 +24,13 @@ game = Game() #creating a game interface
 player1 = Player(input("Your name: "), game.card()) # asking player 1 for their name
 # keeps asking for a difficulty level until a valid answer is given
 while True:
-    difficulty_level = input("Your difficulty level (easy/medium/hard): ").lower()
-    if difficulty_level in ["easy" , "medium" , "hard"]:
+    difficulty_input= input("Your difficulty level (easy/medium/hard): ").lower()
+    if difficulty_input in ["easy" , "medium" , "hard"]:
+        difficulty_enum = Bot.Difficulty[difficulty_input.upper()]
         break
     else:
         print("Invalid choice. Please enter the right difficulty level. ")
-player2 = Bot(difficulty_level, game.card()) # creating bot player with its cards
+player2 = Bot(difficulty_enum, game.card()) # creating bot player with its cards
 
 # starting the game
 result = game.coin() # toss a coin to decide who goes first
@@ -69,6 +70,7 @@ while True:
                                 player1.remove_cards(changed_letter) # remove it
                                 current_word = new_word #update the current word
                                 player1.used_words.add(current_word) # add it to used words
+                                current_player = player2
                             else:
                                 player1.add_card(game.star_card()) # give the player a penalty
                                 current_player = player2 # switch turns
@@ -82,7 +84,7 @@ while True:
         current_timer = 0 # timer for the bot
         bot_word = player2.play_turn(current_word, current_timer) # get the bot's move
 
-        while bot_word == "thinking": # if the bot is still thinking
+        while bot_word == Bot.Output.THINKING: # if the bot is still thinking
             time.sleep(1) # wait 1 second
             current_timer += 1 # increase the timer
             bot_word = player2.play_turn(current_word, current_timer) # check again for bot's move
@@ -98,10 +100,13 @@ while True:
                         if changed_letter in player2.cards: # checks if the bot has the letter in its stack
                             player2.remove_cards(changed_letter) # remove it
                             current_word = bot_word # update current word
-                            player2.used_words.add(current_word) # add it to used words
+                            current_player = player1
+                            player2.end_turn()
                         else:
                             player2.add_card(game.star_card()) # give the bot a penalty card
                             current_player = player1 # switch turns
+                            player2.end_turn()
         else:
             player1.add_card(game.star_card()) # bot gets a penalty if the word is invalid
-            current_player = player2 # switch turns
+            current_player = player1 # switch turns
+            player2.end_turn()
