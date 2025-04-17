@@ -13,7 +13,7 @@ class Bot:
 
     Attributes
     ----------
-    difficulty_level: str
+    difficulty_level: Difficulty
         - How difficult the bot is (must be one of Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD).
 
     cards: list[str]
@@ -22,13 +22,13 @@ class Bot:
     ran_current_turn_code: bool
         - Whether the initial code of the current turn has run.
 
-    current_turn_answer_or_not: bool
+    current_turn_will_answer_or_not: bool
         - Whether the bot will answer in the current turn.
 
-    current_turn_answer_time: int
+    current_turn_answer_time: float
         - How long the bot will take to answer the current turn.
 
-    current_turn_answer: int
+    current_turn_answer: str
         - The bots answer in the current turn.
 
     difficulty_settings: dict[str, dict[str, int]]
@@ -57,7 +57,7 @@ class Bot:
     draw_card(card_deck):
         - Draw a card from the deck.
 
-    answer_or_not():
+    will_answer_or_not():
         - Decide whether the bot will play that turn or not.
 
     answer_time():
@@ -72,10 +72,8 @@ class Bot:
         MEDIUM: str = "medium"
         HARD: str = "hard"
 
-
     class Output(Enum):
         THINKING: str = "thinking"
-
 
     # initialising cards with default value to avoid errors
     def __init__(self, difficulty_level: Difficulty, cards: list[str] = None):
@@ -90,36 +88,37 @@ class Bot:
         cards: list[str]
             - The cards that the bot can play.
         """
-        # how difficult the bot is (must be one of Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD).
+        # how difficult the bot is (must be one of Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD)
         self.difficulty_level = difficulty_level
         if cards is None: cards = []  # if no cards list is given set cards to empty list
         self.cards = cards  # the letter cards the bot can use
 
+        self.used_words = set()
         self.streak = 0  # the number of continuous wins # MIGHT CHANGE COMMENT
 
-        self.ran_current_turn_code = False  # whether the initial code of the turn has run
-        self.current_turn_answer_or_not = False  # whether the bot will answer this turn
-        self.current_turn_answer_time = 0  # how long the bot will take to answer this turn
-        self.current_turn_answer = None  # the bots answer in this turn
+        self.ran_current_turn_code = False  # initial variable for whether the initial code of the turn has run
+        self.current_turn_will_answer_or_not = False  # initial variable for whether the bot will answer this turn
+        self.current_turn_answer_time = 0  # initial variable for how long the bot will take to answer this turn
+        self.current_turn_answer = ""  # initial variable for the bots answer in this turn
 
         self.difficulty_settings = {  # dictionary for the settings based on the chosen difficulty mode
             Bot.Difficulty.EASY: {  # difficulty mode
-                "ANSWER_PROBABILITY": 0.6,  # determines how often the bot plays and doesn't run down the time
-                "AVERAGE_ANSWER_TIME": 6,  # mean answer time
-                "VARIANCE_ANSWER_TIME": 1.5,  # determines how varied the answer times are
+                "ANSWER_PROBABILITY": 0.7,  # determines how often the bot plays its turn (doesn't run down the timer)
+                "AVERAGE_ANSWER_TIME": 0.4 * game_settings.TURN_TIME_LIMIT,  # mean answer time
+                "VARIANCE_ANSWER_TIME": 0.1 * game_settings.TURN_TIME_LIMIT,  # how varied the answer times are
                 # determines the cut-off that determines which words are included in the bots dictionary of words
                 "WORD_FREQUENCY_CUTOFF": 5.752713813881526e-06  # (word frequency means how common the word is)
             },
             Bot.Difficulty.MEDIUM: {
-                "ANSWER_PROBABILITY": 0.75,
-                "AVERAGE_ANSWER_TIME": 4,
-                "VARIANCE_ANSWER_TIME": 1.5,
+                "ANSWER_PROBABILITY": 0.8,
+                "AVERAGE_ANSWER_TIME": 0.266 * game_settings.TURN_TIME_LIMIT,
+                "VARIANCE_ANSWER_TIME": 0.1 * game_settings.TURN_TIME_LIMIT,
                 "WORD_FREQUENCY_CUTOFF": 2.9838168355859476e-06
             },
             Bot.Difficulty.HARD: {
                 "ANSWER_PROBABILITY": 0.9,
-                "AVERAGE_ANSWER_TIME": 2,
-                "VARIANCE_ANSWER_TIME": 1.5,
+                "AVERAGE_ANSWER_TIME": 0.133 * game_settings.TURN_TIME_LIMIT,
+                "VARIANCE_ANSWER_TIME": 0.1 * game_settings.TURN_TIME_LIMIT,
                 "WORD_FREQUENCY_CUTOFF": 0  # the hard bot doesn't have a cut-off and can use all words
             }
         }
@@ -148,21 +147,27 @@ class Bot:
         """
         # initial code for the turn (which runs once)
         if not self.ran_current_turn_code:  # makes sure the code in this statement only runs once in a turn
-            self.current_turn_answer_or_not = self.answer_or_not()  # whether the bot will answer this turn
+            self.current_turn_will_answer_or_not = self.will_answer_or_not()  # whether the bot will answer this turn
             self.current_turn_answer_time = self.answer_time()  # how long the bot will take to answer this turn
             self.current_turn_answer = self.next_word(current_word)  # the bots answer in this turn
             self.ran_current_turn_code = True  # NEEDS TO BE SET BACK TO FALSE # tells program that this code has run in this turn
 
         # output manager for the loop
-        if not self.current_turn_answer_or_not:  # if the bot won't answer this turn
+        if not self.current_turn_will_answer_or_not:  # if the bot won't answer this turn
             return Bot.Output.THINKING  # program will keep returning Bot.Output.THINKING until the bots turn ends
-        elif not (game_settings.turn_time_limit - current_timer) >= self.current_turn_answer_time:
+        elif not (game_settings.TURN_TIME_LIMIT - current_timer) >= self.current_turn_answer_time:
             return Bot.Output.THINKING  # when the timer hasn't reached the set time, return Bot.Output.THINKING
         # when timer reaches the time set by the bot to answer
         elif self.current_turn_answer is None:  # if the bot didn't find an answer
             return Bot.Output.THINKING
         else:  # when the bot has an answer and the timer is has reached the set time
             return self.current_turn_answer  # returns the bots answer
+
+    def end_turn(self) -> None:
+        """
+        End the bots turn.
+        """
+        self.ran_current_turn_code = False
 
     def next_word(self, current_word: str) -> str | None:
         """
@@ -264,27 +269,17 @@ class Bot:
         if self.difficulty_level == Bot.Difficulty.EASY:  # when the bot is in easy mode
             card_to_remove_index = random.randint(0, len(self.cards) - 1)  # pick a random index from the cards list
             self.cards.pop(card_to_remove_index)  # remove the card from the bots cards
-        else:  # when the bot is in medium or hard mode
+        elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.EASY):  # if bot is in medium or hard mode
             worst_card = self.cards[0]  # initiate variable for the worst card as the bots first card
             for letter in self.cards:  # loops through the bots cards
                 # checks if the current letter is less common
                 if self.letter_frequencies[letter] < self.letter_frequencies[worst_card]:
                     worst_card = letter  # sets the current letter as the worst
             self.cards.remove(worst_card)  # remove the worst card from bots cards
+        else:
+            raise Exception("\nError: Unknown difficulty mode was set for Bot")
 
-    def draw_card(self, card_deck: list[str]) -> None:  # CARD STACK IS NOT IMPLEMENTED YET
-        """
-        Draw a card from the deck.
-        
-        Parameters
-        ----------
-        card_deck: list[str]
-            - The current deck of cards.
-        """
-        top_card = card_deck.pop()  # FUNCTION MIGHT BE WRONG # take top card
-        self.cards.append(top_card)  # add to bots list of cards
-
-    def answer_or_not(self) -> bool:
+    def will_answer_or_not(self) -> bool:
         """
         Decide if the bot will play that turn or not.
         Return True or False.
@@ -300,7 +295,7 @@ class Bot:
         else:
             return False
 
-    def answer_time(self) -> int:
+    def answer_time(self) -> float:
         """
         Return how long the bot will take to play its turn.
         """
@@ -313,8 +308,8 @@ class Bot:
         if answer_time <= 0:  # avoiding negative values for answer_time
             return 0
         # avoiding answer_time going over the time limit (subtracting 1 to give leeway to answer)
-        elif answer_time >= game_settings.turn_time_limit - 1:
-            return game_settings.turn_time_limit - 1
+        elif answer_time >= game_settings.TURN_TIME_LIMIT - 1:
+            return game_settings.TURN_TIME_LIMIT - 1
         else:
             return answer_time
 
@@ -323,30 +318,46 @@ class Bot:
         Return the set of words that the bot can use to find a new word.
         """
         word_frequencies = game_settings.WORD_FREQUENCIES  # dictionary of words and how common they are
-        game_words = game_settings.WORDS  # all the words that can be played in the game
+        all_bot_words = game_settings.ALL_BOT_WORDS  # all the words that can be played in the game
         # cut-off that determines which words are included in the bots dictionary of words
         frequency_cutoff = self.difficulty_settings[self.difficulty_level]["WORD_FREQUENCY_CUTOFF"]
 
         # filter function to remove words that are uncommon (under the frequency cutoff) based on the difficulty setting
-        bot_words = set((filter(lambda word: word_frequencies[word] > frequency_cutoff, game_words)))
+        bot_words = set((filter(lambda word: word_frequencies[word] > frequency_cutoff, all_bot_words)))
         return bot_words
 
-    def end_turn(self) -> None:
-        self.ran_current_turn_code = False
+    def add_card(self, letter: str) -> None: # adds a letter to player's stack of cards
+        """
+        Add a card to the bots cards.
 
-    def add_card(self, letter) -> None: # adds a letter to player's stack of cards
+        Parameters
+        ----------
+        letter: str
+            - The letter of the card.
+        """
         self.cards.append(letter)
 
-    def remove_cards(self, letter) -> None: # removes a letter from player's stack of cards
+    def remove_cards(self, letter: str) -> None: # removes a letter from player's stack of cards
+        """
+        Remove a card from the bots cards.
+
+        Parameters
+        ----------
+        letter: str
+            - The letter of the card.
+        """
         if letter in self.cards: # makes sure the letter exists
             self.cards.remove(letter)
 
     def won_game(self) -> bool:
+        """
+        Return whether the bot has won the game.
+        """
         return len(self.cards) == 0 # the winner is announced when they finish all their cards
 
 #testing
 if __name__ == "__main__":
-    b = Bot(Bot.Difficulty.MEDIUM, ["*", 'k', 'h', 'h', 'a'])
-    out = b.next_word("lol")
+    b = Bot(Bot.Difficulty.HARD, ['t', 'u', 'l', 'a', 'x', 'w', 'y', 'p', 'd', 'y'])
+    out = Bot.Difficulty("hard")
     print(out)
     ...
