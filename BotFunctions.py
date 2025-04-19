@@ -201,7 +201,18 @@ class Bot:
                         neighbor_suggestions.append(new_word)  # add to suggestions list
                         break # stop looking for words using this card (only takes the first suggestion)
             elif card == star_card:
-                star_card_word = current_word.replace(current_word[0], star_card, 1)
+                for letter in alphabet:
+                    for k in range(len(current_word)):  # loops the amount of letters in the current word
+                        # swapping 1 letter from the word
+                        characters = list(current_word)  # list of characters of the current word
+                        characters[k] = letter  # replace one of the letters of the current word to create a new word
+                        new_word = "".join(characters)  # join back the list into a string
+                        # make sure the word is a real word, & it is not the current word, & not one of the suggestions
+                        if new_word in self.bot_words and new_word != current_word:
+                            characters = list(new_word)
+                            characters[k] = star_card
+                            star_card_word = "".join(characters)  # join back the list into a string #AND...
+                            break
             else:
                 raise Exception("\nError: Unknown card was found in Bot's card list")
 
@@ -219,7 +230,7 @@ class Bot:
                 case _:
                     raise Exception("\nError: Unknown difficulty mode was set for Bot")
         elif star_card_word:
-            return star_card_word
+            return star_card_word #MATCH CASE?
         else:
             return None
 
