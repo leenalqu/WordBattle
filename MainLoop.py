@@ -4,7 +4,35 @@ from GameFunctions import Game #  importing functions
 from BotFunctions import Bot # importing the bot to use as player 2
 import time # importing time to be able to time players
 class Player:
+    """
+    A human player that plays against a bot
+
+    Attributes
+    ----------
+    name: str
+        Player's name.
+    cards: list
+        Player's letter cards.
+    streak: int
+        Player's win streak.
+    used_words: set
+        Words that the player has used
+
+    """
     def __init__(self, name, cards=None, streak=0):
+        """
+        Initializing a player's instance
+
+        Parameters
+        ----------
+    name: str
+        Player's name.
+    cards: list
+        Player's letter cards, defaults to empty list.
+    streak: int
+        Player's win streak, defaults to 0.
+
+        """
         self.name = name
         if cards is None:
             cards = []
@@ -12,11 +40,38 @@ class Player:
         self.streak = streak # the number of continuous wins
         self.used_words = set() # a set of the words that have been used by the player
     def add_card(self, letter): # adds a letter to player's stack of cards
+        """
+        Adds a card to the player's letter cards
+
+        Parameters
+        ----------
+        letter: str
+            The letter to add to the player's letter cards
+
+        """
         self.cards.append(letter)
     def remove_cards(self, letter): # removes a letter from player's stack of cards
+        """
+        removes a card from the player's letter cards
+
+        Parameters
+        ----------
+        letter: str
+            The letter to add to the player's letter cards
+
+        """
         if letter in self.cards: # makes sure the letter exists
             self.cards.remove(letter)
     def won_game(self):
+        """
+        Checks if the player has used all of their cards
+
+        returns
+        --------
+        bool:
+            True if player has used all of their cards, otherwise False
+
+        """
         return len(self.cards) == 0 # the winner is announced when they finish all their cards
 
 # game setup
