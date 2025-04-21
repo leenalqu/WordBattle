@@ -14,7 +14,7 @@ this file contains two classes
     7-(card_stack): generate a stack of 40 cards uses two functions (fisher_shuffle and star_card)
     8,9-( partition),(quicksort): algorithm to sort player cards
     10-(word_generator): generates a word for the game and uses (valid_transformations) to check if the word can be changed 2 or more
-    11-(check_exists): checks if the word that the player changed is in the words list
+    11-(check_exists): checks if the word that the player changed is in the words list and it handel both word with a star and word without a star
     12-(coin_flip) : decide who play first human or bot
     
  2-class Queue : used in the validation function in class Game
@@ -167,11 +167,20 @@ class Game:
 
 
     # check if the word real or not after the player change it
-    def check_exists(self,user_word):
-        if user_word in self.words:
-            return True
-        else:
+    def check_exists(self,player_word):
+        if "*" in player_word:
+            for i in range(97,123): # letters from a to z
+                letter=chr(i)
+                check_word=player_word.replace("*",chr(i),1) # it is replacing the star with letter
+                if check_word in self.words:
+                    return True
             return False
+        else:
+            if player_word in self.words:
+                return True
+            else:
+                return False
+
 
     #decide who play first
     def coin_flip(self):
@@ -185,7 +194,7 @@ class Game:
 
 #test
 a=Game()
-print(a.card_stack())
+print(a.check_exists("*un"))
 
 
 
