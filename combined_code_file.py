@@ -7,7 +7,7 @@
             #1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
     #2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
         #2.1 In terminal output, the output format is: "Round X ended. Current word: XXX"
-    #3. For word_generater in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
+    #3. For word_generator in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
     #4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
 
 #The Function I am still developing:
@@ -21,6 +21,7 @@
     #2. The order of element drawing should not be changed without testing fully.
 
 #Import libraries
+from GameFunctions import Game
 import pygame
 import sys
 import os
@@ -58,6 +59,20 @@ class CardGameUI:
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Debug Mode")
+
+        # Game logic setup
+        self.logic = Game()
+        self.deck = self.logic.card_stack()
+        self.used_cards = []
+        self.previous_word = self.current_word_letters # Store the first word
+
+        # Generate the starting word
+        current_word = self.logic.word_generator().title()
+        self.current_word_letters = list(self.current_word)
+
+        # Generate player cards
+        self.player1_cards = [self.deck.pop() for _ in range(7)]
+        self.player2_cards = [self.deck.pop() for _ in range(7)]
 
         #Config_Coordinate_Box
         self.text_color_coordinate = (0, 49, 82)
@@ -211,6 +226,10 @@ class CardGameUI:
             self.card_letter_10, self.card_letter_11, self.card_letter_12,
             self.card_letter_13, self.card_letter_14, self.card_letter_15
         ]
+        #Config_Card_Letters
+        self.visible_card_count = 15
+        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
+
         self.card_text_color = (228, 222, 215)
         self.card_positions = []
         card_start_x = 28
@@ -604,6 +623,39 @@ class CardGameUI:
             if pygame.mouse.get_pressed()[0] and self.side_status == 0:
                 self.button_sound.play()
                 self.timer_seconds = 0
+                if self.selected_letters:
+                    _, used_letter = self.selected_letters[0]
+                    if used_letter in self.player1_cards:
+                        self.player1_cards.remove(used_letter)
+                        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
+                    self.selected_letters = []
+                    self.current_word = ''.join(self.current_word_letters)
+                    print(f"New confirmed word: {self.current_word}")
+                    # Validate the new word
+                if self.logic.check_exists(self.current_word) and self.logic.is_one_letter_dif(self.previous_word,
+                                                                                                self.current_word):
+                    print("Valid word.")
+                    self.previous_word = self.current_word
+                else:
+                    print("Invalid word.")
+                    self.current_word_letters = list(self.previous_word)
+
+                    # If word is invalid, give penalty card
+                    if self.deck:
+                        new_card = self.deck.pop()
+                        self.player1_cards.append(new_card)
+                        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
+                        print(f"Penalty card given: {new_card}")
+                    else:
+                        print("Deck is empty. Cannot give penalty card.")
+            # Switch to bot's turn
+            self.side_status = 1
+            self.update_side_text()
+            self.show_popup = True
+            self.game_paused = True
+            pygame.time.set_timer(self.timer_event, 0)
+
+
 
         #Sound_Button
         if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button:
@@ -613,11 +665,11 @@ class CardGameUI:
                     pygame.mixer.music.set_volume(0)
                     self.sound_enabled = False
                     self.current_background = self.background_mute
-                else:
-                    pygame.mixer.music.set_volume(0.3)
-                    self.sound_enabled = True
-                    self.current_background = self.background
-                self.button_sound.play()
+            else:
+                pygame.mixer.music.set_volume(0.3)
+                self.sound_enabled = True
+                self.current_background = self.background
+            self.button_sound.play()
 
         #Remove_Button
         if (
