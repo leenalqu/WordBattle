@@ -64,11 +64,12 @@ class CardGameUI:
         self.logic = Game()
         self.deck = self.logic.card_stack()
         self.used_cards = []
-        self.previous_word = self.current_word_letters # Store the first word
+
 
         # Generate the starting word
-        current_word = self.logic.word_generator().title()
+        self.current_word = self.logic.word_generator().title()
         self.current_word_letters = list(self.current_word)
+        self.previous_word = self.current_word
 
         # Generate player cards
         self.player1_cards = [self.deck.pop() for _ in range(7)]
