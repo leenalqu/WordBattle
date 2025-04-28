@@ -74,6 +74,3 @@ class GameSettings:
         # using a set for faster lookup
         words = set((filter(lambda word: len(word) == self.WORD_LENGTH, self.WORD_FREQUENCIES.keys())))
         return words
-
-
-game_settings = GameSettings() # initiate class object (to be called by other modules)
