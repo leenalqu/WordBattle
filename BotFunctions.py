@@ -108,9 +108,7 @@ class Bot:
         if cards is None: cards = []  # if no cards list is given set cards to empty list
         self.cards = cards  # the letter cards the bot can use
 
-        self.used_words = set() #going to remove
         self.streak = 0  # the number of continuous wins # MIGHT CHANGE COMMENT
-
         self.ran_current_turn_code = False  # initial variable for whether the initial code of the turn has run
         self.current_turn_will_answer_or_not = False  # initial variable for whether the bot will answer this turn
         self.current_turn_answer_time = 0  # initial variable for how long the bot will take to answer this turn
@@ -160,12 +158,12 @@ class Bot:
        current_timer: int
             - How much time has passed since the start of the bots turn.
         """
-        # initial code for the turn (which runs once)
+        # initial code for the turn (which runs once per turn)
         if not self.ran_current_turn_code:  # makes sure the code in this statement only runs once in a turn
             self.current_turn_will_answer_or_not = self.will_answer_or_not()  # whether the bot will answer this turn
             self.current_turn_answer_time = self.answer_time()  # how long the bot will take to answer this turn
             self.current_turn_answer = self.next_word(current_word)  # the bots answer in this turn
-            self.ran_current_turn_code = True  # NEEDS TO BE SET BACK TO FALSE # tells program that this code has run in this turn
+            self.ran_current_turn_code = True  # tells program that this code has run in this turn
 
         # output manager for the loop
         if not self.current_turn_will_answer_or_not:  # if the bot won't answer this turn
@@ -204,7 +202,7 @@ class Bot:
             cards_list = self.letter_frequency_sort(cards_list) # sort cards by least frequency to use hard cards first
 
         # getting neighbor suggestions
-        for card in cards_list:  # loops through the bots cards #CHANGE
+        for card in cards_list:  # loops through the bots cards
             if card in alphabet: # make sure card is a letter (avoid any special cards)
                 for j in range(len(current_word)):  # loops the amount of letters in the current word
                     # swapping 1 letter from the word
@@ -224,16 +222,17 @@ class Bot:
                         new_word = "".join(characters)  # join back the list into a string
                         # make sure the word is a real word, & it is not the current word, & not one of the suggestions
                         if new_word in self.bot_words and new_word != current_word:
-                            characters = list(new_word)
-                            characters[k] = star_card
-                            star_card_word = "".join(characters)  # join back the list into a string #AND...
+                            characters = list(new_word)  # list of characters of the new word
+                            characters[k] = star_card # replace the changed letter with the star card
+                            star_card_word = "".join(characters)  # join back the list into a string
                             break
             else:
+                # stop the program if an unknown card is found (edge case)
                 raise Exception("\nError: Unknown card was found in Bot's card list")
 
         # selecting the next word from neighbor suggestions
         if neighbor_suggestions:  # suggestions are found (meaning if the neighbor_suggestions list is not empty)
-            match self.difficulty_level:
+            match self.difficulty_level: # check difficulty level of the bot, and run the code that matches it
                 case Bot.Difficulty.EASY | Bot.Difficulty.MEDIUM:  # if bot in easy or medium modes
                     random_index = random.randint(0, len(neighbor_suggestions) - 1)  # get random suggestion index
                     next_word = neighbor_suggestions[random_index]  # choose random suggestion
@@ -245,7 +244,7 @@ class Bot:
                 case _:
                     raise Exception("\nError: Unknown difficulty mode was set for Bot")
         elif star_card_word:
-            return star_card_word # MATCH CASE?
+            return star_card_word
         else:
             return None
 
