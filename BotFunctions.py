@@ -6,7 +6,6 @@ from GameSettings import GameSettings
 from enum import Enum
 
 
-# CHECK DOC STRINGS AND CAPITAL COMMENTS
 class Bot:
     """
     A Bot that plays the card game against the player.
@@ -15,7 +14,7 @@ class Bot:
     ----------
     difficulty_level: Difficulty
         - How difficult the bot is.
-        - Must be one of Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
+        - Must be either Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
 
     cards: list[str]
         - The cards that the bot can play.
@@ -98,7 +97,7 @@ class Bot:
         ----------
         difficulty_level: Difficulty
             - How difficult the bot is.
-            - Must be one of Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
+            - Must be either Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
 
         cards: list[str]
             - The cards that the bot can play.
@@ -108,7 +107,6 @@ class Bot:
         if cards is None: cards = []  # if no cards list is given set cards to empty list
         self.cards = cards  # the letter cards the bot can use
 
-        self.streak = 0  # the number of continuous wins # MIGHT CHANGE COMMENT
         self.ran_current_turn_code = False  # initial variable for whether the initial code of the turn has run
         self.current_turn_will_answer_or_not = False  # initial variable for whether the bot will answer this turn
         self.current_turn_answer_time = 0  # initial variable for how long the bot will take to answer this turn
@@ -191,11 +189,10 @@ class Bot:
         current_word: str
             - The current word in the game that the bot must change.
         """
-
         # declaring variables
-        alphabet = self.letter_frequencies.keys()
-        star_card = "*"
-        star_card_word = None
+        alphabet = self.letter_frequencies.keys() # all english letters (from keys of letter_frequencies dictionary)
+        star_card = "*" # variable to define the star card
+        star_card_word = "" # initialize a variable for the answer that uses the star card
         neighbor_suggestions = []  # word suggestions (neighbor is a word with 1 letter changed from the current word)
         cards_list = self.cards  # the bots cards
         if self.difficulty_level == Bot.Difficulty.HARD:  # if the bot is in hard mode
@@ -213,8 +210,8 @@ class Bot:
                     if new_word in self.bot_words and new_word != current_word and new_word not in neighbor_suggestions:
                         neighbor_suggestions.append(new_word)  # add to suggestions list
                         break # stop looking for words using this card (only takes the first suggestion)
-            elif card == star_card:
-                for letter in alphabet:
+            elif card == star_card: # if the current card is a star card
+                for letter in alphabet: # loop through all english letters
                     for k in range(len(current_word)):  # loops the amount of letters in the current word
                         # swapping 1 letter from the word
                         characters = list(current_word)  # list of characters of the current word
@@ -243,7 +240,8 @@ class Bot:
                     return next_word
                 case _:
                     raise Exception("\nError: Unknown difficulty mode was set for Bot")
-        elif star_card_word:
+        # in the case that that bot doesn't find any normal answers
+        elif star_card_word: # check whether an answer using the star card has been found
             return star_card_word
         else:
             return None
@@ -259,10 +257,9 @@ class Bot:
             - List of cards (letters and special cards).
         """
         letter_cards, special_cards = [], []  # initiate empty lists to separate the letter cards from special ones
-        alphabet = self.letter_frequencies.keys()
+        alphabet = self.letter_frequencies.keys() # all english letters (from keys of letter_frequencies dictionary)
         for card in cards_list:  # loop through cards
-            # if a card is a letter (the keys of letter_frequencies are the letters)
-            if card in alphabet:
+            if card in alphabet: # if a card is a letter
                 letter_cards.append(card)  # add it to the letter cards list
             else: # otherwise
                 special_cards.append(card)  # add it to the special cards list
@@ -353,7 +350,7 @@ class Bot:
         letter: str
             - The letter of the card.
         """
-        self.cards.append(letter)
+        self.cards.append(letter) # add card to bots card list
 
     def remove_cards(self, letter: str) -> None:
         """
@@ -364,8 +361,8 @@ class Bot:
         letter: str
             - The letter of the card.
         """
-        if letter in self.cards: # makes sure the letter exists
-            self.cards.remove(letter)
+        if letter in self.cards: # makes sure the letter is in the cards list
+            self.cards.remove(letter) # remove the card
 
     def won_game(self) -> bool:
         """
