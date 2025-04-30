@@ -42,6 +42,10 @@ gets to remove one too to keep things fair and spicy 🔥
 2. First to zero cards wins the game 😍🎉🏆
 3. But if you or the bot collect 15 cards bye bye ☠️😵‍💫
 
+# Coin Flip (Who Goes First?)🪙
+At the start of the game a coin flip decides who makes the first move 
+wish luck be on your side 😊
+
 ##### Ready???? Let’s go 🤗
 
 
