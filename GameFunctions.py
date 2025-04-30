@@ -2,6 +2,7 @@ import random
 import string
 
 # function class game created by Raghad Aljubran (5635869)
+
 """
 this file contains two classes 
 1- class game contain 12 functions :
@@ -192,9 +193,7 @@ class Game:
 
 
 
-#test
-a=Game()
-print(a.check_exists("*un"))
+#
 
 
 
