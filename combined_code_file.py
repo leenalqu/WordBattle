@@ -1,30 +1,31 @@
 
 # Instructions for Reserved Interface：
-    #1. For is_one_letter_dif in GameFunction.py, I have created a code in the UI that only allows the replacement of one word, which may have the possibility of duplication or conflict
-        #1.1 My code allows:
-            #1.1.1 Only different letters can be replaced
-            #1.1.2 Before replacing letters, the selected letter will be checked to see if it is the same as the letter in the target position.
-            #1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
-    #2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
+    # 1. For is_one_letter_dif in GameFunction.py, I have created a code in the UI that only allows the replacement of one word, which may have the possibility of duplication or conflict
+        # 1.1 My code allows:
+            # 1.1.1 Only different letters can be replaced
+            # 1.1.2 Before replacing letters, the selected letter will be checked to see if it is the same as the letter in the target position.
+            # 1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
+    # 2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
         #2.1 In terminal output, the output format is: "Round X ended. Current word: XXX"
-    #3. For word_generator in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
-    #4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
+    # 3. For word_generator in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
+    # 4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
 
 # The Function I am still developing:
-    #1. Prepare to connect bot_function-py.
-    #2. Points function and card removal function (Done).
-    #3. Card centering and dynamic quantity of cards (Done).
-    #4. Star Card.
+    # 1. Prepare to connect bot_function-py.
+    # 2. Points function and card removal function (Done).
+    # 3. Card centering and dynamic quantity of cards (Done).
+    # 4. Star Card.
 
 # Things need attention:
-    #1. My UI interaction is based on detecting whether there are clicks within a specified coordinate range.
-    #2. The order of element drawing should not be changed without testing fully.
+    # 1. My UI interaction is based on detecting whether there are clicks within a specified coordinate range.
+    # 2. The order of element drawing should not be changed without testing fully.
 
 # Import libraries
-from GameFunctions import Game
-import pygame
 import sys
 import os
+import pygame
+from GameFunctions import Game
+
 
 class CardGameUI:
     """
@@ -68,12 +69,12 @@ class CardGameUI:
         self.used_cards = []
 
 
-        # Generate the starting word
+        # Generate the starting word.
         self.current_word = self.logic.word_generator().title()
         self.current_word_letters = list(self.current_word)
         self.previous_word = self.current_word
 
-        # Generate players' cards
+        # Generate the players' cards.
         self.player1_cards = [self.deck.pop() for _ in range(7)]
         self.player2_cards = [self.deck.pop() for _ in range(7)]
 
