@@ -56,7 +56,7 @@ class CardGameUI:
         self.show_game_paused_page = False
         self.show_rules_page = False
 
-        # Configure screen
+        # Configure the screen.
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
