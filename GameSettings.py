@@ -1,7 +1,6 @@
 # general variables for the game settings to be used by other files
 # by Hasan Alwazzan (5640356)
 
-# SEE CAPITAL COMMENTS
 #import library
 import json
 
@@ -25,18 +24,22 @@ class GameSettings:
         - How many cards each player starts with.
 
     BOT_WORDS_FILE_NAME: str
-        - The name of the file that contains the data for word frequencies and the bot's words
+        - The name of the file that contains the data
+        for word frequencies and the bot's words
 
     WORD_FREQUENCIES: dict[str, int]
-        - Words and their relative frequencies in % (i.e. how common they are in the English language).
+        - Words and their relative frequencies in %
+        (i.e. how common they are in the English language).
 
     ALL_BOT_WORDS: set[str]
-        - All the words that the bot can play. All are of the length specified by self.word_length (e.g. 3 letters long)
+        - All the words that the bot can play.All are of the length
+        specified by self.word_length (e.g. 3 letters long)
 
     Methods
     -------
     load_word_frequencies():
-        - Return a dictionary of all words and their frequencies from the bot's words file (self.words_file_name).
+        - Return a dictionary of all words and their frequencies
+        from the bot's words file (self.words_file_name).
 
     get_all_bot_words():
         - Return a set of all the words that the bot is allowed to play.
@@ -46,31 +49,35 @@ class GameSettings:
         """
         Construct all the necessary attributes for the GameSettings object.
         """
-        self.TURN_TIME_LIMIT = 15 # the maximum amount of time a player can take to play their turn
-        self.MAX_CARDS = 15 # the amount of cards that if you exceed, you lose the game
-        self.WORD_LENGTH = 3 # the length of the word that the players have to change
-        self.START_CARDS_AMOUNT = 7 # how many cards each player starts with
+        self.TURN_TIME_LIMIT = 15 # The maximum amount of time a player can take to play their turn.
+        self.MAX_CARDS = 15 # The amount of cards that if you exceed, you lose the game.
+        self.WORD_LENGTH = 3 # The length of the word that the players have to change.
+        self.START_CARDS_AMOUNT = 7 # How many cards each player starts with.
 
-        # The name of the file that contains the data for word frequencies and the bot's words
+        # The name of the file that contains the data for word frequencies and the bot's words.
         self.BOT_WORDS_FILE_NAME = "data/word_frequencies_json.txt"
-        # dictionary for words & their relative frequencies in % (i.e. how common they are in the English language)
+        # Dictionary for words & their relative frequencies in % (i.e. how common they are in the English language).
         self.WORD_FREQUENCIES = self.load_word_frequencies()
-        # set of all words that the bot can use (all are of the length specified by word_length e.g. 3 letters long)
+        # The set of all words the bot can use (all are of the length specified by word_length e.g. 3 letters long).
         self.ALL_BOT_WORDS = self.get_all_bot_words()
 
     def load_word_frequencies(self) -> dict[str, int]:
-        """Return a dictionary of all words and their frequencies from the bot's words file (self.words_file_name)."""
-        try: # attempt the following code
-            with open(self.BOT_WORDS_FILE_NAME, "r") as file: # opens the words file in read mode & closes it when done
-                word_frequencies = json.loads(file.readline()) # loads the file from json format to a python dictionary
+        """
+        Return a dictionary of all words and their frequencies
+        from the bot's words file (self.BOT_WORDS_FILE_NAME).
+        """
+        try: # Attempt the following code.
+            with open(self.BOT_WORDS_FILE_NAME, "r") as file: # Opens the words file in read mode & closes it when done.
+                word_frequencies = json.loads(file.readline()) # Loads the file from json format to a python dictionary.
                 return word_frequencies
-        except FileNotFoundError: # checks for the error that happens when the program can't find the file
-            raise FileNotFoundError(f"\nThe file {self.BOT_WORDS_FILE_NAME} was not found. " # stop program & show error
+        except FileNotFoundError: # Checks for the error that happens when the program can't find the file.
+            # Stop program & show error.
+            raise FileNotFoundError(f"\nThe file {self.BOT_WORDS_FILE_NAME} was not found. "
                                     f"Please make sure all game files are downloaded and in the correct folder.")
 
     def get_all_bot_words(self) -> set[str]:
         """Return a set of all the words that the bot is allowed to play."""
-        # from the words in the word frequency dictionary, filter out all words that are not of the specified length
-        # using a set for faster lookup
+        # From the words in the word frequency dictionary, filter out all words that are not of the specified length.
+        # Using a set for faster lookup.
         words = set((filter(lambda word: len(word) == self.WORD_LENGTH, self.WORD_FREQUENCIES.keys())))
         return words
