@@ -347,12 +347,27 @@ class CardGameUI:
         self.x_max_credits_button, self.y_max_credits_button = 744, 549
 
     def update_side_text(self):
+        """
+        Update the display text for current active player
+
+        Updates to show "YOUR TURN" or "COMPUTER'S TURN" based on side_status value
+        """
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
         else:
             self.side_text_box = "COMPUTER'S TURN"
 
     def draw_card_from_deck(self):
+        """
+        Draw a random card from the deck and add it to player's hand.
+
+        Selects a random letter from the remaining cards in the deck
+        that aren't already in the player's hand. The card is then
+        placed in the first available empty slot in the player's hand.
+
+        Returns:
+            str: The letter drawn from the deck, or None if no cards remain.
+        """
 
         card_stack = self.logic.card_stack()
 
@@ -377,6 +392,13 @@ class CardGameUI:
                 return None
 
     def move_cards_forward(self):
+        """
+        Rearrange cards to fill empty spaces in the player's hand.
+
+        Moves all non-empty cards forward to fill any gaps, maintaining
+        their relative order. Updates the used card positions list and
+        saves the previous state for potential rollback.
+        """
         new_card_letters = [''] * len(self.card_letters)
         new_card_letters[0] = self.card_letters[0]
 
@@ -403,6 +425,13 @@ class CardGameUI:
         print("Number of Remaining Positions:", len(self.used_card_positions))
 
     def update_theme(self):
+        """
+        Update the game's visual theme based on current theme setting.
+
+        Changes colors, backgrounds, and UI elements according to the
+        selected theme (0 for default theme, other values for alternate theme).
+        Affects text colors, popup styles, backgrounds, and page images.
+        """
         # Config_Color
         if self.theme_setting == 0:
             # Color_Coordinate_Box
@@ -477,15 +506,31 @@ class CardGameUI:
             self.image_defeat_page = self.image_defeat_page_0
 
     def draw_timer(self):
+        """
+        Draw game timer
+
+        Displays remaining time on screen in "00:XX" format
+        """
         timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.text_color_timer)
         self.screen.blit(timer_text, (self.timer_x, self.timer_y))
 
     def draw_side_text_box(self):
+        """
+        Draw the current side status text box
+
+        Renders and displays the current player's turn status at the top of the screen
+        """
         # Draw Title
         text = self.font_default.render(self.side_text_box, True, self.side_text_box_color)
         self.screen.blit(text, (self.side_text_box_pos[0] - text.get_width() // 2, self.side_text_box_pos[1]))
 
     def draw_current_word_letters(self):
+        """
+        Draw the current word letters in the game
+
+        Renders each letter of the current word in the designated positions
+        with proper centering and spacing
+        """
         for i, pos in enumerate(self.current_word_positions):
             letter_text = self.current_word_font.render(self.current_word_letters[i], True,
                                                         self.current_word_text_color)
@@ -494,6 +539,21 @@ class CardGameUI:
             self.screen.blit(letter_text, (text_x, text_y))
 
     def draw_card_letters(self):
+        """
+        Draw the card letters in a centered layout
+
+        Dynamically positions and renders available card letters:
+            - Centers remaining cards based on total available space
+            - Excludes previously used cards from display
+            - Updates click areas for each visible card
+            - Maintains consistent spacing between cards
+
+        Card positions are calculated using:
+            - Total screen width
+            - Number of unused cards
+            - Card width and spacing
+            - Historical card usage data
+        """
         for i, pos in enumerate(self.card_positions[:self.visible_card_count]):
             # Only draw unused cards
             if i not in self.used_card_positions:
@@ -521,6 +581,12 @@ class CardGameUI:
                 pygame.draw.rect(self.screen, self.card_overlay_color, rect)
 
     def draw_coordinate_display(self):
+        """
+        Draw mouse coordinate display
+
+        Shows the current X and Y coordinates of the mouse cursor
+        in the top-left corner of the screen
+        """
         mouse_x, mouse_y = pygame.mouse.get_pos()
         text = self.font_default.render(f"X: {mouse_x}, Y: {mouse_y}", True, self.text_color_coordinate)
         text_rect = text.get_rect()
@@ -528,6 +594,12 @@ class CardGameUI:
         self.screen.blit(text, text_rect)
 
     def draw_popup(self):
+        """
+        Draw the side change popup
+
+        Creates a semi-transparent overlay and displays a popup message
+        when the active player changes, with an OK button to dismiss
+        """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
@@ -545,6 +617,11 @@ class CardGameUI:
                                               self.button_rect.centery - button_text_render.get_height() // 2))
 
     def draw_popup_remove(self):
+        """
+        Draw the remove mode popup
+
+        Same content as above
+        """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
@@ -569,6 +646,26 @@ class CardGameUI:
                                           self.remove_no_button_rect.centery - no_text_render.get_height() // 2))
 
     def handle_button_click(self, mouse_x, mouse_y):
+        """
+        Handle all button click events
+
+        Parameters:
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
+
+        Returns:
+            bool: False if quit button is clicked, True otherwise
+
+        Processes clicks on:
+            - Welcome page and story pages
+            - Back button
+            - Rules button
+            - Quit button
+            - Game_Paused button
+            - Confirm button
+            - Sound toggle button
+            - Remove button (Developing)
+        """
         # Theme_0_Button
         if self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button:
             if pygame.mouse.get_pressed()[0]:
@@ -628,6 +725,15 @@ class CardGameUI:
         # Conditions
 
     def check_victory_condition(self):
+        """
+        Check if the player has won the game.
+
+        Victory occurs when all card positions are used (no cards left).
+        When victory is achieved, displays the victory page and stops the timer.
+
+        Returns:
+            bool: True if victory condition is met, False otherwise.
+        """
         if len(self.used_card_positions) == 15:
 
             self.show_victory_page = True
@@ -639,6 +745,15 @@ class CardGameUI:
         return False
 
     def check_failure_condition(self):
+        """
+        Check if the player has lost the game.
+
+        Defeat occurs when there are no used card positions (all positions filled).
+        When defeat is detected, displays the defeat page and stops the timer.
+
+        Returns:
+            bool: True if failure condition is met, False otherwise.
+        """
         if len(self.used_card_positions) == 0:
 
             self.show_defeat_page = True
@@ -651,6 +766,24 @@ class CardGameUI:
 
     # Handle_Card_Click
     def handle_card_click(self, mouse_x, mouse_y):
+        """
+        Handle card selection events
+
+        Processes mouse clicks on card positions with dynamic centering:
+            - Calculates valid click areas based on centered layout
+            - Filters out previously used cards
+            - Updates selection state for valid clicks
+
+        Parameters:
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
+
+        Returns:
+            bool: True if a card was selected, False otherwise
+
+        Side effects:
+            - Updates self.selected_letters when a valid card is clicked
+        """
         if self.show_remove_page:
             for i, (x, y, width, height) in enumerate(self.card_click_areas):
                 if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
@@ -673,6 +806,19 @@ class CardGameUI:
 
     # Handle_Current_Word_Click
     def handle_current_word_click(self, mouse_x, mouse_y):
+        """
+        Handle letter swapping in the current word
+
+        Parameters:
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
+
+        Returns:
+            bool: True if a swap was performed, False otherwise
+
+        Manages the swapping of letters between selected card and current word,
+        including handling of previous swaps and position restoration
+        """
         if self.side_status != 0 or self.game_paused:
             return
         for i, (x, y, width, height) in enumerate(self.current_word_click_areas):
@@ -715,6 +861,13 @@ class CardGameUI:
         return False
 
     def check_current_word(self):
+        """
+        Verify if the current word exists in the dictionary.
+
+        Checks if the current word formed by the player is valid.
+        If valid, sets answer_status to 1 and saves the current state.
+        If invalid, sets answer_status to 0 and reverts to the previous state.
+        """
         current_word_str = ''.join(self.current_word_letters).lower()
         if self.logic.check_exists(current_word_str):
             self.answer_status = 1
@@ -730,6 +883,23 @@ class CardGameUI:
             print("Invalid Word")
 
     def handle_timer_event(self):
+        """
+        Handle timer events and round transitions
+
+        Manages the game timer, round transitions, and updates game state
+        when timer runs out. Includes:
+            - Countdown management (15 seconds per turn)
+            - Round completion logging
+            - Card usage history tracking
+            - Player turn switching
+            - Game state reset between rounds
+
+        Side effects:
+            - Updates self.used_cards_history
+            - Resets current round data
+            - Toggles player turns
+            - Triggers side change popup
+        """
         if self.timer_seconds > 0 and not self.game_paused:
             self.timer_seconds -= 1
         else:
@@ -771,6 +941,19 @@ class CardGameUI:
             self.last_swapped_position = None
 
     def handle_popup_click(self, pos):
+        """
+        Handle mouse clicks on popup windows.
+
+        Processes user interactions with popup windows, including
+        confirmation popups and card removal popups. Updates game state
+        based on user choices.
+
+        Args:
+            pos (tuple): The (x, y) coordinates of the mouse click.
+
+        Returns:
+            bool: True if the popup interaction was successful, False otherwise.
+        """
         if self.show_popup:
             if self.button_rect.collidepoint(pos):
                 self.button_sound.play()
@@ -814,6 +997,16 @@ class CardGameUI:
         return False
 
     def handle_events(self):
+        """
+        Process all game events.
+
+        Handles all pygame events including mouse clicks, timer events,
+        and quit events. Manages navigation between different game screens
+        and user interactions with game elements.
+
+        Returns:
+            bool: True if the game should continue running, False if it should quit.
+        """
         for event in pygame.event.get():
             # Quit_Event
             if event.type == pygame.QUIT:
@@ -907,11 +1100,24 @@ class CardGameUI:
 
     # Draw_Round_Counter
     def draw_round_counter(self):
+        """
+        Draw the current round number on the screen.
+
+        Renders the current round number using the round font
+        at the designated position on the screen.
+        """
         round_text = self.font_round.render(str(self.current_round), True, self.round_text_color)
         self.screen.blit(round_text, self.round_text_pos)
 
     # Draw_Game_Screen
     def draw(self):
+        """
+        Render all game elements on the screen.
+
+        Draws the game background, UI elements, cards, and any active
+        popups or special screens based on the current game state.
+        Updates the display after drawing all elements.
+        """
         # Draw_Background
         self.screen.blit(self.current_background, (0, 0))
         self.draw_timer()
@@ -982,6 +1188,12 @@ class CardGameUI:
         pygame.display.flip()
 
     def run(self):
+        """
+        Start and maintain the main game loop.
+
+        Continuously processes events and updates the display
+        until the game is exited. Handles cleanup when the game ends.
+        """
         running = True
         while running:
             running = self.handle_events()
