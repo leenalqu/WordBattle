@@ -1,5 +1,3 @@
-# Coded by Jiaxi Huang (5670238)
-
 # Import libraries
 import pygame
 import sys
@@ -9,17 +7,49 @@ from GameFunctions import Game
 
 
 class CardGameUI:
+    """
+    Card Game User Interface Class.
+
+    This class manages the game's graphical interface, event handling,
+    and game states. Contains all visual elements, audio controls, and
+    interaction logic.
+
+    Attributes:
+        screen_width (int): Game window width.
+        screen_height (int): Game window height.
+        show_popup (bool): Whether to show popup.
+        game_paused (bool): Whether game is paused.
+        current_round (int): Current round number.
+        side_status (int): Current active player (0 for player,
+            1 for computer).
+    """
+
     def __init__(self):
         # Initialize Pygame
         pygame.init()
         pygame.mixer.init()
-        self.timer_count = 2
+        self.logic = Game()
 
+        # Game logic setup
+        card_stack = self.logic.card_stack()
+        print("\nInitial Deck Content:", card_stack, "\n")
+
+        # Generate the starting word
+        self.current_word = self.logic.word_generator().upper()
+        self.current_word_letters = list(self.current_word)
+        self.current_word = self.logic.word_generator().upper()
+        self.current_word_letters = list(self.current_word)
+
+        # Generate the players' cards
+        player_cards = [card_stack.pop() for _ in range(7)]
+        print("Player's Cards:", player_cards)
+        computer_cards = [card_stack.pop() for _ in range(7)]
+        print("Computer's Cards:", computer_cards, "\n")
+
+        # Configure settings
         self.points = 2
         self.answer_status = 1
         self.theme_setting = 0
-
-        # Config_Settings
         self.show_popup = False
         self.show_popup_remove = False
         self.game_paused = False
@@ -32,6 +62,9 @@ class CardGameUI:
         self.show_rules_page = False
         self.show_options_page = False
         self.show_credits_page = False
+        self.show_rules_main_page = False
+        self.show_victory_page = False
+        self.show_defeat_page = False
 
         # Config_Color
         # Color_Coordinate_Box
@@ -56,7 +89,7 @@ class CardGameUI:
         self.round_text_color = (33, 33, 33)
         self.card_overlay_color = (33, 33, 33)
 
-        # Config_Screen
+        # Configure the screen
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -102,6 +135,9 @@ class CardGameUI:
         self.image_rules_page_1 = pygame.image.load("data/image/rules_page_1.png")
         self.image_rules_page = self.image_rules_page_0
 
+        self.image_rules_main_page_0 = pygame.image.load("data/image/rules_main_page_0.png")
+        self.image_rules_main_page = self.image_rules_main_page_0
+
         # Config_Options_Page
         self.image_options_page_0 = pygame.image.load("data/image/options_page_0.png")
         self.image_options_page_1 = pygame.image.load("data/image/options_page_1.png")
@@ -111,6 +147,12 @@ class CardGameUI:
         self.image_credits_page_0 = pygame.image.load("data/image/credits_page_0.png")
         self.image_credits_page_1 = pygame.image.load("data/image/credits_page_1.png")
         self.image_credits_page = self.image_credits_page_0
+
+        # Config_Credits_Page
+        self.image_victory_page_0 = pygame.image.load("data/image/victory_0.png")
+        self.image_defeat_page_0 = pygame.image.load("data/image/defeat_0.png")
+        self.image_victory_page = self.image_victory_page_0
+        self.image_defeat_page = self.image_defeat_page_0
 
         # Config_Font
         self.font_size_default = 24
@@ -122,7 +164,7 @@ class CardGameUI:
 
         # Config_Timer
         self.timer_event = pygame.USEREVENT + 1
-        self.timer_duration = 3
+        self.timer_duration = 2
         self.timer_seconds = self.timer_duration
         self.timer_x = 301
         self.timer_y = 248
@@ -172,11 +214,13 @@ class CardGameUI:
         self.current_word_font_size = 88
         self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf",
                                                   self.current_word_font_size)
-        self.current_word_letter_1 = 'C'
-        self.current_word_letter_2 = 'A'
-        self.current_word_letter_3 = 'T'
+
+        self.current_word_letter_1 = self.current_word_letters[0]
+        self.current_word_letter_2 = self.current_word_letters[1]
+        self.current_word_letter_3 = self.current_word_letters[2]
         self.current_word_letters = [self.current_word_letter_1, self.current_word_letter_2, self.current_word_letter_3]
         self.current_word_positions = []
+
         current_word_start_x = 256
         current_word_width = 95
         current_word_spacing = 5
@@ -196,21 +240,22 @@ class CardGameUI:
         self.card_font_size = 52
         self.card_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.card_font_size)
         self.visible_card_count = 15
-        self.card_letter_1 = 'C'
-        self.card_letter_2 = 'O'
-        self.card_letter_3 = 'M'
-        self.card_letter_4 = 'P'
-        self.card_letter_5 = 'U'
-        self.card_letter_6 = 'T'
-        self.card_letter_7 = 'E'
-        self.card_letter_8 = 'R'
-        self.card_letter_9 = 'S'
-        self.card_letter_10 = 'C'
-        self.card_letter_11 = 'I'
-        self.card_letter_12 = 'E'
-        self.card_letter_13 = 'N'
-        self.card_letter_14 = 'C'
-        self.card_letter_15 = 'E'
+
+        self.card_letter_1 = player_cards[0].upper()
+        self.card_letter_2 = player_cards[1].upper()
+        self.card_letter_3 = player_cards[2].upper()
+        self.card_letter_4 = player_cards[3].upper()
+        self.card_letter_5 = player_cards[4].upper()
+        self.card_letter_6 = player_cards[5].upper()
+        self.card_letter_7 = player_cards[6].upper()
+        self.card_letter_8 = ''
+        self.card_letter_9 = ''
+        self.card_letter_10 = ''
+        self.card_letter_11 = ''
+        self.card_letter_12 = ''
+        self.card_letter_13 = ''
+        self.card_letter_14 = ''
+        self.card_letter_15 = ''
         self.card_letters = [
             self.card_letter_1, self.card_letter_2, self.card_letter_3,
             self.card_letter_4, self.card_letter_5, self.card_letter_6,
@@ -238,6 +283,9 @@ class CardGameUI:
         self.last_swapped_position = None
         self.original_letters = []
         self.used_card_positions = list(range(7, 15))
+
+        self.previous_word_letters = self.current_word_letters.copy()
+        self.previous_used_card_positions = self.used_card_positions.copy()
 
         # Config_Sound
         pygame.mixer.music.load("data/sound/background_music.wav")
@@ -271,6 +319,10 @@ class CardGameUI:
         self.x_min_rules_button, self.y_min_rules_button = 427, 525
         self.x_max_rules_button, self.y_max_rules_button = 527, 549
 
+        # Rules_Button
+        self.x_min_rules_main_button, self.y_min_rules_main_button = 547, 563
+        self.x_max_rules_main_button, self.y_max_rules_main_button = 660, 593
+
         # Back_Button
         self.x_min_back_button, self.y_min_back_button = 547, 563
         self.x_max_back_button, self.y_max_back_button = 660, 593
@@ -297,8 +349,58 @@ class CardGameUI:
     def update_side_text(self):
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
-        elif self.side_status == 1:
+        else:
             self.side_text_box = "COMPUTER'S TURN"
+
+    def draw_card_from_deck(self):
+
+        card_stack = self.logic.card_stack()
+
+        used_letters = [letter for letter in self.card_letters if letter != '']
+
+        remaining_letters = [letter.upper() for letter in card_stack if letter.upper() not in used_letters]
+        if self.answer_status == 0:
+
+            if remaining_letters:
+                random_card = random.choice(remaining_letters)
+                print(f"The letters drawn from the deck of cards: {random_card}")
+
+                for i in range(1, 15):
+                    if self.card_letters[i] == '':
+                        self.card_letters[i] = random_card
+                        if i in self.used_card_positions:
+                            self.used_card_positions.remove(i)
+                        break
+                return random_card
+            else:
+                print("There are no remaining letters to draw from the deck of cards.")
+                return None
+
+    def move_cards_forward(self):
+        new_card_letters = [''] * len(self.card_letters)
+        new_card_letters[0] = self.card_letters[0]
+
+        non_empty_cards = []
+        for i in range(1, len(self.card_letters)):
+            if self.card_letters[i] != '' and i not in self.used_card_positions:
+                non_empty_cards.append(self.card_letters[i])
+
+        for i, card in enumerate(non_empty_cards):
+            if i + 1 < len(new_card_letters):
+                new_card_letters[i + 1] = card
+
+        self.card_letters = new_card_letters
+
+        self.used_card_positions = [i for i in range(1, len(self.card_letters)) if
+                                    i >= len(non_empty_cards) + 1 or self.card_letters[i] == '']
+
+        self.previous_word_letters = self.current_word_letters.copy()
+        self.previous_used_card_positions = self.used_card_positions.copy()
+
+        print("The card has been moved forward to fill the vacancy.")
+        print("Current Cards:", self.card_letters)
+        print("Used Position:", self.used_card_positions)
+        print("Number of Remaining Positions:", len(self.used_card_positions))
 
     def update_theme(self):
         # Config_Color
@@ -334,8 +436,11 @@ class CardGameUI:
             self.player_first = self.player_first_0
             self.computer_first = self.computer_first_0
             self.image_game_paused_page = self.image_game_paused_page_0
+            self.image_rules_main_page = self.image_rules_main_page_0
+            self.image_victory_page = self.image_victory_page_0
+            self.image_defeat_page = self.image_defeat_page_0
 
-        elif self.theme_setting == 1:
+        else:
             # Color_Coordinate_Box
             self.text_color_coordinate = (0, 49, 82)
             # Color_Timer
@@ -367,6 +472,9 @@ class CardGameUI:
             self.player_first = self.player_first_0
             self.computer_first = self.computer_first_0
             self.image_game_paused_page = self.image_game_paused_page_0
+            self.image_rules_main_page = self.image_rules_main_page_0
+            self.image_victory_page = self.image_victory_page_0
+            self.image_defeat_page = self.image_defeat_page_0
 
     def draw_timer(self):
         timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.text_color_timer)
@@ -515,25 +623,30 @@ class CardGameUI:
                     if self.theme_setting == 0:
                         self.current_background = self.background_0
                 self.button_sound.play()
-
         return True
 
         # Conditions
 
     def check_victory_condition(self):
+        if len(self.used_card_positions) == 15:
 
-        if self.visible_card_count == 0:
+            self.show_victory_page = True
+            pygame.time.set_timer(self.timer_event, 0)
             print("Victory！")
             return True
+        else:
+            print("No Victory")
         return False
 
     def check_failure_condition(self):
-        if self.visible_card_count == 15 and self.answer_status == 0:
+        if len(self.used_card_positions) == 0:
+
+            self.show_defeat_page = True
+            pygame.time.set_timer(self.timer_event, 0)
             print("Defeat.")
             return True
-        if self.answer_status == 0:
-            print("Invalid Answer")
-            return True
+        else:
+            print("No Defeat")
         return False
 
     # Handle_Card_Click
@@ -592,6 +705,7 @@ class CardGameUI:
                     # Update_Current_Word
                     self.current_word_letters[i] = card_letter
                     print(f"Swapped letters: {current_letter} -> {card_letter}")
+                    print(f"Current Word: {''.join(self.current_word_letters)}")
 
                     # Update_Swap_Status
                     self.last_swapped_position = i
@@ -600,17 +714,45 @@ class CardGameUI:
                 return True
         return False
 
+    def check_current_word(self):
+        current_word_str = ''.join(self.current_word_letters).lower()
+        if self.logic.check_exists(current_word_str):
+            self.answer_status = 1
+            if self.side_status == 0:
+                self.previous_word_letters = self.current_word_letters.copy()
+                self.previous_used_card_positions = self.used_card_positions.copy()
+            print("Valid Word")
+        else:
+            self.answer_status = 0
+            if self.side_status == 0:
+                self.current_word_letters = self.previous_word_letters.copy()
+                self.used_card_positions = self.previous_used_card_positions.copy()
+            print("Invalid Word")
+
     def handle_timer_event(self):
         if self.timer_seconds > 0 and not self.game_paused:
             self.timer_seconds -= 1
         else:
+            self.check_current_word()
             self.side_status = 1 - self.side_status
-            if self.answer_status == 1 and self.side_status == 1:
-                self.points += 1
-                print(f"Current Points: {self.points}")
+
+            current_card_letters = [letter for i, letter in enumerate(self.card_letters) if
+                                    i not in self.used_card_positions]
+            print(f"\nCurrent Card Letters: {current_card_letters}")
+
+            self.draw_card_from_deck()
+            if self.side_status == 1:
+                if self.answer_status == 1:
+                    self.points += 1
+
+            self.check_failure_condition()
+            self.check_victory_condition()
+
             self.timer_seconds = self.timer_duration
+
             self.update_side_text()
-            if self.points == 1 or self.points == 2:
+
+            if self.points == 0 or self.points == 1 or self.points == 2:
                 self.show_popup = True
                 self.game_paused = True
                 pygame.time.set_timer(self.timer_event, 0)
@@ -623,10 +765,8 @@ class CardGameUI:
                 self.game_paused = True
                 print("Remove Mode")
                 pygame.time.set_timer(self.timer_event, 0)
-            elif self.points == 0 and self.side_status == 1:
-                self.show_popup = False
 
-            # Reset original letters and last swapped position at the end of each round
+            #  Reset original letters and last swapped position at the end of each round
             self.original_letters = []
             self.last_swapped_position = None
 
@@ -640,7 +780,9 @@ class CardGameUI:
                 self.show_remove_page_1 = False
                 self.popup_ok_clicks += 1
                 self.current_round = math.floor(self.popup_ok_clicks / 2)
-                print(f"Current Round {self.popup_ok_clicks / 2}")
+                print(f"\nCurrent Round {self.popup_ok_clicks / 2}")
+                print(f"Current Points: {self.points}")
+                self.move_cards_forward()
                 pygame.time.set_timer(self.timer_event, 1000)
 
         if self.show_popup_remove:
@@ -648,7 +790,8 @@ class CardGameUI:
             if self.remove_yes_button_rect.collidepoint(mouse_x, mouse_y):
                 if pygame.mouse.get_pressed()[0]:
                     self.button_sound.play()
-                    print("yes")
+                    self.side_status = 0
+                    print("Removal Successful")
                     if self.selected_letters and isinstance(self.selected_letters[0], tuple):
                         position, _ = self.selected_letters[0]
                         self.used_card_positions.append(position)
@@ -656,7 +799,6 @@ class CardGameUI:
                     self.show_popup_remove = False
                     self.show_remove_page = False
                     self.points = 0
-                    self.side_status = 0
                     self.timer_seconds = self.timer_duration
                     self.show_remove_page_1 = True
                     pygame.time.set_timer(self.timer_event, 1000)
@@ -665,7 +807,7 @@ class CardGameUI:
             elif self.remove_no_button_rect.collidepoint(mouse_x, mouse_y):
                 if pygame.mouse.get_pressed()[0]:
                     self.button_sound.play()
-                    print("no")
+                    print("Cancel")
                     self.show_popup_remove = False
                     pygame.time.set_timer(self.timer_event, 0)
                     return True
@@ -684,9 +826,12 @@ class CardGameUI:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if not self.handle_button_click(mouse_x, mouse_y):
                     return False
+                if not self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
+                    self.handle_card_click(mouse_x, mouse_y)
+                    self.handle_current_word_click(mouse_x, mouse_y)
                 # Welcome_Page_Click
                 if self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
-                    if event.type == pygame.MOUSEBUTTONDOWN and self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
+                    if self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
                         self.button_sound.play()
                         self.show_welcome_page = False
                         self.show_rules_page = False
@@ -694,60 +839,67 @@ class CardGameUI:
                         self.show_first_role = True
                         self.show_credits_page = False
                         pygame.time.set_timer(self.timer_event, 0)
-                    elif event.type == pygame.MOUSEBUTTONDOWN and self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
+                    elif self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
                         self.button_sound.play()
                         self.show_welcome_page = False
                         self.show_rules_page = True
                         self.show_options_page = False
                         self.show_credits_page = False
                         pygame.time.set_timer(self.timer_event, 0)
-                    elif event.type == pygame.MOUSEBUTTONDOWN and self.x_min_options_button <= mouse_x <= self.x_max_options_button and self.y_min_options_button <= mouse_y <= self.y_max_options_button:
+                    elif self.x_min_options_button <= mouse_x <= self.x_max_options_button and self.y_min_options_button <= mouse_y <= self.y_max_options_button:
                         self.button_sound.play()
                         self.show_welcome_page = False
                         self.show_rules_page = False
                         self.show_options_page = True
                         self.show_credits_page = False
                         pygame.time.set_timer(self.timer_event, 0)
-                    elif event.type == pygame.MOUSEBUTTONDOWN and self.x_min_credits_button <= mouse_x <= self.x_max_credits_button and self.y_min_credits_button <= mouse_y <= self.y_max_credits_button:
+                    elif self.x_min_credits_button <= mouse_x <= self.x_max_credits_button and self.y_min_credits_button <= mouse_y <= self.y_max_credits_button:
                         self.button_sound.play()
                         self.show_welcome_page = False
                         self.show_rules_page = False
                         self.show_options_page = False
                         self.show_credits_page = True
                         pygame.time.set_timer(self.timer_event, 0)
+
+                # Popup_Click
+                elif self.show_popup or self.show_popup_remove:
+                    self.handle_popup_click(event.pos)
+
+                # Popup_Click
+                elif self.show_popup:
+                    self.handle_popup_click(event.pos)
+
+                # First_Role_Page_Click
+                elif self.show_first_role:
+                    self.button_sound.play()
+                    self.show_first_role = False
+                    pygame.time.set_timer(self.timer_event, 1000)
+
                 elif not (
                         self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page) and self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
-                    if event.type == pygame.MOUSEBUTTONDOWN and not self.show_game_paused_page:
+                    if not self.show_game_paused_page and not self.show_first_role:
                         self.button_sound.play()
                         self.game_paused = True
                         self.show_game_paused_page = True
                         print("Game Paused")
                         pygame.time.set_timer(self.timer_event, 0)
-                    elif event.type == pygame.MOUSEBUTTONDOWN and self.show_game_paused_page:
+                    elif self.show_game_paused_page:
                         self.button_sound.play()
                         self.game_paused = False
                         self.show_game_paused_page = False
                         print("Game Unpaused")
                         pygame.time.set_timer(self.timer_event, 1000)
 
-                # Popup_Click
-                elif self.show_popup or self.show_popup_remove:
-                    self.handle_popup_click(event.pos)
-
-
-                # First_Role_Page_Click
-                elif self.show_first_role:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        self.button_sound.play()
-                        self.show_first_role = False
+                elif not (
+                        self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page):
+                    if self.x_min_rules_main_button <= mouse_x <= self.x_max_rules_main_button and self.y_min_rules_main_button <= mouse_y <= self.y_max_rules_main_button and not self.show_rules_page:
+                        self.show_rules_main_page = True
                         pygame.time.set_timer(self.timer_event, 1000)
-                # Popup_Click
-                elif self.show_popup:
-                    self.handle_popup_click(event.pos)
-                # Game_Card_Click
-                else:
-                    self.handle_card_click(mouse_x, mouse_y)
-                    self.handle_current_word_click(mouse_x, mouse_y)
+                    elif self.show_rules_main_page:
+                        self.show_rules_main_page = False
+                        pygame.time.set_timer(self.timer_event, 1000)
+
+
             # Timer_Event
             elif event.type == self.timer_event:
                 self.handle_timer_event()
@@ -792,6 +944,9 @@ class CardGameUI:
         if self.show_remove_page_1:
             self.screen.blit(self.image_remove_page_1, (0, 0))
 
+        if self.show_rules_main_page:
+            self.screen.blit(self.image_rules_main_page, (0, 0))
+
         if self.show_remove_page:
             self.screen.blit(self.image_remove_page, (0, 0))
             self.draw_card_letters()
@@ -802,6 +957,12 @@ class CardGameUI:
 
         if self.show_credits_page:
             self.screen.blit(self.image_credits_page, (0, 0))
+
+        if self.show_victory_page:
+            self.screen.blit(self.image_victory_page, (0, 0))
+
+        if self.show_defeat_page:
+            self.screen.blit(self.image_defeat_page, (0, 0))
 
         # Draw_Game_Pages
         if self.show_game_paused_page:
