@@ -14,7 +14,8 @@ class Bot:
     ----------
     difficulty_level: Difficulty
         - How difficult the bot is.
-        - Must be either Bot.Difficulty.EASY or Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
+        - Must be either Bot.Difficulty.EASY or
+         Bot.Difficulty.MEDIUM or Bot.Difficulty.HARD.
 
     cards: list[str]
         - The cards that the bot can play.
@@ -43,7 +44,8 @@ class Bot:
     Methods
     -------
     play_turn(current_word, current_timer):
-        - Return the bots answer or Bot.Output.THINKING if the bot is not ready to answer or if it won't answer at all.
+        - Return the bots answer or Bot.Output.THINKING if the bot
+        is not ready to answer or if it won't answer at all.
 
     end_turn():
         - End the bots turn.
@@ -67,7 +69,8 @@ class Bot:
         - Return how long the bot will take to play its turn (seconds).
 
     get_bot_words()
-        - Initialize the set of words that the bot can use to find a new word.
+        - Initialize the set of words that the bot can
+        use to find a new word.
 
     add_card(letter):
         - Add a card to the bots cards.
@@ -248,8 +251,9 @@ class Bot:
 
     def letter_frequency_sort(self, cards_list: list[str]) -> list[str]:  # variation of insertion sort
         """
-        Sort cards based on the letter frequency distribution in the English language.
-        Any Special cards (e.g. Star cards) are placed at the end of the sorted list.
+        Sort cards based on the letter frequency distribution
+        in the English language, and any Special cards (e.g. Star cards)
+        are placed at the end of the sorted list.
 
         Parameters
         ----------
@@ -299,7 +303,8 @@ class Bot:
         Decide if the bot will play that turn or not.
         Return True or False.
 
-        (True means that the bot will play its turn, and False means that it will not).
+        (True means that the bot will play its turn,
+        and False means that it will not).
         """
         # gets the answer probability from settings based on the difficulty
         answer_probability = self.difficulty_settings[self.difficulty_level]["ANSWER_PROBABILITY"]
