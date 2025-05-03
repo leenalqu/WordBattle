@@ -1,29 +1,8 @@
-
-# Instructions for Reserved Interface：
-    # 1. For is_one_letter_dif in GameFunction.py, I have created a code in the UI that only allows the replacement of one word, which may have the possibility of duplication or conflict
-        # 1.1 My code allows:
-            # 1.1.1 Only different letters can be replaced
-            # 1.1.2 Before replacing letters, the selected letter will be checked to see if it is the same as the letter in the target position.
-            # 1.1.3 If it is the same letter, the selection will be canceled and a prompt message will be output.
-    # 2. For check_exists in GameFunction.py, I have reserved a variable called 'current word' to display the words after each round ends
-        #2.1 In terminal output, the output format is: "Round X ended. Current word: XXX"
-    # 3. For word_generator in GameFunction.py, self.current_word_letters provides a list to store the Current_Word, which can be connected to the GameFunction.py.
-    # 4. For card in GameFunction.py, self.card_letter_1 to self.card_letter_15 are created to store the letters of the cards.
-
-# The Function I am still developing:
-    # 1. Prepare to connect bot_function-py.
-    # 2. Points function and card removal function (Done).
-    # 3. Card centering and dynamic quantity of cards (Done).
-    # 4. Star Card.
-
-# Things need attention:
-    # 1. My UI interaction is based on detecting whether there are clicks within a specified coordinate range.
-    # 2. The order of element drawing should not be changed without testing fully.
-
 # Import libraries
-import sys
-import os
 import pygame
+import sys
+import random
+import math
 from GameFunctions import Game
 
 
@@ -49,97 +28,152 @@ class CardGameUI:
         # Initialize Pygame
         pygame.init()
         pygame.mixer.init()
+        self.logic = Game()
+
+        # Game logic setup
+        card_stack = self.logic.card_stack()
+        print("\nInitial Deck Content:", card_stack, "\n")
+
+        # Generate the starting word
+        self.current_word = self.logic.word_generator().upper()
+        self.current_word_letters = list(self.current_word)
+        self.current_word = self.logic.word_generator().upper()
+        self.current_word_letters = list(self.current_word)
+
+        # Generate the players' cards
+        player_cards = [card_stack.pop() for _ in range(7)]
+        print("Player's Cards:", player_cards)
+        computer_cards = [card_stack.pop() for _ in range(7)]
+        print("Computer's Cards:", computer_cards, "\n")
 
         # Configure settings
+        self.points = 2
+        self.answer_status = 1
+        self.theme_setting = 0
         self.show_popup = False
+        self.show_popup_remove = False
         self.game_paused = False
         self.show_welcome_page = True
         self.show_game_paused_page = False
         self.show_rules_page = False
+        self.show_remove_page = False
+        self.show_remove_page_1 = False
+        self.show_first_role = False
+        self.show_rules_page = False
+        self.show_options_page = False
+        self.show_credits_page = False
+        self.show_rules_main_page = False
+        self.show_victory_page = False
+        self.show_defeat_page = False
 
-        # Configure the screen.
+        # Config_Color
+        # Color_Coordinate_Box
+        self.text_color_coordinate = (33, 33, 33)
+        # Color_Timer
+        self.text_color_timer = (33, 33, 33)
+        # Color_Popup
+        self.popup_side_changer_color_background = self.popup_remove_color_background = (188, 173, 119)
+        self.popup_side_changer_color_border = self.popup_remove_color_border = (33, 33, 33)
+        self.popup_side_changer_color_button = self.popup_remove_color_button = (33, 33, 33)
+        self.popup_side_changer_color_button_border = self.popup_remove_color_button_border = (33, 33, 33)
+        self.popup_side_changer_color_text = self.popup_remove_color_text = (188, 173, 119)
+        self.popup_side_changer_color_text_button = self.popup_remove_color_text_button = (33, 33, 33)
+        # Color_Side_Status
+        self.side_text_box_color = (33, 33, 33)
+        # Color_Current_Word
+        self.current_word_text_color = (33, 33, 33)
+        # Color_Card_Letters
+        self.card_text_color = (33, 33, 33)
+        self.selected_letter_color = (240, 153, 31)
+        # Color_Round_Counter
+        self.round_text_color = (33, 33, 33)
+        self.card_overlay_color = (33, 33, 33)
+
+        # Configure the screen
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Debug Mode")
 
-        # Game logic setup
-        self.logic = Game()
-        self.deck = self.logic.card_stack()
-        self.used_cards = []
+        # Config_Background
+        self.background_0 = pygame.image.load("data/image/background_0.png")
 
+        self.background_mute_0 = pygame.image.load("data/image/background_mute_0.png")
 
-        # Generate the starting word.
-        self.current_word = self.logic.word_generator().title()
-        self.current_word_letters = list(self.current_word)
-        self.previous_word = self.current_word
+        self.current_background = self.background_0
 
-        # Generate the players' cards.
-        self.player1_cards = [self.deck.pop() for _ in range(7)]
-        self.player2_cards = [self.deck.pop() for _ in range(7)]
+        # Config_First_Role
+        self.player_first_0 = pygame.image.load("data/image/player_first_0.png")
 
-        # Configure coordinate box
-        self.text_color_coordinate = (0, 49, 82)
+        self.computer_first_0 = pygame.image.load("data/image/computer_first_0.png")
 
-        # Configure background
-        self.background = pygame.image.load("data/image/background.png")
-        self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
-        self.background_mute = pygame.image.load("data/image/background_mute.png")
-        self.background_mute = pygame.transform.scale(self.background_mute, (self.screen_width, self.screen_height))
-        self.current_background = self.background
+        self.player_first = self.player_first_0
 
-        # Configure welcome page
-        self.image_welcome_page = pygame.image.load("data/image/welcome_page.png")
-        self.image_welcome_page = pygame.transform.scale(self.image_welcome_page,
-                                                         (self.screen_width, self.screen_height))
+        self.computer_first = self.computer_first_0
 
-        # Configure story pages
-        self.current_story_page = 0
-        self.story_images = []
-        for i in range(6):
-            image = pygame.image.load(f"data/image/story_{i}.png")
-            image = pygame.transform.scale(image, (self.screen_width, self.screen_height))
-            self.story_images.append(image)
+        value = random.randint(0, 1)
+        if value == 0:
+            self.first_role = self.player_first
+        else:
+            self.first_role = self.computer_first
 
-        # Configure pause page
-        self.image_game_paused_page = pygame.image.load("data/image/game_paused_page.png")
-        self.image_game_paused_page = pygame.transform.scale(self.image_game_paused_page,
-                                                             (self.screen_width, self.screen_height))
+        # Config_Welcome_Page
+        self.image_welcome_page_0 = pygame.image.load("data/image/welcome_page_0.png")
+        self.image_welcome_page_1 = pygame.image.load("data/image/welcome_page_1.png")
+        self.image_welcome_page = self.image_welcome_page_0
 
-        # Configure rules page
-        self.image_rules_page = pygame.image.load("data/image/rules_page.png")
-        self.image_rules_page = pygame.transform.scale(self.image_rules_page, (self.screen_width, self.screen_height))
-
-        # Configure Win/Lose page
-        self.image_win_page = pygame.image.load("data/image/win_page.png")
-        self.image_win_page = pygame.transform.scale(self.image_win_page, (self.screen_width, self.screen_height))
-        self.image_lose_page = pygame.image.load("data/image/lose_page.png")
-        self.image_lose_page = pygame.transform.scale(self.image_lose_page, (self.screen_width, self.screen_height))
-
-        # Configure remove page
+        # Config_Remove_Page
         self.image_remove_page = pygame.image.load("data/image/remove_page.png")
-        self.image_remove_page = pygame.transform.scale(self.image_remove_page, (self.screen_width, self.screen_height))
+        self.image_remove_page_1 = pygame.image.load("data/image/remove_page_1.png")
 
-        # Configure font
+        # Config_Pause_Page
+        self.image_game_paused_page_0 = pygame.image.load("data/image/game_paused_page_0.png")
+        self.image_game_paused_page = self.image_game_paused_page_0
+
+        # Config_Rules_Page
+        self.image_rules_page_0 = pygame.image.load("data/image/rules_page_0.png")
+        self.image_rules_page_1 = pygame.image.load("data/image/rules_page_1.png")
+        self.image_rules_page = self.image_rules_page_0
+
+        self.image_rules_main_page_0 = pygame.image.load("data/image/rules_main_page_0.png")
+        self.image_rules_main_page = self.image_rules_main_page_0
+
+        # Config_Options_Page
+        self.image_options_page_0 = pygame.image.load("data/image/options_page_0.png")
+        self.image_options_page_1 = pygame.image.load("data/image/options_page_1.png")
+        self.image_options_page = self.image_options_page_0
+
+        # Config_Credits_Page
+        self.image_credits_page_0 = pygame.image.load("data/image/credits_page_0.png")
+        self.image_credits_page_1 = pygame.image.load("data/image/credits_page_1.png")
+        self.image_credits_page = self.image_credits_page_0
+
+        # Config_Credits_Page
+        self.image_victory_page_0 = pygame.image.load("data/image/victory_0.png")
+        self.image_defeat_page_0 = pygame.image.load("data/image/defeat_0.png")
+        self.image_victory_page = self.image_victory_page_0
+        self.image_defeat_page = self.image_defeat_page_0
+
+        # Config_Font
         self.font_size_default = 24
         self.font_size_timer = 88
         self.font_size_round = 34
-        self.card_font_size = 52
         self.font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default)
         self.font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer)
         self.font_round = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_round)
-        self.card_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.card_font_size)
 
-        # Configure timer
+        # Config_Timer
         self.timer_event = pygame.USEREVENT + 1
-        self.timer_duration = 15
+        self.timer_duration = 2
         self.timer_seconds = self.timer_duration
         self.timer_x = 301
         self.timer_y = 248
-        self.text_color_timer = (228, 222, 215)
         pygame.time.set_timer(self.timer_event, 1000)
+        self.popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
+        self.popup_remove_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
+        self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
 
-        # Configure popup
+        # Config_Popup
         self.popup_side_changer_width = 350
         self.popup_side_changer_height = 150
         self.popup_side_changer_width_button = 100
@@ -148,81 +182,80 @@ class CardGameUI:
         self.popup_side_changer_pos_y = self.screen_width // 2 - self.popup_side_changer_height // 2
         self.popup_side_changer_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
         self.popup_side_changer_pos_y_button = self.screen_width // 2 + 25
-        self.popup_side_changer_color_background = (228, 222, 215)
-        self.popup_side_changer_color_border = (228, 222, 215)
-        self.popup_side_changer_color_button = (0, 49, 82)
-        self.popup_side_changer_color_button_border = (0, 49, 82)
-        self.popup_side_changer_color_text = (228, 222, 215)
-        self.popup_side_changer_color_text_button = (0, 49, 82)
         self.popup_side_changer_text = "Side has changed"
         self.popup_side_changer_text_button = "OK"
-        self.popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
-        self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
 
-        # Configure remover popup
+        # Config_Popup_Remove
         self.popup_remove_width = 350
         self.popup_remove_height = 150
         self.popup_remove_width_button = 100
         self.popup_remove_height_button = 30
-        self.popup_remove_pos_x = self.screen_width // 2 - self.popup_remove_width // 2
-        self.popup_remove_pos_y = self.screen_width // 2 - self.popup_remove_height // 2
-        self.popup_remove_pos_x_button = self.screen_width // 2 - self.popup_remove_width_button // 2
+        self.popup_remove_pos_x = self.screen_width // 2 - self.popup_side_changer_width // 2
+        self.popup_remove_pos_y = self.screen_width // 2 - self.popup_side_changer_height // 2
+        self.popup_remove_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
         self.popup_remove_pos_y_button = self.screen_width // 2 + 25
-        self.popup_remove_color_background = (228, 222, 215)
-        self.popup_remove_color_border = (228, 222, 215)
-        self.popup_remove_color_button = (0, 49, 82)
-        self.popup_remove_color_button_border = (0, 49, 82)
-        self.popup_remove_color_text = (228, 222, 215)
-        self.popup_remove_color_text_button = (0, 49, 82)
-        self.popup_remove_text = "Already used"
+        self.popup_remove_text = "Move this Card?"
+        self.popup_remove_text_yes = "Yes"
+        self.popup_remove_text_no = "No"
+
+        self.remove_yes_button_rect = pygame.Rect(self.screen_width // 2 - 120, self.screen_height // 2 + 25, 100, 30)
+        self.remove_no_button_rect = pygame.Rect(self.screen_width // 2 + 20, self.screen_height // 2 + 25, 100, 30)
         self.popup_remove_text_button = "OK"
-        self.remove_popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
-        self.remove_button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
 
-        # Configure side status
-        self.side_status = 0
+        # Config_Side_Status
+        if self.first_role == self.player_first:
+            self.side_status = 0
+        else:
+            self.side_status = 1
         self.update_side_text()
-        self.side_text_box_pos = (self.screen_width // 2, 5)
-        self.side_text_box_color = (228, 222, 215)
+        self.side_text_box_pos = (self.screen_width // 2, 0)
 
-        # Configure current word
+        # Config_Current_Word
         self.current_word_font_size = 88
         self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf",
                                                   self.current_word_font_size)
-        self.current_word_letters = ['C', 'A', 'T']
-        self.current_word_text_color = (228, 222, 215)
+
+        self.current_word_letter_1 = self.current_word_letters[0]
+        self.current_word_letter_2 = self.current_word_letters[1]
+        self.current_word_letter_3 = self.current_word_letters[2]
+        self.current_word_letters = [self.current_word_letter_1, self.current_word_letter_2, self.current_word_letter_3]
         self.current_word_positions = []
+
         current_word_start_x = 256
         current_word_width = 95
         current_word_spacing = 5
         current_word_y = 110
-        self.current_word_click_areas = []
-        self.selected_current_word_letters = []
         for i in range(3):
             self.current_word_positions.append(
                 (current_word_start_x + i * (current_word_width + current_word_spacing), current_word_y))
-        for i in range(3):
-            x = current_word_start_x + i * (current_word_width + current_word_spacing)
-            y = current_word_y
-            self.current_word_click_areas.append((x, y, current_word_width, current_word_width))
 
-        # Configure card letters
+            self.current_word_click_areas = []
+            for i in range(3):
+                x = current_word_start_x + i * (current_word_width + current_word_spacing)
+                y = current_word_y
+                self.current_word_click_areas.append((x, y, current_word_width, current_word_width))
+                self.selected_current_word_letters = []
+
+        # Config_Card_Letters
+        self.card_font_size = 52
+        self.card_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.card_font_size)
         self.visible_card_count = 15
-        self.card_letter_1 = 'C'
-        self.card_letter_2 = 'O'
-        self.card_letter_3 = 'M'
-        self.card_letter_4 = 'P'
-        self.card_letter_5 = 'U'
-        self.card_letter_6 = 'T'
-        self.card_letter_7 = 'E'
-        self.card_letter_8 = 'R'
-        self.card_letter_9 = 'S'
-        self.card_letter_10 = 'C'
-        self.card_letter_11 = 'I'
-        self.card_letter_12 = 'E'
-        self.card_letter_13 = 'N'
-        self.card_letter_14 = 'C'
-        self.card_letter_15 = 'E'
+
+        self.card_letter_1 = player_cards[0].upper()
+        self.card_letter_2 = player_cards[1].upper()
+        self.card_letter_3 = player_cards[2].upper()
+        self.card_letter_4 = player_cards[3].upper()
+        self.card_letter_5 = player_cards[4].upper()
+        self.card_letter_6 = player_cards[5].upper()
+        self.card_letter_7 = player_cards[6].upper()
+        self.card_letter_8 = ''
+        self.card_letter_9 = ''
+        self.card_letter_10 = ''
+        self.card_letter_11 = ''
+        self.card_letter_12 = ''
+        self.card_letter_13 = ''
+        self.card_letter_14 = ''
+        self.card_letter_15 = ''
         self.card_letters = [
             self.card_letter_1, self.card_letter_2, self.card_letter_3,
             self.card_letter_4, self.card_letter_5, self.card_letter_6,
@@ -230,11 +263,6 @@ class CardGameUI:
             self.card_letter_10, self.card_letter_11, self.card_letter_12,
             self.card_letter_13, self.card_letter_14, self.card_letter_15
         ]
-        # Configure card letters
-        self.visible_card_count = 15
-        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
-
-        self.card_text_color = (228, 222, 215)
         self.card_positions = []
         card_start_x = 28
         card_width = 49
@@ -243,136 +271,265 @@ class CardGameUI:
         for i in range(15):
             self.card_positions.append((card_start_x + i * (card_width + card_spacing), card_y))
 
-        # Configure card clickers
+        # Config_Card_Clickers
         self.card_click_areas = []
         for i in range(15):
             x = card_start_x + i * (card_width + card_spacing)
             y = card_y
             self.card_click_areas.append((x, y, card_width, card_width))
 
-        # Configure selected letters
+        # Config_Selected_Letters
         self.selected_letters = []
         self.last_swapped_position = None
         self.original_letters = []
-        self.used_card_positions = []
+        self.used_card_positions = list(range(7, 15))
 
-        # Configure used_cards_history
-        self.used_cards_history = {}
+        self.previous_word_letters = self.current_word_letters.copy()
+        self.previous_used_card_positions = self.used_card_positions.copy()
 
-        # Configure sound
+        # Config_Sound
         pygame.mixer.music.load("data/sound/background_music.wav")
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
         self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
         self.sound_enabled = True
 
-        # Configure points
-        self.points = 8
-        self.max_points = 8
-        self.point_block_size = 19
-        self.point_block_spacing = 2
-        self.point_block_color = (0, 49, 82)
-        self.point_block_y = 569
-        self.point_block_start_x = 244
-
-        # Configure round counter
+        # Config_Round_Counter
+        self.popup_ok_clicks = 2
         self.current_round = 1
         self.round_text_pos = (119, 559)
-        self.round_text_color = (228, 222, 215)
 
-        # Game paused button
+        # Game_Paused_Button
         self.x_min_game_paused_page, self.y_min_game_paused_page = 472, 563
         self.x_max_game_paused_page, self.y_max_game_paused_page = 502, 593
 
-        # Quit button
+        # Quit_Button
         self.x_min_quit, self.y_min_quit = 508, 563
         self.x_max_quit, self.y_max_quit = 538, 593
 
-        # Sound button
+        # Sound_Button
         self.x_min_sound_button, self.y_min_sound_button = 436, 563
         self.x_max_sound_button, self.y_max_sound_button = 466, 593
 
-        # Confirm button
+        # Confirm_Button
         self.x_min_confirm_button, self.y_min_confirm_button = 666, 563
         self.x_max_confirm_button, self.y_max_confirm_button = 794, 593
 
-        # Rules button
-        self.x_min_rules_button, self.y_min_rules_button = 547, 563
-        self.x_max_rules_button, self.y_max_rules_button = 660, 593
+        # Rules_Button
+        self.x_min_rules_button, self.y_min_rules_button = 427, 525
+        self.x_max_rules_button, self.y_max_rules_button = 527, 549
 
-        # Back button
+        # Rules_Button
+        self.x_min_rules_main_button, self.y_min_rules_main_button = 547, 563
+        self.x_max_rules_main_button, self.y_max_rules_main_button = 660, 593
+
+        # Back_Button
         self.x_min_back_button, self.y_min_back_button = 547, 563
         self.x_max_back_button, self.y_max_back_button = 660, 593
 
-        # Remove button
-        self.x_min_remove_button, self.y_min_remove_button = 547, 563
-        self.x_max_remove_button, self.y_max_remove_button = 660, 593
-        self.remove_mode = False
-        self.last_clicked_card = None
-        self.last_click_time = 0
-        self.remove_click_count = 0
-        self.remove_used_this_round = False
-        self.show_remove_popup = False
-        self.last_click_time = 0
-        self.remove_click_count = 0
-        self.remove_used_this_round = False
+        # Theme
+        self.x_min_theme_0_button, self.y_min_theme_0_button = 4, 4
+        self.x_max_theme_0_button, self.y_max_theme_0_button = 22, 22
+
+        self.x_min_theme_1_button, self.y_min_theme_1_button = 26, 4
+        self.x_max_theme_1_button, self.y_max_theme_1_button = 44, 22
+
+        # Play
+        self.x_min_play_button, self.y_min_play_button = 56, 525
+        self.x_max_play_button, self.y_max_play_button = 129, 549
+
+        # Options
+        self.x_min_options_button, self.y_min_options_button = 208, 525
+        self.x_max_options_button, self.y_max_options_button = 341, 549
+
+        # Credits
+        self.x_min_credits_button, self.y_min_credits_button = 612, 525
+        self.x_max_credits_button, self.y_max_credits_button = 744, 549
 
     def update_side_text(self):
         """
-        Update the display text for current active player.
+        Update the display text for current active player
 
-        Updates to show "YOUR TURN" or "COMPUTER'S TURN" based on
-        side_status value.
+        Updates to show "YOUR TURN" or "COMPUTER'S TURN" based on side_status value
         """
-        # Update side text box
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
-        elif self.side_status == 1:
+        else:
             self.side_text_box = "COMPUTER'S TURN"
+
+    def draw_card_from_deck(self):
+        """
+        Draw a random card from the deck and add it to player's hand.
+
+        Selects a random letter from the remaining cards in the deck
+        that aren't already in the player's hand. The card is then
+        placed in the first available empty slot in the player's hand.
+
+        Returns:
+            str: The letter drawn from the deck, or None if no cards remain.
+        """
+
+        card_stack = self.logic.card_stack()
+
+        used_letters = [letter for letter in self.card_letters if letter != '']
+
+        remaining_letters = [letter.upper() for letter in card_stack if letter.upper() not in used_letters]
+        if self.answer_status == 0:
+
+            if remaining_letters:
+                random_card = random.choice(remaining_letters)
+                print(f"The letters drawn from the deck of cards: {random_card}")
+
+                for i in range(1, 15):
+                    if self.card_letters[i] == '':
+                        self.card_letters[i] = random_card
+                        if i in self.used_card_positions:
+                            self.used_card_positions.remove(i)
+                        break
+                return random_card
+            else:
+                print("There are no remaining letters to draw from the deck of cards.")
+                return None
+
+    def move_cards_forward(self):
+        """
+        Rearrange cards to fill empty spaces in the player's hand.
+
+        Moves all non-empty cards forward to fill any gaps, maintaining
+        their relative order. Updates the used card positions list and
+        saves the previous state for potential rollback.
+        """
+        new_card_letters = [''] * len(self.card_letters)
+        new_card_letters[0] = self.card_letters[0]
+
+        non_empty_cards = []
+        for i in range(1, len(self.card_letters)):
+            if self.card_letters[i] != '' and i not in self.used_card_positions:
+                non_empty_cards.append(self.card_letters[i])
+
+        for i, card in enumerate(non_empty_cards):
+            if i + 1 < len(new_card_letters):
+                new_card_letters[i + 1] = card
+
+        self.card_letters = new_card_letters
+
+        self.used_card_positions = [i for i in range(1, len(self.card_letters)) if
+                                    i >= len(non_empty_cards) + 1 or self.card_letters[i] == '']
+
+        self.previous_word_letters = self.current_word_letters.copy()
+        self.previous_used_card_positions = self.used_card_positions.copy()
+
+        print("The card has been moved forward to fill the vacancy.")
+        print("Current Cards:", self.card_letters)
+        print("Used Position:", self.used_card_positions)
+        print("Number of Remaining Positions:", len(self.used_card_positions))
+
+    def update_theme(self):
+        """
+        Update the game's visual theme based on current theme setting.
+
+        Changes colors, backgrounds, and UI elements according to the
+        selected theme (0 for default theme, other values for alternate theme).
+        Affects text colors, popup styles, backgrounds, and page images.
+        """
+        # Config_Color
+        if self.theme_setting == 0:
+            # Color_Coordinate_Box
+            self.text_color_coordinate = (33, 33, 33)
+            # Color_Timer
+            self.text_color_timer = (33, 33, 33)
+            # Color_Popup
+            self.popup_side_changer_color_background = (188, 173, 119)
+            self.popup_side_changer_color_border = (33, 33, 33)
+            self.popup_side_changer_color_button = (33, 33, 33)
+            self.popup_side_changer_color_button_border = (33, 33, 33)
+            self.popup_side_changer_color_text = (188, 173, 119)
+            self.popup_side_changer_color_text_button = (33, 33, 33)
+            # Color_Side_Status
+            self.side_text_box_color = (33, 33, 33)
+            # Color_Current_Word
+            self.current_word_text_color = (33, 33, 33)
+            # Color_Card_Letters
+            self.card_text_color = (33, 33, 33)
+            self.selected_letter_color = (240, 153, 31)
+            # Color_Round_Counter
+            self.round_text_color = (33, 33, 33)
+            # Overlay
+            self.card_overlay_color = (33, 33, 33)
+            # Pages
+            self.image_welcome_page = self.image_welcome_page_0
+            self.image_rules_page = self.image_rules_page_0
+            self.image_options_page = self.image_options_page_0
+            self.image_credits_page = self.image_credits_page_0
+            self.current_background = self.background_0
+            self.player_first = self.player_first_0
+            self.computer_first = self.computer_first_0
+            self.image_game_paused_page = self.image_game_paused_page_0
+            self.image_rules_main_page = self.image_rules_main_page_0
+            self.image_victory_page = self.image_victory_page_0
+            self.image_defeat_page = self.image_defeat_page_0
+
+        else:
+            # Color_Coordinate_Box
+            self.text_color_coordinate = (0, 49, 82)
+            # Color_Timer
+            self.text_color_timer = (228, 222, 215)
+            # Color_Popup
+            self.popup_side_changer_color_background = (228, 222, 215)
+            self.popup_side_changer_color_border = (228, 222, 215)
+            self.popup_side_changer_color_button = (0, 49, 82)
+            self.popup_side_changer_color_button_border = (0, 49, 82)
+            self.popup_side_changer_color_text = (228, 222, 215)
+            self.popup_side_changer_color_text_button = (0, 49, 82)
+            # Color_Side_Status
+            self.side_text_box_color = (228, 222, 215)
+            # Color_Current_Word
+            self.current_word_text_color = (228, 222, 215)
+            # Color_Card_Letters
+            self.card_text_color = (228, 222, 215)
+            self.selected_letter_color = (240, 153, 31)
+            # Color_Round_Counter
+            self.round_text_color = (228, 222, 215)
+            # Overlay
+            self.card_overlay_color = (33, 33, 33)
+            # Pages
+            self.image_welcome_page = self.image_welcome_page_1
+            self.image_rules_page = self.image_rules_page_1
+            self.image_options_page = self.image_options_page_1
+            self.image_credits_page = self.image_credits_page_1
+            self.current_background = self.background_0
+            self.player_first = self.player_first_0
+            self.computer_first = self.computer_first_0
+            self.image_game_paused_page = self.image_game_paused_page_0
+            self.image_rules_main_page = self.image_rules_main_page_0
+            self.image_victory_page = self.image_victory_page_0
+            self.image_defeat_page = self.image_defeat_page_0
 
     def draw_timer(self):
         """
-        Draw game timer.
+        Draw game timer
 
-        Displays remaining time on screen in "00:XX" format.
+        Displays remaining time on screen in "00:XX" format
         """
-        # Draw timer text
         timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.text_color_timer)
         self.screen.blit(timer_text, (self.timer_x, self.timer_y))
 
-    def draw_points(self):
-        """
-        Draw points blocks.
-
-        Display current points using blue blocks arranged horizontally,
-        maximum 8 blocks. Display from left to right, points reduction
-        removes blocks from left to right.
-        """
-        # Draw points blocks
-        for i in range(self.max_points):
-            #Calculate block position
-            x = self.point_block_start_x + i * (self.point_block_size + self.point_block_spacing)
-            rect = pygame.Rect(x, self.point_block_y, self.point_block_size, self.point_block_size)
-            # Draw active blocks
-            if i >= (self.max_points - self.points):
-                pygame.draw.rect(self.screen, self.point_block_color, rect)
-
     def draw_side_text_box(self):
         """
-        Draw the current side status text box.
+        Draw the current side status text box
 
-        Renders and displays the current player's turn status at the top of the screen.
+        Renders and displays the current player's turn status at the top of the screen
         """
-        # Draw title
+        # Draw Title
         text = self.font_default.render(self.side_text_box, True, self.side_text_box_color)
         self.screen.blit(text, (self.side_text_box_pos[0] - text.get_width() // 2, self.side_text_box_pos[1]))
 
     def draw_current_word_letters(self):
         """
-        Draw the current word letters in the game.
+        Draw the current word letters in the game
 
         Renders each letter of the current word in the designated positions
-        with proper centering and spacing.
+        with proper centering and spacing
         """
         for i, pos in enumerate(self.current_word_positions):
             letter_text = self.current_word_font.render(self.current_word_letters[i], True,
@@ -383,154 +540,71 @@ class CardGameUI:
 
     def draw_card_letters(self):
         """
-        Draw the card letters in a centered layout.
+        Draw the card letters in a centered layout
 
         Dynamically positions and renders available card letters:
-            - Centers remaining cards based on total available space.
-            - Excludes previously used cards from display.
-            - Updates click areas for each visible card.
-            - Maintains consistent spacing between cards.
+            - Centers remaining cards based on total available space
+            - Excludes previously used cards from display
+            - Updates click areas for each visible card
+            - Maintains consistent spacing between cards
 
         Card positions are calculated using:
-            - Total screen width.
-            - Number of unused cards.
-            - Card width and spacing.
-            - Historical card usage data.
+            - Total screen width
+            - Number of unused cards
+            - Card width and spacing
+            - Historical card usage data
         """
-        card_width = 49
-        card_spacing = 1
-        card_y = 449
-        total_positions = 15
-
-        # Get all historically used cards
-        all_used_cards = set()
-        for used_cards in self.used_cards_history.values():
-            all_used_cards.update(used_cards)
-
-        # Get currently available cards (excluding historically used cards)
-        unused_cards = [i for i in range(self.visible_card_count) if
-                        i not in all_used_cards and i not in self.used_card_positions]
-        total_unused = len(unused_cards)
-
-        # Calculate the number of empty card position
-        total_empty = total_positions - total_unused
-        empty_start = total_empty // 2
-        if total_unused % 2 == 0:
-            empty_start = (total_empty - 1) // 2
-
-        # Traverse all card positions
-        for i in range(total_positions):
-            x = 28 + i * (card_width + card_spacing)
-
-            # Determine whether the card should be displayed at the current location
-            card_index = i - empty_start
-            if 0 <= card_index < total_unused:
-                card_idx = unused_cards[card_index]
-                # Update the click area to a new location
-                self.card_click_areas[card_idx] = (x, card_y, card_width, card_width)
-                # Draw card letters
-                letter_text = self.card_font.render(self.card_letters[card_idx], True, self.card_text_color)
-                text_x = x + 25 - letter_text.get_width() // 2
-                text_y = card_y + 25 - letter_text.get_height() // 2
+        for i, pos in enumerate(self.card_positions[:self.visible_card_count]):
+            # Only draw unused cards
+            if i not in self.used_card_positions:
+                letter_text = self.card_font.render(self.card_letters[i], True, self.card_text_color)
+                text_x = pos[0] + 25 - letter_text.get_width() // 2
+                text_y = pos[1] + 25 - letter_text.get_height() // 2
                 self.screen.blit(letter_text, (text_x, text_y))
+
+    def draw_selected_letters(self):
+        font = self.card_font
+        start_y = 443
+        for i, letter in enumerate(self.selected_letters):
+            if isinstance(letter, tuple):
+                position, letter = letter
+                text_x = self.card_positions[position][0] + 25 - font.size(letter)[0] // 2
+            else:
+                text_x = self.screen_width - 150 + i * 20
+            letter_text = font.render(str(letter), True, self.selected_letter_color)
+            self.screen.blit(letter_text, (text_x, start_y))
+
+    def draw_card_overlay(self):
+        for i, pos in enumerate(self.card_positions[:self.visible_card_count]):
+            if i in self.used_card_positions:
+                rect = pygame.Rect(pos[0], pos[1] - 10, 49, 70)
+                pygame.draw.rect(self.screen, self.card_overlay_color, rect)
 
     def draw_coordinate_display(self):
         """
-        Draw mouse coordinate display.
+        Draw mouse coordinate display
 
         Shows the current X and Y coordinates of the mouse cursor
-        in the top-left corner of the screen.
+        in the top-left corner of the screen
         """
         mouse_x, mouse_y = pygame.mouse.get_pos()
         text = self.font_default.render(f"X: {mouse_x}, Y: {mouse_y}", True, self.text_color_coordinate)
         text_rect = text.get_rect()
-        text_rect.topleft = (10, 5)
+        text_rect.topleft = (650, 0)
         self.screen.blit(text, text_rect)
-
-    def handle_timer_event(self):
-        """
-        Handle timer events and round transitions.
-
-        Manages the game timer, round transitions, and updates game state
-        when timer runs out. Includes:
-            - Countdown management (15 seconds per turn).
-            - Round completion logging.
-            - Card usage history tracking.
-            - Player turn switching.
-            - Game state reset between rounds.
-
-        Side effects:
-            - Updates self.used_cards_history.
-            - Resets current round data.
-            - Toggles player turns.
-            - Triggers side change popup.
-        """
-        if self.timer_seconds > 0 and not self.game_paused:
-            self.timer_seconds -= 1
-        else:
-            current_word = ''.join(self.current_word_letters)
-            print(f"Round {self.current_round} ended. Current word: {current_word}")
-
-            # Save the cards used in this round
-            if self.used_card_positions:
-                self.used_cards_history[self.current_round] = self.used_card_positions.copy()
-
-            # Check remaining cards
-            all_used_cards = set()
-            for used_cards in self.used_cards_history.values():
-                all_used_cards.update(used_cards)
-            unused_cards = [i for i in range(self.visible_card_count)
-                            if i not in all_used_cards and i not in self.used_card_positions]
-            if len(unused_cards) == 0:
-                print("Win")
-                self.screen.blit(self.image_win_page, (0, 0))
-                pygame.display.flip()
-            if len(unused_cards) >= 16:
-                print("Lose")
-                self.screen.blit(self.image_lose_page, (0, 0))
-                pygame.display.flip()
-
-                waiting = True
-                while waiting:
-                    for event in pygame.event.get():
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            pygame.quit()
-                            python = sys.executable
-                            os.execl(python, python, *sys.argv)
-                        elif event.type == pygame.QUIT:
-                            pygame.quit()
-                            sys.exit()
-
-            # Reset the usage record of the current round (keep the historical cards)
-            self.used_card_positions = []
-            self.last_swapped_position = None
-            self.original_letters = []
-            self.selected_letters = []
-            self.remove_used_this_round = False
-            # Update the sides
-            self.side_status = 1 - self.side_status
-            if self.side_status == 0:
-                self.current_round += 1
-
-            # Reset timer
-            self.timer_seconds = self.timer_duration
-            self.update_side_text()
-            self.show_popup = True
-            self.game_paused = True
-            pygame.time.set_timer(self.timer_event, 0)
 
     def draw_popup(self):
         """
-        Draw the side change popup.
+        Draw the side change popup
 
-        Creates a semi-transparent overlay and displays a popup message.
-        when the active player changes, with an OK button to dismiss.
+        Creates a semi-transparent overlay and displays a popup message
+        when the active player changes, with an OK button to dismiss
         """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
         pygame.draw.rect(self.screen, self.popup_side_changer_color_background, self.popup_rect)
-        pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 2)
+        pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 5)
         popup_text_render = self.font_default.render(self.popup_side_changer_text, True,
                                                      self.popup_side_changer_color_text_button)
         self.screen.blit(popup_text_render,
@@ -542,255 +616,208 @@ class CardGameUI:
         self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,
                                               self.button_rect.centery - button_text_render.get_height() // 2))
 
-    def draw_remove_popup(self):
+    def draw_popup_remove(self):
         """
-        Draw the remove mode popup.
+        Draw the remove mode popup
 
-        Same content as above.
+        Same content as above
         """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
+
         pygame.draw.rect(self.screen, self.popup_remove_color_background, self.popup_rect)
-        pygame.draw.rect(self.screen, self.popup_remove_color_border, self.popup_rect, 2)
+        pygame.draw.rect(self.screen, self.popup_remove_color_border, self.popup_rect, 5)
+
         popup_text_render = self.font_default.render(self.popup_remove_text, True, self.popup_remove_color_text_button)
         self.screen.blit(popup_text_render,
                          (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
-        pygame.draw.rect(self.screen, self.popup_remove_color_button, self.button_rect)
-        pygame.draw.rect(self.screen, self.popup_remove_color_button_border, self.button_rect, 2)
-        button_text_render = self.font_default.render(self.popup_remove_text_button, True, self.popup_remove_color_text)
-        self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,
-                                              self.button_rect.centery - button_text_render.get_height() // 2))
+
+        pygame.draw.rect(self.screen, self.popup_remove_color_button, self.remove_yes_button_rect)
+        pygame.draw.rect(self.screen, self.popup_remove_color_button_border, self.remove_yes_button_rect, 2)
+        yes_text_render = self.font_default.render(self.popup_remove_text_yes, True, self.popup_remove_color_text)
+        self.screen.blit(yes_text_render, (self.remove_yes_button_rect.centerx - yes_text_render.get_width() // 2,
+                                           self.remove_yes_button_rect.centery - yes_text_render.get_height() // 2))
+
+        pygame.draw.rect(self.screen, self.popup_remove_color_button, self.remove_no_button_rect)
+        pygame.draw.rect(self.screen, self.popup_remove_color_button_border, self.remove_no_button_rect, 2)
+        no_text_render = self.font_default.render(self.popup_remove_text_no, True, self.popup_remove_color_text)
+        self.screen.blit(no_text_render, (self.remove_no_button_rect.centerx - no_text_render.get_width() // 2,
+                                          self.remove_no_button_rect.centery - no_text_render.get_height() // 2))
 
     def handle_button_click(self, mouse_x, mouse_y):
         """
-        Handle all button click events.
+        Handle all button click events
 
         Parameters:
-            mouse_x (int): X coordinate of mouse click.
-            mouse_y (int): Y coordinate of mouse click.
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
 
         Returns:
-            bool: False if quit button is clicked, True otherwise.
+            bool: False if quit button is clicked, True otherwise
 
         Processes clicks on:
-            - Welcome page and story pages.
-            - Back button.
-            - Rules button.
-            - Quit button.
-            - Game paused button.
-            - Confirm button.
-            - Sound toggle button.
-            - Remove button (developing).
+            - Welcome page and story pages
+            - Back button
+            - Rules button
+            - Quit button
+            - Game_Paused button
+            - Confirm button
+            - Sound toggle button
+            - Remove button (Developing)
         """
-        # Disable all buttons on the welcome page and story pages
-        if self.show_welcome_page or self.current_story_page >= 0:
-            return True
-
-        # Back button
-        if self.show_rules_page:
-            if self.x_min_back_button <= mouse_x <= self.x_max_back_button and self.y_min_back_button <= mouse_y <= self.y_max_back_button:
-                if pygame.mouse.get_pressed()[0]:
-                    self.button_sound.play()
-                    self.show_rules_page = False
-                    self.game_paused = False
-                    pygame.time.set_timer(self.timer_event, 1000)
-
-        # Rules button
-        if self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
+        # Theme_0_Button
+        if self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button:
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
-                if self.show_game_paused_page and not self.show_rules_page:
-                    self.show_rules_page = True
-                    self.show_game_paused_page = False
+                self.theme_setting = 0
+                if self.show_rules_page or self.show_options_page or self.show_credits_page:
+                    self.show_welcome_page = True
+                    self.show_rules_page = False
+                    self.show_options_page = False
+                    self.show_credits_page = False
+                pygame.time.set_timer(self.timer_event, 0)
+                self.update_theme()
 
-        # Quit button
-        if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit:
+        # Theme_1_Button
+        if self.x_min_theme_1_button <= mouse_x <= self.x_max_theme_1_button and self.y_min_theme_1_button <= mouse_y <= self.y_max_theme_1_button:
+            if pygame.mouse.get_pressed()[0]:
+                self.button_sound.play()
+                self.theme_setting = 1
+                if self.show_rules_page or self.show_options_page or self.show_credits_page:
+                    self.show_welcome_page = True
+                    self.show_rules_page = False
+                    self.show_options_page = False
+                    self.show_credits_page = False
+                pygame.time.set_timer(self.timer_event, 0)
+                self.update_theme()
+
+        # Quit_Button
+        if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit and not self.show_first_role:
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
                 print("Quit")
                 return False
 
-        # Game paused button
-        if self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
-            if pygame.mouse.get_pressed()[0]:
-                self.button_sound.play()
-                if self.show_game_paused_page:
-                    self.show_game_paused_page = False
-                    self.game_paused = False
-                    pygame.time.set_timer(self.timer_event, 1000)
-                else:
-                    self.show_game_paused_page = True
-                    self.game_paused = True
-                    pygame.time.set_timer(self.timer_event, 0)
-
-        # Confirm button
-        if self.x_min_confirm_button <= mouse_x <= self.x_max_confirm_button and self.y_min_confirm_button <= mouse_y <= self.y_max_confirm_button:
+        # Confirm_Button
+        if self.x_min_confirm_button <= mouse_x <= self.x_max_confirm_button and self.y_min_confirm_button <= mouse_y <= self.y_max_confirm_button and not self.show_first_role:
             if pygame.mouse.get_pressed()[0] and self.side_status == 0:
                 self.button_sound.play()
                 self.timer_seconds = 0
-                if self.selected_letters:
-                    _, used_letter = self.selected_letters[0]
-                    if used_letter in self.player1_cards:
-                        self.player1_cards.remove(used_letter)
-                        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
-                    self.selected_letters = []
-                    self.current_word = ''.join(self.current_word_letters)
-                    print(f"New confirmed word: {self.current_word}")
-                    # Validate the new word
-                if self.logic.check_exists(self.current_word) and self.logic.is_one_letter_dif(self.previous_word,
-                                                                                                self.current_word):
-                    print("Valid word.")
-                    self.previous_word = self.current_word
-                else:
-                    print("Invalid word.")
-                    self.current_word_letters = list(self.previous_word)
 
-                    # If word is invalid, give penalty card.
-                    if self.deck:
-                        new_card = self.deck.pop()
-                        self.player1_cards.append(new_card)
-                        self.card_letters = self.player1_cards + [''] * (15 - len(self.player1_cards))
-                        print(f"Penalty card given: {new_card}")
-                    else:
-                        print("Deck is empty. Cannot give penalty card.")
-            # Switch to bot's turn.
-            self.side_status = 1
-            self.update_side_text()
-            self.show_popup = True
-            self.game_paused = True
-            pygame.time.set_timer(self.timer_event, 0)
-
-
-
-        # Sound button
-        if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button:
+        # Sound_Button
+        if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button and not self.show_first_role:
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
                 if self.sound_enabled:
                     pygame.mixer.music.set_volume(0)
                     self.sound_enabled = False
-                    self.current_background = self.background_mute
-            else:
-                pygame.mixer.music.set_volume(0.3)
-                self.sound_enabled = True
-                self.current_background = self.background
-            self.button_sound.play()
-
-        # Remove button
-        if (
-                self.x_min_remove_button <= mouse_x <= self.x_max_remove_button and self.y_min_remove_button <= mouse_y <= self.y_max_remove_button):
-            if pygame.mouse.get_pressed()[0] and not self.show_game_paused_page and not self.show_rules_page:
-                if self.side_status == 0:
-                    if self.remove_used_this_round:
-                        self.show_remove_popup = True
-                        return True
-                    self.button_sound.play()
-                    if self.remove_mode:
-                        self.remove_mode = False
-                    else:
-                        self.remove_mode = True
+                    if self.theme_setting == 0:
+                        self.current_background = self.background_mute_0
                 else:
-                    self.popup_remove_text = "Player's turn only"
-                    self.show_remove_popup = True
-                return True
-
+                    pygame.mixer.music.set_volume(0.3)
+                    self.sound_enabled = True
+                    if self.theme_setting == 0:
+                        self.current_background = self.background_0
+                self.button_sound.play()
         return True
 
-    def handle_card_click(self, mouse_x, mouse_y):
+        # Conditions
+
+    def check_victory_condition(self):
         """
-        Handle card selection events.
+        Check if the player has won the game.
 
-        Processes mouse clicks on card positions with dynamic centering:
-            - Calculates valid click areas based on centered layout.
-            - Filters out previously used cards.
-            - Updates selection state for valid clicks.
-
-        Parameters:
-            mouse_x (int): X coordinate of mouse click.
-            mouse_y (int): Y coordinate of mouse click.
+        Victory occurs when all card positions are used (no cards left).
+        When victory is achieved, displays the victory page and stops the timer.
 
         Returns:
-            bool: True if a card was selected, False otherwise.
-
-        Side effects:
-            - Updates self.selected_letters when a valid card is clicked.
+            bool: True if victory condition is met, False otherwise.
         """
-        if self.side_status != 0 or self.game_paused:
-            return
+        if len(self.used_card_positions) == 15:
 
-        # Get all historically used cards.
-        all_used_cards = set()
-        for used_cards in self.used_cards_history.values():
-            all_used_cards.update(used_cards)
-
-        # Get currently available cards (excluding historically used cards).
-        unused_cards = [i for i in range(self.visible_card_count)
-                        if i not in all_used_cards and i not in self.used_card_positions]
-        total_unused = len(unused_cards)
-
-        # Calculate the number of empty card position and starting position.
-        total_empty = 15 - total_unused
-        empty_start = total_empty // 2
-        if total_unused % 2 == 0:
-            empty_start = (total_empty - 1) // 2
-
-        # Calculate the actual card position and click area.
-        card_width = 49
-        card_spacing = 1
-        card_y = 449
-
-        # Traverse the actual displayed card positions.
-        for i in range(total_unused):
-            x = 28 + (i + empty_start) * (card_width + card_spacing)
-            if x <= mouse_x <= x + card_width and card_y <= mouse_y <= card_y + card_width:
-                if i < len(unused_cards):
-                    card_idx = unused_cards[i]
-                    if card_idx not in self.used_card_positions:
-                        selected_letter = self.card_letters[card_idx]
-                        if self.remove_mode:
-                            # Check if points are sufficient.
-                            if self.points < 2:
-                                print("Insufficient points to remove card")
-                                return True
-                            current_time = pygame.time.get_ticks()
-                            if self.last_clicked_card != card_idx or current_time - self.last_click_time > 1000:
-                                self.remove_click_count = 1
-                                self.last_clicked_card = card_idx
-                            else:
-                                self.remove_click_count += 1
-                                if self.remove_click_count >= 3:
-                                    print(f"Card removed: {selected_letter}")
-                                    self.used_card_positions.append(card_idx)
-                                    # Consume 2 points.
-                                    self.points -= 2
-                                    self.remove_click_count = 0
-                                    self.last_clicked_card = None
-                                    self.remove_mode = False
-                                    # Mark remove mode as used for this round.
-                                    self.remove_used_this_round = True
-                                else:
-                                    print(f"Click count: {self.remove_click_count}")
-                            self.last_click_time = current_time
-                            return True
-                        self.selected_letters = [(card_idx, selected_letter)]
-                        print(f"Selected Letter: {selected_letter}")
-                        return True
+            self.show_victory_page = True
+            pygame.time.set_timer(self.timer_event, 0)
+            print("Victory！")
+            return True
+        else:
+            print("No Victory")
         return False
 
-    def handle_current_word_click(self, mouse_x, mouse_y):
+    def check_failure_condition(self):
         """
-        Handle letter swapping in the current word.
+        Check if the player has lost the game.
 
-        Parameters:
-            mouse_x (int): X coordinate of mouse click.
-            mouse_y (int): Y coordinate of mouse click.
+        Defeat occurs when there are no used card positions (all positions filled).
+        When defeat is detected, displays the defeat page and stops the timer.
 
         Returns:
-            bool: True if a swap was performed, False otherwise.
+            bool: True if failure condition is met, False otherwise.
+        """
+        if len(self.used_card_positions) == 0:
+
+            self.show_defeat_page = True
+            pygame.time.set_timer(self.timer_event, 0)
+            print("Defeat.")
+            return True
+        else:
+            print("No Defeat")
+        return False
+
+    # Handle_Card_Click
+    def handle_card_click(self, mouse_x, mouse_y):
+        """
+        Handle card selection events
+
+        Processes mouse clicks on card positions with dynamic centering:
+            - Calculates valid click areas based on centered layout
+            - Filters out previously used cards
+            - Updates selection state for valid clicks
+
+        Parameters:
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
+
+        Returns:
+            bool: True if a card was selected, False otherwise
+
+        Side effects:
+            - Updates self.selected_letters when a valid card is clicked
+        """
+        if self.show_remove_page:
+            for i, (x, y, width, height) in enumerate(self.card_click_areas):
+                if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
+                    if i not in self.used_card_positions:
+                        self.selected_letters = [(i, self.card_letters[i])]
+                        self.show_popup_remove = True
+                        return True
+            return False
+
+        if self.side_status != 0 or self.game_paused:
+            return
+        for i, (x, y, width, height) in enumerate(self.card_click_areas):
+            if x <= mouse_x <= x + width and y <= mouse_y <= y + height:
+                if i not in self.used_card_positions:
+                    selected_letter = self.card_letters[i]
+                    self.selected_letters = [(i, selected_letter)]
+                    print(f"Selected Letter: {selected_letter}")
+                    return True
+        return False
+
+    # Handle_Current_Word_Click
+    def handle_current_word_click(self, mouse_x, mouse_y):
+        """
+        Handle letter swapping in the current word
+
+        Parameters:
+            mouse_x (int): X coordinate of mouse click
+            mouse_y (int): Y coordinate of mouse click
+
+        Returns:
+            bool: True if a swap was performed, False otherwise
 
         Manages the swapping of letters between selected card and current word,
-        including handling of previous swaps and position restoration.
+        including handling of previous swaps and position restoration
         """
         if self.side_status != 0 or self.game_paused:
             return
@@ -800,198 +827,372 @@ class CardGameUI:
                     card_position, card_letter = self.selected_letters[0]
                     current_letter = self.current_word_letters[i]
 
-                    # Same letter checker
-                    if card_letter == current_letter:
-                        print(f"Cannot swap same letter: {card_letter}")
-                        self.selected_letters = []
-                        return True
-
-                    # Handle previous swap
+                    # Handle_Previous_Swap
                     if self.last_swapped_position is not None:
-                        #Same_Position_Swap
+                        # Same_Position_Swap
                         if self.last_swapped_position == i:
                             if self.used_card_positions:
                                 last_card_position = self.used_card_positions.pop()
-                        # Different position swap
+                                print(f"Restored previous card at position {last_card_position}")
+                        # Different_Position_Swap
                         else:
                             self.current_word_letters[self.last_swapped_position] = self.original_letters[
                                 self.last_swapped_position]
                             if self.used_card_positions:
                                 last_card_position = self.used_card_positions.pop()
+                                print(f"Restored card at position {last_card_position}")
+                            print(
+                                f"Restored position {self.last_swapped_position} to {self.original_letters[self.last_swapped_position]}")
 
-                    # Store original letters
+                    # Store_Original_Letters
                     if not self.original_letters:
                         self.original_letters = self.current_word_letters.copy()
 
-                    # Update current word
+                    # Update_Current_Word
                     self.current_word_letters[i] = card_letter
                     print(f"Swapped letters: {current_letter} -> {card_letter}")
+                    print(f"Current Word: {''.join(self.current_word_letters)}")
 
-                    # Update swap status
+                    # Update_Swap_Status
                     self.last_swapped_position = i
                     self.used_card_positions.append(card_position)
                     self.selected_letters = []
                 return True
         return False
 
+    def check_current_word(self):
+        """
+        Verify if the current word exists in the dictionary.
+
+        Checks if the current word formed by the player is valid.
+        If valid, sets answer_status to 1 and saves the current state.
+        If invalid, sets answer_status to 0 and reverts to the previous state.
+        """
+        current_word_str = ''.join(self.current_word_letters).lower()
+        if self.logic.check_exists(current_word_str):
+            self.answer_status = 1
+            if self.side_status == 0:
+                self.previous_word_letters = self.current_word_letters.copy()
+                self.previous_used_card_positions = self.used_card_positions.copy()
+            print("Valid Word")
+        else:
+            self.answer_status = 0
+            if self.side_status == 0:
+                self.current_word_letters = self.previous_word_letters.copy()
+                self.used_card_positions = self.previous_used_card_positions.copy()
+            print("Invalid Word")
+
+    def handle_timer_event(self):
+        """
+        Handle timer events and round transitions
+
+        Manages the game timer, round transitions, and updates game state
+        when timer runs out. Includes:
+            - Countdown management (15 seconds per turn)
+            - Round completion logging
+            - Card usage history tracking
+            - Player turn switching
+            - Game state reset between rounds
+
+        Side effects:
+            - Updates self.used_cards_history
+            - Resets current round data
+            - Toggles player turns
+            - Triggers side change popup
+        """
+        if self.timer_seconds > 0 and not self.game_paused:
+            self.timer_seconds -= 1
+        else:
+            self.check_current_word()
+            self.side_status = 1 - self.side_status
+
+            current_card_letters = [letter for i, letter in enumerate(self.card_letters) if
+                                    i not in self.used_card_positions]
+            print(f"\nCurrent Card Letters: {current_card_letters}")
+
+            self.draw_card_from_deck()
+            if self.side_status == 1:
+                if self.answer_status == 1:
+                    self.points += 1
+
+            self.check_failure_condition()
+            self.check_victory_condition()
+
+            self.timer_seconds = self.timer_duration
+
+            self.update_side_text()
+
+            if self.points == 0 or self.points == 1 or self.points == 2:
+                self.show_popup = True
+                self.game_paused = True
+                pygame.time.set_timer(self.timer_event, 0)
+            elif self.points == 3:
+                self.show_popup = True
+                self.show_popup = False
+                self.game_paused = True
+                pygame.time.set_timer(self.timer_event, 0)
+                self.show_remove_page = True
+                self.game_paused = True
+                print("Remove Mode")
+                pygame.time.set_timer(self.timer_event, 0)
+
+            #  Reset original letters and last swapped position at the end of each round
+            self.original_letters = []
+            self.last_swapped_position = None
+
     def handle_popup_click(self, pos):
         """
-        Handle clicks on popups.
-        """
-        if self.show_remove_popup:
-            if self.remove_button_rect.collidepoint(pos):
-                self.button_sound.play()
-                self.show_remove_popup = False
-                return
+        Handle mouse clicks on popup windows.
 
+        Processes user interactions with popup windows, including
+        confirmation popups and card removal popups. Updates game state
+        based on user choices.
+
+        Args:
+            pos (tuple): The (x, y) coordinates of the mouse click.
+
+        Returns:
+            bool: True if the popup interaction was successful, False otherwise.
+        """
         if self.show_popup:
             if self.button_rect.collidepoint(pos):
                 self.button_sound.play()
                 self.show_popup = False
                 self.game_paused = False
+                self.show_remove_page = False
+                self.show_remove_page_1 = False
+                self.popup_ok_clicks += 1
+                self.current_round = math.floor(self.popup_ok_clicks / 2)
+                print(f"\nCurrent Round {self.popup_ok_clicks / 2}")
+                print(f"Current Points: {self.points}")
+                self.move_cards_forward()
                 pygame.time.set_timer(self.timer_event, 1000)
+
+        if self.show_popup_remove:
+            mouse_x, mouse_y = pos
+            if self.remove_yes_button_rect.collidepoint(mouse_x, mouse_y):
+                if pygame.mouse.get_pressed()[0]:
+                    self.button_sound.play()
+                    self.side_status = 0
+                    print("Removal Successful")
+                    if self.selected_letters and isinstance(self.selected_letters[0], tuple):
+                        position, _ = self.selected_letters[0]
+                        self.used_card_positions.append(position)
+                    self.selected_letters = []
+                    self.show_popup_remove = False
+                    self.show_remove_page = False
+                    self.points = 0
+                    self.timer_seconds = self.timer_duration
+                    self.show_remove_page_1 = True
+                    pygame.time.set_timer(self.timer_event, 1000)
+                    return True
+
+            elif self.remove_no_button_rect.collidepoint(mouse_x, mouse_y):
+                if pygame.mouse.get_pressed()[0]:
+                    self.button_sound.play()
+                    print("Cancel")
+                    self.show_popup_remove = False
+                    pygame.time.set_timer(self.timer_event, 0)
+                    return True
+        return False
 
     def handle_events(self):
         """
-        Main event handler for the game.
+        Process all game events.
+
+        Handles all pygame events including mouse clicks, timer events,
+        and quit events. Manages navigation between different game screens
+        and user interactions with game elements.
 
         Returns:
-            bool: False if game should quit, True otherwise.
-
-        Processes all game events including:
-            - Quit events.
-            - Mouse wheel events.
-            - Mouse clicks.
-            - Timer events.
-            - Others (developing).
+            bool: True if the game should continue running, False if it should quit.
         """
         for event in pygame.event.get():
-            # Quit event
+            # Quit_Event
             if event.type == pygame.QUIT:
                 return False
-            # Mouse wheel event
+            # Mouse_Wheel_Event
             elif event.type == pygame.MOUSEWHEEL:
                 continue
-            # Mouse click event
+            # Mouse_Click_Event
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if not self.handle_button_click(mouse_x, mouse_y):
                     return False
-                # Welcome page click
-                if self.show_welcome_page:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        self.button_sound.play()
-                        self.show_welcome_page = False
-                        self.current_story_page = 0
-                        pygame.time.set_timer(self.timer_event, 0)
-                # Story page click
-                elif self.current_story_page >= 0:
-                    # Left click next page
-                    if event.button == 1:
-                        self.button_sound.play()
-                        if self.current_story_page == 5:
-                            self.current_story_page = -1
-                            self.game_paused = False
-                            pygame.time.set_timer(self.timer_event, 1000)
-                        else:
-                            self.current_story_page += 1
-                    # Right click previous page
-                    elif event.button == 3:
-                        self.button_sound.play()
-                        if self.current_story_page > 0:
-                            self.current_story_page -= 1
-                # Popup click
-                elif self.show_popup or self.show_remove_popup:
-                    self.handle_popup_click(event.pos)
-                # Game card click
-                else:
+                if not self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
                     self.handle_card_click(mouse_x, mouse_y)
                     self.handle_current_word_click(mouse_x, mouse_y)
-            # Timer event
+                # Welcome_Page_Click
+                if self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
+                    if self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
+                        self.button_sound.play()
+                        self.show_welcome_page = False
+                        self.show_rules_page = False
+                        self.show_options_page = False
+                        self.show_first_role = True
+                        self.show_credits_page = False
+                        pygame.time.set_timer(self.timer_event, 0)
+                    elif self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
+                        self.button_sound.play()
+                        self.show_welcome_page = False
+                        self.show_rules_page = True
+                        self.show_options_page = False
+                        self.show_credits_page = False
+                        pygame.time.set_timer(self.timer_event, 0)
+                    elif self.x_min_options_button <= mouse_x <= self.x_max_options_button and self.y_min_options_button <= mouse_y <= self.y_max_options_button:
+                        self.button_sound.play()
+                        self.show_welcome_page = False
+                        self.show_rules_page = False
+                        self.show_options_page = True
+                        self.show_credits_page = False
+                        pygame.time.set_timer(self.timer_event, 0)
+                    elif self.x_min_credits_button <= mouse_x <= self.x_max_credits_button and self.y_min_credits_button <= mouse_y <= self.y_max_credits_button:
+                        self.button_sound.play()
+                        self.show_welcome_page = False
+                        self.show_rules_page = False
+                        self.show_options_page = False
+                        self.show_credits_page = True
+                        pygame.time.set_timer(self.timer_event, 0)
+
+                # Popup_Click
+                elif self.show_popup or self.show_popup_remove:
+                    self.handle_popup_click(event.pos)
+
+                # Popup_Click
+                elif self.show_popup:
+                    self.handle_popup_click(event.pos)
+
+                # First_Role_Page_Click
+                elif self.show_first_role:
+                    self.button_sound.play()
+                    self.show_first_role = False
+                    pygame.time.set_timer(self.timer_event, 1000)
+
+                elif not (
+                        self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page) and self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
+                    if not self.show_game_paused_page and not self.show_first_role:
+                        self.button_sound.play()
+                        self.game_paused = True
+                        self.show_game_paused_page = True
+                        print("Game Paused")
+                        pygame.time.set_timer(self.timer_event, 0)
+                    elif self.show_game_paused_page:
+                        self.button_sound.play()
+                        self.game_paused = False
+                        self.show_game_paused_page = False
+                        print("Game Unpaused")
+                        pygame.time.set_timer(self.timer_event, 1000)
+
+                elif not (
+                        self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page):
+                    if self.x_min_rules_main_button <= mouse_x <= self.x_max_rules_main_button and self.y_min_rules_main_button <= mouse_y <= self.y_max_rules_main_button and not self.show_rules_page:
+                        self.show_rules_main_page = True
+                        pygame.time.set_timer(self.timer_event, 1000)
+                    elif self.show_rules_main_page:
+                        self.show_rules_main_page = False
+                        pygame.time.set_timer(self.timer_event, 1000)
+
+
+            # Timer_Event
             elif event.type == self.timer_event:
                 self.handle_timer_event()
         return True
 
-    # draw_round_Counter
+    # Draw_Round_Counter
     def draw_round_counter(self):
         """
-        Draw the current round number.
+        Draw the current round number on the screen.
 
-        Renders the current round number at the designated position
-        using the round font and color.
+        Renders the current round number using the round font
+        at the designated position on the screen.
         """
         round_text = self.font_round.render(str(self.current_round), True, self.round_text_color)
         self.screen.blit(round_text, self.round_text_pos)
 
-    # Draw game screen
+    # Draw_Game_Screen
     def draw(self):
         """
-        Main drawing function.
+        Render all game elements on the screen.
 
-        Handles all game rendering including:
-            - Background.
-            - Game elements (timer, text, cards).
-            - Welcome page.
-            - Story pages.
-            - Pause menu.
-            - Popups.
-            - Rules page.
-            - Others (developing).
+        Draws the game background, UI elements, cards, and any active
+        popups or special screens based on the current game state.
+        Updates the display after drawing all elements.
         """
-        # Draw background
+        # Draw_Background
         self.screen.blit(self.current_background, (0, 0))
+        self.draw_timer()
         self.draw_side_text_box()
         self.draw_coordinate_display()
         self.draw_current_word_letters()
         self.draw_card_letters()
-        self.draw_points()
+        self.draw_selected_letters()
         self.draw_round_counter()
+        self.draw_card_overlay()
 
-        # draw_timer after overlay
-        self.draw_timer()
-
-        # Draw game status
+        # Draw_Game_Status
         if not self.game_paused:
             self.draw_side_text_box()
             self.draw_timer()
 
-        # Draw welcome page
+        # Draw_Welcome_Page
         if self.show_welcome_page:
             self.screen.blit(self.image_welcome_page, (0, 0))
+            pygame.time.set_timer(self.timer_event, 0)
             pygame.display.flip()
             return
 
-        # Draw story page
-        elif self.current_story_page >= 0:
-            self.screen.blit(self.story_images[self.current_story_page], (0, 0))
-            pygame.display.flip()
-            return
+        if self.show_first_role:
+            self.screen.blit(self.first_role, (0, 0))
 
-        # Draw game pages
+        if self.show_options_page:
+            self.screen.blit(self.image_options_page, (0, 0))
+
+        if self.show_remove_page_1:
+            self.screen.blit(self.image_remove_page_1, (0, 0))
+
+        if self.show_rules_main_page:
+            self.screen.blit(self.image_rules_main_page, (0, 0))
+
+        if self.show_remove_page:
+            self.screen.blit(self.image_remove_page, (0, 0))
+            self.draw_card_letters()
+            self.draw_selected_letters()
+            self.draw_card_overlay()
+            if self.show_popup_remove:
+                self.draw_popup_remove()
+
+        if self.show_credits_page:
+            self.screen.blit(self.image_credits_page, (0, 0))
+
+        if self.show_victory_page:
+            self.screen.blit(self.image_victory_page, (0, 0))
+
+        if self.show_defeat_page:
+            self.screen.blit(self.image_defeat_page, (0, 0))
+
+        # Draw_Game_Pages
         if self.show_game_paused_page:
             self.screen.blit(self.image_game_paused_page, (0, 0))
+            pygame.time.set_timer(self.timer_event, 0)
+
         if self.show_popup:
             self.draw_popup()
+
+        if self.show_popup_remove:
+            self.draw_popup_remove()
+
         if self.show_rules_page:
             self.screen.blit(self.image_rules_page, (0, 0))
 
-        # Draw remove mode page
-        if self.remove_mode:
-            self.screen.blit(self.image_remove_page, (0, 0))
-
-        # Draw remove popup
-        if self.show_remove_popup:
-            self.draw_remove_popup()
-
-        # Update screen
+        # Update_Screen
         pygame.display.flip()
 
     def run(self):
         """
-        Main game loop.
+        Start and maintain the main game loop.
 
-        Initializes and runs the game, handling events and updating display
-        until the game is closed.
+        Continuously processes events and updates the display
+        until the game is exited. Handles cleanup when the game ends.
         """
         running = True
         while running:
@@ -1002,7 +1203,7 @@ class CardGameUI:
         pygame.quit()
         sys.exit()
 
+
 if __name__ == "__main__":
     game = CardGameUI()
     game.run()
-
