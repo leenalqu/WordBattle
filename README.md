@@ -48,6 +48,9 @@ wish luck be on your side 😊
 
 ##### Ready???? Let’s go 🤗
 
+How To Use The Interface Of The Game🃏🧩✨:
+
+
 
 
 
