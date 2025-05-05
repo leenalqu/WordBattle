@@ -189,7 +189,7 @@ class Bot:
         """
         self.ran_current_turn_code = False
 
-    def next_word(self, current_word: str) -> tuple | None:
+    def next_word(self, current_word: str) -> tuple:
         """
         Return the bots answer as a string (if no word is found Return None).
 
@@ -254,7 +254,7 @@ class Bot:
         elif star_card_word: # check whether an answer using the star card has been found
             return star_card_word, star_card
         else:
-            return None
+            return None, None
 
     def letter_frequency_sort(self, cards_list: list[str]) -> list[str]:  # variation of insertion sort
         """
