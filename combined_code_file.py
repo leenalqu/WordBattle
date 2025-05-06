@@ -91,8 +91,8 @@ class GameProgress:
         self.game_settings = GameSettings()
         card_stack = self.logic.card_stack()
         self.deck = card_stack
-        print("\n--- Game Initialization In Progress ---")
-        print("Initial Deck Content:", card_stack)
+        print("\n[__init__] --- Game Initialization In Progress ---")
+        print("[__init__] Initial Deck Content:", card_stack)
 
         # Generate the starting word
         self.current_word = self.logic.word_generator().upper()
@@ -102,27 +102,28 @@ class GameProgress:
 
         # Generate the players' cards
         player_cards = [card_stack.pop().upper() for _ in range(self.game_settings.START_CARDS_AMOUNT)]
-        print("Player's Cards:", player_cards)
+        print(f"[__init__] Player's Cards: {player_cards}")
         computer_cards = [card_stack.pop().lower() for _ in range(self.game_settings.START_CARDS_AMOUNT)]
-        print("Computer's Cards:", computer_cards)
-        print("--- Game Initialization Completed ---\n")
+        print(f"[__init__] Computer's Cards: {computer_cards}")
+        print("[__init__] --- Game Initialization Completed ---\n")
 
         # Initialize bot
-        self.bot = Bot(Bot.Difficulty.MEDIUM, computer_cards)
+        self.bot = Bot(Bot.Difficulty.EASY, computer_cards)
 
         # Configure settings
         self.points = 1
         self.side_status = 0
         self.computer_points = 0
         self.bot_correct_answers = 0
-        self.player_answer_status = 0
-        self.computer_answer_status = 0
+        self.player_answer_status = None
+        self.computer_answer_status = None
         self.theme_setting = 0
         self.game_paused = False
 
         # Configure Pages
         self.show_popup = False
         self.show_popup_remove = False
+        self.show_popup_bot_difficulty = False
         self.show_welcome_page = True
         self.show_options_page = False
         self.show_rules_page = False
@@ -137,7 +138,7 @@ class GameProgress:
         self.show_defeat_page = False
 
         self.value = self.logic.coin_flip()
-        print(self.value)
+        print(f"[__init__] {self.value}")
 
         # Configure Default Theme Settings
         # Color_Coordinate_Box
@@ -145,12 +146,12 @@ class GameProgress:
         # Color_Timer
         self.text_color_timer = (33, 33, 33)
         # Color_Popup
-        self.popup_side_changer_color_background = self.popup_remove_color_background = (188, 173, 119)
-        self.popup_side_changer_color_border = self.popup_remove_color_border = (33, 33, 33)
-        self.popup_side_changer_color_button = self.popup_remove_color_button = (33, 33, 33)
-        self.popup_side_changer_color_button_border = self.popup_remove_color_button_border = (33, 33, 33)
-        self.popup_side_changer_color_text = self.popup_remove_color_text = (188, 173, 119)
-        self.popup_side_changer_color_text_button = self.popup_remove_color_text_button = (33, 33, 33)
+        self.popup_color_background = self.popup_color_background = (188, 173, 119)
+        self.popup_color_border = self.popup_color_border = (33, 33, 33)
+        self.popup_color_button = self.popup_color_button = (33, 33, 33)
+        self.popup_color_button_border = self.popup_color_button_border = (33, 33, 33)
+        self.popup_color_text = self.popup_color_text = (188, 173, 119)
+        self.popup_color_text_button = self.popup_color_text_button = (33, 33, 33)
         # Color_Side_Status
         self.side_text_box_color = (33, 33, 33)
         # Color_Current_Word
@@ -197,11 +198,11 @@ class GameProgress:
         if self.value == "Head":
             self.side_status = 0
             self.player_first = self.player_first_0
-            print("Player goes first")  # Player goes first
+            print("[__init__] Player First")  # Player goes first
         elif self.value == "Tail":
             self.side_status = 1
             self.computer_first = self.computer_first_0
-            print("Computer goes first")  # Computer goes first
+            print("[__init__] Computer First")  # Computer goes first
 
         # Config_Remove_Page
         self.image_remove_page_0 = pygame.image.load("data/image/remove_page_0.png")
@@ -248,14 +249,19 @@ class GameProgress:
         self.timer_x = 301
         self.timer_y = 248
         pygame.time.set_timer(self.timer_event, 1000)
-        self.popup_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
-        self.popup_remove_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
-        self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
+
         # Config_Popup
         self.popup_side_changer_width = 350
         self.popup_side_changer_height = 150
         self.popup_side_changer_width_button = 100
         self.popup_side_changer_height_button = 30
+        self.popup_rect = pygame.Rect(self.screen_width // 2 - self.popup_side_changer_width // 2,  # x position
+                                      self.screen_height // 2 - self.popup_side_changer_height // 2,  # y position
+                                      self.popup_side_changer_width,  # width
+                                      self.popup_side_changer_height  # height
+                                      )
+        self.popup_remove_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
+        self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
         self.popup_side_changer_pos_x = self.screen_width // 2 - self.popup_side_changer_width // 2
         self.popup_side_changer_pos_y = self.screen_width // 2 - self.popup_side_changer_height // 2
         self.popup_side_changer_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
@@ -263,27 +269,47 @@ class GameProgress:
         self.popup_side_changer_text = ""
         self.popup_side_changer_text_player = "COMPUTER THINKING"
         self.popup_side_changer_text_computer = "IT IS YOUR TURN"
-        self.popup_side_changer_text_button = ""
         self.popup_side_changer_text_button_player = "WAIT"
         self.popup_side_changer_text_button_computer = "GO"
+        self.popup_side_changer_text_button = ""
+
         # Config_Popup_Remove
         self.popup_remove_width = 350
         self.popup_remove_height = 150
         self.popup_remove_width_button = 100
         self.popup_remove_height_button = 30
+        self.popup_rect_remove = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
         self.popup_remove_pos_x = self.screen_width // 2 - self.popup_side_changer_width // 2
         self.popup_remove_pos_y = self.screen_width // 2 - self.popup_side_changer_height // 2
         self.popup_remove_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
         self.popup_remove_pos_y_button = self.screen_width // 2 + 25
-        self.popup_remove_text = "Move this Card?"
+        self.popup_remove_text = "Remove this Card?"
         self.popup_remove_text_yes = "Yes"
         self.popup_remove_text_no = "No"
         self.remove_yes_button_rect = pygame.Rect(self.screen_width // 2 - 120, self.screen_height // 2 + 25, 100, 30)
         self.remove_no_button_rect = pygame.Rect(self.screen_width // 2 + 20, self.screen_height // 2 + 25, 100, 30)
         self.popup_remove_text_button = "OK"
         self.update_side_text()
+        print("[__init__] Side Text Updated")
         self.side_text_box_pos = (self.screen_width // 2, 0)
-        # Config_Current_Word
+        # Config_popup_bot_difficulty
+        self.popup_bot_difficulty_width = 380
+        self.popup_bot_difficulty_height = 150
+        self.popup_rect_bot_difficulty = pygame.Rect(self.screen_width // 2 - self.popup_bot_difficulty_width // 2,
+                                                     self.screen_height // 2 - self.popup_bot_difficulty_height // 2,
+                                                     self.popup_bot_difficulty_width, self.popup_bot_difficulty_height
+                                                     # height
+                                                     )
+        self.difficulty_button_width = 100
+        self.difficulty_button_height = 30
+        self.popup_bot_difficulty_pos_x = self.screen_width // 2 - self.popup_bot_difficulty_width // 2
+        self.popup_bot_difficulty_pos_y = self.screen_width // 2 - self.popup_bot_difficulty_height // 2
+
+        self.easy_button_rect = pygame.Rect(self.screen_width // 2 - 170, self.screen_height // 2 + 25, 100, 30)
+        self.medium_button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
+        self.hard_button_rect = pygame.Rect(self.screen_width // 2 + 70, self.screen_height // 2 + 25, 100, 30)
+
+        # config_word
         self.current_word_font_size = 88
         self.current_word_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf",
                                                   self.current_word_font_size)
@@ -390,12 +416,28 @@ class GameProgress:
         """
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
-            self.popup_side_changer_text = self.popup_side_changer_text_player
+            # self.popup_side_changer_text = self.popup_side_changer_text_player
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_player
         else:
             self.side_text_box = "COMPUTER'S TURN"
-            self.popup_side_changer_text = self.popup_side_changer_text_computer
+            # self.popup_side_changer_text = self.popup_side_changer_text_computer
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_computer
+
+    def update_popup_text(self):
+        if self.side_status == 0:
+            if self.player_answer_status == 0:
+                self.popup_side_changer_text_player = "Player Invalid Answer"
+            elif self.player_answer_status == 1:
+                self.popup_side_changer_text_player = "Player Valid Answer"
+            self.popup_side_changer_text = self.popup_side_changer_text_player
+            print("[update_popup_text] Player Popup Text Updated.")
+        else:
+            if self.computer_answer_status == 0:
+                self.popup_side_changer_text_computer = "Computer Invalid Answer"
+            elif self.computer_answer_status == 1:
+                self.popup_side_changer_text_computer = "Computer Valid Answer"
+            self.popup_side_changer_text = self.popup_side_changer_text_computer
+            print("[update_popup_text] Computer Popup Text Updated.")
 
     def add_penalty_card(self):
         """
@@ -410,18 +452,21 @@ class GameProgress:
         """
         if self.player_answer_status == 0 or self.computer_answer_status == 0:
             penalty_card = self.deck.pop()
-            print(f"The letters drawn from the deck of cards: {penalty_card}")
+            print(f"[add_penalty_card] Penalty Card: {penalty_card}")
 
-            for i in range(1, 15):
-                if self.card_letters[i] == '':
-                    self.card_letters[i] = penalty_card.upper()
-                    if i in self.used_card_positions:
-                        self.used_card_positions.remove(i)
-                    break
+            if self.side_status == 0:
+                for i in range(1, 15):
+                    if self.card_letters[i] == '':
+                        self.card_letters[i] = penalty_card.upper()
+                        if i in self.used_card_positions:
+                            self.used_card_positions.remove(i)
+                        break
+            elif self.side_status == 1:
+                self.bot.cards.append(penalty_card)
             return penalty_card
 
         else:
-            print("There are no remaining letters to draw from the deck of cards.")
+            print("[add_penalty_card] No remaining card in deck.")
             return None
 
     def organize_cards(self):
@@ -451,10 +496,10 @@ class GameProgress:
         self.previous_word_letters = self.word_letters.copy()
         self.previous_used_card_positions = self.used_card_positions.copy()
 
-        print("The card has been moved forward to fill the vacancy.")
-        print("Current Cards (Player):", self.card_letters)
-        print("Used Position (Player):", self.used_card_positions)
-        print("Number of Remaining Positions (Player):", len(self.used_card_positions))
+        print("[organize_cards] Cards moved forward.")
+        print("[organize_cards] Current Cards (Player):", self.card_letters)
+        print("[organize_cards] Used Position (Player):", self.used_card_positions)
+        # print("[organize_cards] Number of Remaining Positions (Player):", len(self.used_card_positions))
 
     def update_theme(self):
         """
@@ -471,12 +516,14 @@ class GameProgress:
             # Color_Timer
             self.text_color_timer = (33, 33, 33)
             # Color_Popup
-            self.popup_side_changer_color_background = (188, 173, 119)
-            self.popup_side_changer_color_border = (33, 33, 33)
-            self.popup_side_changer_color_button = (33, 33, 33)
-            self.popup_side_changer_color_button_border = (33, 33, 33)
-            self.popup_side_changer_color_text = (188, 173, 119)
-            self.popup_side_changer_color_text_button = (33, 33, 33)
+
+            self.popup_color_background = (188, 173, 119)
+            self.popup_color_border = (33, 33, 33)
+            self.popup_color_button = (33, 33, 33)
+            self.popup_color_button_border = (33, 33, 33)
+            self.popup_color_text = (188, 173, 119)
+            self.popup_color_text_button = (33, 33, 33)
+
             # Color_Side_Status
             self.side_text_box_color = (33, 33, 33)
             # Color_Current_Word
@@ -515,12 +562,13 @@ class GameProgress:
             # Color_Timer
             self.text_color_timer = (228, 222, 215)
             # Color_Popup
-            self.popup_side_changer_color_background = (228, 222, 215)
-            self.popup_side_changer_color_border = (228, 222, 215)
-            self.popup_side_changer_color_button = (0, 49, 82)
-            self.popup_side_changer_color_button_border = (0, 49, 82)
-            self.popup_side_changer_color_text = (228, 222, 215)
-            self.popup_side_changer_color_text_button = (0, 49, 82)
+
+            self.popup_color_background = (228, 222, 215)
+            self.popup_color_border = (0, 49, 82)
+            self.popup_color_button = (0, 49, 82)
+            self.popup_color_button_border = (0, 49, 82)
+            self.popup_color_text = (228, 222, 215)
+            self.popup_color_text_button = (0, 49, 82)
             # Color_Side_Status
             self.side_text_box_color = (228, 222, 215)
             # Color_Current_Word
@@ -667,16 +715,16 @@ class GameProgress:
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
-        pygame.draw.rect(self.screen, self.popup_side_changer_color_background, self.popup_rect)
-        pygame.draw.rect(self.screen, self.popup_side_changer_color_border, self.popup_rect, 5)
+        pygame.draw.rect(self.screen, self.popup_color_background, self.popup_rect)
+        pygame.draw.rect(self.screen, self.popup_color_border, self.popup_rect, 5)
         popup_text_render = self.font_default.render(self.popup_side_changer_text, True,
-                                                     self.popup_side_changer_color_text_button)
+                                                     self.popup_color_text_button)
         self.screen.blit(popup_text_render,
                          (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
-        pygame.draw.rect(self.screen, self.popup_side_changer_color_button, self.button_rect)
-        pygame.draw.rect(self.screen, self.popup_side_changer_color_button_border, self.button_rect, 2)
+        pygame.draw.rect(self.screen, self.popup_color_button, self.button_rect)
+        pygame.draw.rect(self.screen, self.popup_color_button_border, self.button_rect, 2)
         button_text_render = self.font_default.render(self.popup_side_changer_text_button, True,
-                                                      self.popup_side_changer_color_text)
+                                                      self.popup_color_text)
         self.screen.blit(button_text_render, (self.button_rect.centerx - button_text_render.get_width() // 2,
                                               self.button_rect.centery - button_text_render.get_height() // 2))
 
@@ -690,60 +738,89 @@ class GameProgress:
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
 
-        pygame.draw.rect(self.screen, self.popup_remove_color_background, self.popup_rect)
-        pygame.draw.rect(self.screen, self.popup_remove_color_border, self.popup_rect, 5)
+        pygame.draw.rect(self.screen, self.popup_color_background, self.popup_rect_remove)
+        pygame.draw.rect(self.screen, self.popup_color_border, self.popup_rect_remove, 5)
 
-        popup_text_render = self.font_default.render(self.popup_remove_text, True, self.popup_remove_color_text_button)
+        popup_text_render = self.font_default.render(self.popup_remove_text, True, self.popup_color_text_button)
         self.screen.blit(popup_text_render,
-                         (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
+                         (self.popup_rect_remove.centerx - popup_text_render.get_width() // 2,
+                          self.popup_rect_remove.centery - 40))
 
-        pygame.draw.rect(self.screen, self.popup_remove_color_button, self.remove_yes_button_rect)
-        pygame.draw.rect(self.screen, self.popup_remove_color_button_border, self.remove_yes_button_rect, 2)
-        yes_text_render = self.font_default.render(self.popup_remove_text_yes, True, self.popup_remove_color_text)
+        pygame.draw.rect(self.screen, self.popup_color_button, self.remove_yes_button_rect)
+        pygame.draw.rect(self.screen, self.popup_color_button_border, self.remove_yes_button_rect, 2)
+        yes_text_render = self.font_default.render(self.popup_remove_text_yes, True, self.popup_color_text)
         self.screen.blit(yes_text_render, (self.remove_yes_button_rect.centerx - yes_text_render.get_width() // 2,
                                            self.remove_yes_button_rect.centery - yes_text_render.get_height() // 2))
 
-        pygame.draw.rect(self.screen, self.popup_remove_color_button, self.remove_no_button_rect)
-        pygame.draw.rect(self.screen, self.popup_remove_color_button_border, self.remove_no_button_rect, 2)
-        no_text_render = self.font_default.render(self.popup_remove_text_no, True, self.popup_remove_color_text)
+        pygame.draw.rect(self.screen, self.popup_color_button, self.remove_no_button_rect)
+        pygame.draw.rect(self.screen, self.popup_color_button_border, self.remove_no_button_rect, 2)
+        no_text_render = self.font_default.render(self.popup_remove_text_no, True, self.popup_color_text)
         self.screen.blit(no_text_render, (self.remove_no_button_rect.centerx - no_text_render.get_width() // 2,
                                           self.remove_no_button_rect.centery - no_text_render.get_height() // 2))
+
+    def draw_popup_bot_difficulty(self):
+        """
+        Draw the bot difficulty selection popup
+
+        Displays a popup with three difficulty options: EASY, MEDIUM, HARD
+        """
+        s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
+        s.fill((0, 0, 0, 128))
+        self.screen.blit(s, (0, 0))
+
+        pygame.draw.rect(self.screen, self.popup_color_background, self.popup_rect_bot_difficulty)
+        pygame.draw.rect(self.screen, self.popup_color_border, self.popup_rect_bot_difficulty, 5)
+
+        popup_text_render = self.font_default.render("GAME DIFFICULTY SELECTION", True, self.popup_color_text_button)
+        self.screen.blit(popup_text_render,
+                         (self.popup_rect_bot_difficulty.centerx - popup_text_render.get_width() // 2,
+                          self.popup_rect_bot_difficulty.centery - 40))
+
+        for button, text in [(self.easy_button_rect, "EASY"),
+                             (self.medium_button_rect, "MEDIUM"),
+                             (self.hard_button_rect, "HARD")]:
+            pygame.draw.rect(self.screen, self.popup_color_button, button)
+            pygame.draw.rect(self.screen, self.popup_color_button_border, button, 2)
+            button_text = self.font_default.render(text, True, self.popup_color_text)
+            text_rect = button_text.get_rect(center=button.center)
+            self.screen.blit(button_text, text_rect)
 
     def handle_bot_turn(self):
         if self.side_status == 1 and not self.game_paused:
             current_word = "".join(self.word_letters).lower()
-            print(str(current_word))
+            print(f"[handle_bot_turn] Current Word: {str(current_word).upper()}")
             bot_output = self.bot.play_turn(current_word, self.timer_seconds)
             match bot_output:
                 case self.bot.Output.THINKING:
-                    print(f"{bot_output}")
-                    print("Computer Cards:", self.bot.cards)
-                    print("Will Computer answer:", self.bot.current_turn_will_answer_or_not)
-                    print("Next Word:", self.bot.current_turn_answer)
-                    print("Answer Time:", self.bot.current_turn_answer_time)
-                    print("Ran Initial Code:", self.bot.ran_current_turn_code)
+                    print(f"[handle_bot_turn] Bot Output: {bot_output}")
+                    print(f"[handle_bot_turn] Computer Cards: {self.bot.cards}")
+                    print(f"[handle_bot_turn] Will Computer answer: {self.bot.current_turn_will_answer_or_not}")
+                    print(f"[handle_bot_turn] Next Word: {self.bot.current_turn_answer}")
+                    print(f"[handle_bot_turn] Answer Time: {self.bot.current_turn_answer_time}")
+                    print(f"[handle_bot_turn] Ran Initial Code: {self.bot.ran_current_turn_code}")
                     print()
                     return
                 case _:
                     computer_answer, computer_used_letter = bot_output
                     if not computer_answer:
-                        print("Computer failed to make a word, drawing penalty card")
+                        print("[handle_bot_turn] Computer failed to make a word.")
                         self.add_penalty_card()
                     else:
                         self.word_letters = list(computer_answer.upper())
-                        print(f"{bot_output} answered")
-                        print(f"Computer Used Card:", computer_used_letter)
+                        print(f"[handle_bot_turn] {bot_output} answered")
+                        print(f"[handle_bot_turn] Computer Used Card:", computer_used_letter)
 
                         if computer_answer and computer_used_letter:
                             if computer_used_letter in self.bot.cards:
                                 self.bot.cards.remove(computer_used_letter)
-                                print(f"Card {computer_used_letter} removed from computer's hand")
+                                print(f"[handle_bot_turn] Card {computer_used_letter} removed from computer's hand")
+                                print(f"[handle_bot_turn] Computer Cards(after removed used card): {self.bot.cards}")
                             self.deck.append(computer_used_letter)
-                            print(f"Card {computer_used_letter} returned to deck")
+                            print(f"[handle_bot_turn] Card {computer_used_letter} returned to deck")
                     self.timer_seconds = 0
                     if self.computer_points == 3:
                         self.bot.discard_card()
-                        print("Computer discarded a card")
+                        print("[handle_bot_turn] Computer discarded a card")
                     return
 
     def handle_button_click(self, mouse_x, mouse_y):
@@ -798,7 +875,7 @@ class GameProgress:
                 self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first or self.show_player_first or self.show_remove_page or self.show_remove_page_mode or self.show_victory_page or self.show_defeat_page):
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
-                print("Quit")
+                print("(handle_button_click) Quit")
                 return False
 
         # Confirm_Button
@@ -849,7 +926,7 @@ class GameProgress:
             self.show_victory_page = True
             pygame.time.set_timer(self.timer_event, 0)
             self.game_paused = True
-            print("Victory")
+            print("(check_victory_condition) Victory")
             return True
         # else:
         # print("No Victory")
@@ -869,7 +946,7 @@ class GameProgress:
             self.show_defeat_page = True
             pygame.time.set_timer(self.timer_event, 0)
             self.game_paused = True
-            print("Defeat")
+            print("(check_failure_condition) Defeat")
             return True
         # else:
         # print("No Defeat")
@@ -910,7 +987,7 @@ class GameProgress:
                 if i not in self.used_card_positions:
                     selected_card = self.card_letters[i]
                     self.selected_card = [(i, selected_card)]
-                    print(f"Selected Letter: {selected_card}")
+                    print(f"[handle_card_click] Selected Letter: {selected_card}")
                     return True
         return False
 
@@ -939,16 +1016,17 @@ class GameProgress:
                         current_letter = self.word_letters[i]
 
                         if i in self.replaced_positions:
-                            print(f"Position {i} has already been replaced and cannot be replaced again")
+                            print(
+                                f"[handle_word_click] Position {i} has already been replaced and cannot be replaced again")
                             return False
 
                         # Check if the letters are the same as those in the original word
                         if card_letter.lower() == self.previous_word_letters[i].lower():
-                            print(f"Cannot use same card：{card_letter}")
+                            print(f"[handle_word_click] Cannot use same card：{card_letter}")
                             return False
 
                         if current_letter == card_letter:
-                            print(f"Cannot use same card {card_letter} ")
+                            print(f"[handle_word_click] Cannot use same card {card_letter} ")
                             self.selected_card = []
                             return True
 
@@ -958,16 +1036,17 @@ class GameProgress:
                             if self.last_swapped_position == i:
                                 if self.used_card_positions:
                                     last_card_position = self.used_card_positions.pop()
-                                    print(f"Restored previous card at position {last_card_position}")
+                                    print(
+                                        f"[handle_word_click] Restored previous card at position {last_card_position}")
                             # Different_Position_Swap
                             else:
                                 self.word_letters[self.last_swapped_position] = self.original_cards[
                                     self.last_swapped_position]
                                 if self.used_card_positions:
                                     last_card_position = self.used_card_positions.pop()
-                                    print(f"Restored card at position {last_card_position}")
+                                    print(f"[handle_word_click] Restored card at position {last_card_position}")
                                 print(
-                                    f"Restored position {self.last_swapped_position} to {self.original_cards[self.last_swapped_position]}")
+                                    f"[handle_word_click] Restored position {self.last_swapped_position} to {self.original_cards[self.last_swapped_position]}")
 
                         # Store_original_cards
                         elif not self.original_cards:
@@ -975,8 +1054,8 @@ class GameProgress:
 
                         # Update_Current_Word
                         self.word_letters[i] = card_letter
-                        print(f"Swapped letters: {current_letter} -> {card_letter}")
-                        print(f"Current Word: {''.join(self.word_letters)}")
+                        print(f"[handle_word_click] Swapped letters: {current_letter} -> {card_letter}")
+                        print(f"[handle_word_click] Current Word: {''.join(self.word_letters)}")
 
                         # Update_Swap_Status
                         self.last_swapped_position = i
@@ -1001,30 +1080,43 @@ class GameProgress:
             - Restores previous state
         """
         current_word_str = ''.join(self.word_letters).lower()
-        if self.logic.check_exists(current_word_str):
-            if self.side_status == 0:
+        if self.logic.check_exists(current_word_str):  # Valid Word
+            if self.side_status == 0:  # Player
                 self.player_answer_status = 1
+                print(f"[check_word_validity] Player answer checked: {self.player_answer_status}")
                 replaced_letter = None
                 for i, letter in enumerate(self.word_letters):
                     if letter != self.previous_word_letters[i]:
                         replaced_letter = letter
-                        print(f"Player used letter: {letter}")
+                        print(f"[check_word_validity] Player used letter: {letter}")
                         self.deck.append(letter.lower())
-                        print(f"{letter} returned to deck")
-                        print
+                        print(f"[check_word_validity] {letter} returned to deck")
                 self.previous_word_letters = self.word_letters.copy()
                 self.previous_used_card_positions = self.used_card_positions.copy()
-                print("Answer check: Valid Word")
+                print("[check_word_validity] Answer check: Valid Word")
             elif self.side_status == 1:
-                self.computer_answer_status = 1
+                if self.bot.current_turn_will_answer_or_not:
+                    if not self.bot.current_turn_answer == None:
+                        self.computer_answer_status = 1
+                        print(
+                            f"[check_word_validity] Computer answer checked(will answer and not NONE): {self.computer_answer_status}")
+                    else:
+                        self.computer_answer_status = 0
+                        print(
+                            f"[check_word_validity] Computer answer checked(will answer but NONE): {self.computer_answer_status}")
+                else:
+                    self.computer_answer_status = 0
+                    print(f"[check_word_validity] Computer answer checked(no answer): {self.computer_answer_status}")
         else:
             if self.side_status == 0:
                 self.player_answer_status = 0
+                print(f"[check_word_validity] Player answer checked: {self.player_answer_status}")
                 self.word_letters = self.previous_word_letters.copy()
                 self.used_card_positions = self.previous_used_card_positions.copy()
-                print("Answer check: Invalid Word")
+                print("[check_word_validity] Answer check: Invalid Word")
             elif self.side_status == 1:
                 self.computer_answer_status = 0
+                print(f"[check_word_validity] Computer answer checked: {self.computer_answer_status}")
 
     def handle_timer_event(self):
         """
@@ -1047,28 +1139,43 @@ class GameProgress:
         if self.timer_seconds > 0 and not self.game_paused:
             self.timer_seconds -= 1
         else:
-            if self.side_status == 0:
-                print("Current Word:", self.word_letters)
-                print("Previous Word:", self.previous_word_letters)
-                if self.word_letters == self.previous_word_letters:
-                    print("Player did not make a valid word change, drawing penalty card")
+            if self.side_status == 0:  # Player
+                print("[handle_timer_event] Current Word:", self.word_letters)
+                print("[handle_timer_event] Previous Word:", self.previous_word_letters)
+                if self.word_letters == self.previous_word_letters:  # No word change
+                    print("[handle_timer_event] No Word Changed.")
+                    self.player_answer_status = 0
+                    print(f"[handle_timer_event] Player answer checked(no word change): {self.player_answer_status}")
                     self.add_penalty_card()
                     pass
                 else:
+                    print("[handle_timer_event] Word Changed.")
                     self.check_word_validity()
+                    print("[handle_timer_event] Word validity checked.")
+                    self.update_popup_text()
+                    print(f"[handle_timer_event] Popup Text Updated.")
+                    self.update_side_text()
                     if self.player_answer_status == 1:
                         self.points += 1
-                        print("Current Word:", self.word_letters)
-                        print("Previous Word:", self.previous_word_letters)
-                    else:
+                        print("[handle_timer_event] Player Points added one.")
+                        print(f"[handle_timer_event] Player Points: {self.points}")
+                        # print("Current Word:", self.word_letters)
+                        # print("Previous Word:", self.previous_word_letters)
+                    elif self.player_answer_status == 0:
                         self.add_penalty_card()
-            elif self.side_status == 1:
+            elif self.side_status == 1:  # Computer
                 self.check_word_validity()
+                self.update_popup_text()
+                print(f"[handle_timer_event] Popup Text Updated.")
+                self.update_side_text()
                 if self.computer_answer_status == 1:
                     self.computer_points += 1
-                    print(f"Computer Points: {self.computer_points}")
+                    print("[handle_timer_event] Computer Points added one.")
+                    print(f"[handle_timer_event] Computer Points: {self.computer_points}")
                 self.bot.end_turn()
-
+            print(f"[handle_timer_event] Side Status(0-Player 1-Computer): {self.side_status}")
+            print(f"[handle_timer_event] Player answer status: {self.player_answer_status}")
+            print(f"[handle_timer_event] Computer answer status: {self.computer_answer_status}")
             self.side_status = 1 - self.side_status
 
             self.check_failure_condition()
@@ -1086,8 +1193,8 @@ class GameProgress:
                 pygame.time.set_timer(self.timer_event, 0)
                 self.show_remove_page = True
                 self.game_paused = True
-                print("--- Remove Mode Enables ---")
-                print("Remove mode: Enable")
+                print("[handle_timer_event] --- Remove Mode Enables ---")
+                print("[handle_timer_event] Remove mode: Enable")
                 pygame.time.set_timer(self.timer_event, 0)
 
             #  Reset original letters and last swapped position at the end of each round
@@ -1112,17 +1219,18 @@ class GameProgress:
             if self.button_rect.collidepoint(pos):
                 self.button_sound.play()
                 self.organize_cards()
-                self.update_side_text()
-                print(self.deck)
+                # self.update_side_text()
+                # print(f"[handle_popup_click] Side Text Updated")
+                print(f"[handle_popup_click] Card Stack: {self.deck}")
                 self.show_popup = False
                 self.game_paused = False
                 self.show_remove_page = False
                 self.show_remove_page_mode = False
                 self.popup_ok_clicks += 1
-                self.replaced_positions.clear()
                 self.current_round = math.floor(self.popup_ok_clicks / 2)
+
                 if '*' in self.word_letters:
-                    print("Star card detected! New word will be generated.")
+                    print("[handle_popup_click] Star card detected! New word will be generated.")
                     self.star_card_active = True
 
                 # If the star card is activated, generate new word
@@ -1131,26 +1239,28 @@ class GameProgress:
                     self.word_letters = list(self.current_word)
                     self.previous_word_letters = self.word_letters.copy()
                     self.star_card_active = False
-                    print(f"Due to the star card, the new word is: {self.current_word}")
+                    print(f"[handle_popup_click] Due to the star card, the new word is: {self.current_word}")
 
                 self.replaced_positions.clear()
 
                 if self.side_status == 0:
-                    print("--- Player Turn Starts ---")
-                    print(f"Current Round {self.popup_ok_clicks / 2}")
-                    print(f"Current Points: {self.points}")
+                    print("[handle_popup_click] --- Computer Turn Ends ---\n")
+                    print("\n[handle_popup_click] --- Player Turn Starts ---")
+                    print(f"[handle_popup_click] Current Round {self.popup_ok_clicks / 2}")
+                    print(f"[handle_popup_click] Current Points: {self.points}")
                 else:
-                    print("--- Computer Turn Starts ---")
+                    print("[handle_popup_click] --- Player Turn Ends ---")
+                    print("[handle_popup_click] --- Computer Turn Starts ---")
                 pygame.time.set_timer(self.timer_event, 1000)
 
-        if self.show_popup_remove:
+        elif self.show_popup_remove:
             mouse_x, mouse_y = pos
             if self.remove_yes_button_rect.collidepoint(mouse_x, mouse_y):
                 if pygame.mouse.get_pressed()[0]:
                     self.button_sound.play()
                     self.side_status = 0
-                    print("Removal Successful\nRemove mode: Disable")
-                    print("--- Remove Mode Disables ---")
+                    print("[handle_popup_click] Removal Successful\n[handle_popup_click] Remove mode: Disable")
+                    print("[handle_popup_click] --- Remove Mode Disables ---")
                     if self.selected_card and isinstance(self.selected_card[0], tuple):
                         position, _ = self.selected_card[0]
                         self.used_card_positions.append(position)
@@ -1166,10 +1276,27 @@ class GameProgress:
             elif self.remove_no_button_rect.collidepoint(mouse_x, mouse_y):
                 if pygame.mouse.get_pressed()[0]:
                     self.button_sound.play()
-                    print("Cancel")
+                    print("[handle_popup_click] Cancel")
                     self.show_popup_remove = False
                     pygame.time.set_timer(self.timer_event, 0)
                     return True
+
+        elif self.show_popup_bot_difficulty:
+            mouse_x, mouse_y = pos
+            if self.easy_button_rect.collidepoint(mouse_x, mouse_y):
+                self.bot = Bot(Bot.Difficulty.EASY, self.bot.cards)
+                self.show_popup_bot_difficulty = False
+                print(f"[handle_popup_click] Bot difficulty EASY")
+            elif self.medium_button_rect.collidepoint(mouse_x, mouse_y):
+                self.bot = Bot(Bot.Difficulty.MEDIUM, self.bot.cards)
+                self.show_popup_bot_difficulty = False
+                print(f"[handle_popup_click] Bot difficulty MEDIUM")
+            elif self.hard_button_rect.collidepoint(mouse_x, mouse_y):
+                self.bot = Bot(Bot.Difficulty.HARD, self.bot.cards)
+                self.show_popup_bot_difficulty = False
+                print(f"[handle_popup_click] Bot difficulty HARD")
+            return True
+
         return False
 
     def handle_events(self):
@@ -1193,13 +1320,14 @@ class GameProgress:
             # Mouse_Click_Event
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                print("Click")
+                # print("[handle_events] Click")
                 if not self.handle_button_click(mouse_x, mouse_y):
                     return False
 
                 if self.show_victory_page or self.show_defeat_page:
                     if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit:
-                        return False
+                        pygame.quit()
+                        sys.exit()
                     continue
 
                 if not self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
@@ -1209,6 +1337,7 @@ class GameProgress:
                 if self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
                     if self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
                         self.button_sound.play()
+                        self.show_popup_bot_difficulty = True
                         self.show_welcome_page = False
                         self.show_rules_page = False
                         self.show_options_page = False
@@ -1243,18 +1372,18 @@ class GameProgress:
                         pygame.time.set_timer(self.timer_event, 0)
 
                 # Popup_Click
-                elif self.show_popup or self.show_popup_remove:
+                elif self.show_popup or self.show_popup_remove or self.show_popup_bot_difficulty:
                     self.handle_popup_click(event.pos)
 
                 # First_Role_Page_Click
-                elif self.show_computer_first or self.show_player_first:
+                elif (self.show_computer_first or self.show_player_first) and not self.show_popup_bot_difficulty:
                     self.button_sound.play()
                     self.show_computer_first = False
                     self.show_player_first = False
                     if self.side_status == 0:
-                        print("--- Player Turn Starts ---")
+                        print("[handle_events] --- Player Turn Starts ---")
                     elif self.side_status == 1:
-                        print("--- Computer Turn Starts ---")
+                        print("[handle_events] --- Computer Turn Starts ---")
                     pygame.time.set_timer(self.timer_event, 1000)
 
                 elif not (
@@ -1263,13 +1392,13 @@ class GameProgress:
                         self.button_sound.play()
                         self.game_paused = True
                         self.show_game_paused_page = True
-                        print("Game Paused")
+                        print("[handle_events] Game Paused")
                         pygame.time.set_timer(self.timer_event, 0)
                     elif self.show_game_paused_page:
                         self.button_sound.play()
                         self.game_paused = False
                         self.show_game_paused_page = False
-                        print("Game Unpaused")
+                        print("[handle_events] Game Unpaused")
                         pygame.time.set_timer(self.timer_event, 1000)
 
                 elif not (
@@ -1370,6 +1499,9 @@ class GameProgress:
 
         if self.show_popup_remove:
             self.draw_popup_remove()
+
+        if self.show_popup_bot_difficulty:
+            self.draw_popup_bot_difficulty()
 
         if self.show_rules_page:
             self.screen.blit(self.image_rules_page, (0, 0))
