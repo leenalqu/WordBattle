@@ -52,6 +52,45 @@ How To Use The Interface Of The Game🃏🧩✨:
 
 
 
+not finshed yet 
+
+
+
+
+# Software requirements 🌐:
+1. Python version (3.13) you can download it from Python official website.
+ 
+2. Code editor: You can use any code editor, but PyCharm is recommended for 
+    its powerful features and easy to use.You can do  download PyCharm from
+    jetbrains.com/pycharm
+
+3. Python packages:  Pygame: This can installed via the terminal by using 
+    command pip install pygame. 
+
+4. Script Permissions: No special permissions needed to run this game in
+    PyCharm. 
+
+# Hardware Requirements 💻
+It’s recommended to have at least 100MB of available RAM for optimal performance.
+
+# Instructions to run code 🏃‍♂️‍➡️
+1. make sure that Python is installed and you met the software and hardware requirements.
+
+2. In a code editor with an integrated terminal, save the file with a .py extension and 
+    run it with python file_name.py. If you have multiple Python versions, use python3 file_name.py.
+
+3. If you are using an editor without integrated terminal for example Notepad you need to save the file as .py, and open the 
+    terminal (e.g., Windows Command Prompt), navigate to the file's directory, and run it with python file_name.py or python3 file_name.py.
+
+4. If you’ve set the correct interpreter (Python 3.13) click the button Run and the code will run automatically.
+
+
+
+                 
+
+
+
+
 
 
 
