@@ -334,6 +334,7 @@ class GameProgress:
         self.previous_word_letters = self.word_letters.copy()
         self.previous_used_card_positions = self.used_card_positions.copy()
         self.replaced_positions = set()
+        self.star_card_active = False
         # Config_Points
         self.max_points = 3
         self.point_block_length = 55
@@ -1120,6 +1121,19 @@ class GameProgress:
                 self.popup_ok_clicks += 1
                 self.replaced_positions.clear()
                 self.current_round = math.floor(self.popup_ok_clicks / 2)
+                if '*' in self.word_letters:
+                    print("Star card detected! New word will be generated.")
+                    self.star_card_active = True
+
+                # If the star card is activated, generate new word
+                if self.star_card_active:
+                    self.current_word = self.logic.word_generator().upper()
+                    self.word_letters = list(self.current_word)
+                    self.previous_word_letters = self.word_letters.copy()
+                    self.star_card_active = False
+                    print(f"Due to the star card, the new word is: {self.current_word}")
+
+                self.replaced_positions.clear()
 
                 if self.side_status == 0:
                     print("--- Player Turn Starts ---")
