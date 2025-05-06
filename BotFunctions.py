@@ -293,7 +293,7 @@ class Bot:
         if self.difficulty_level == Bot.Difficulty.EASY:  # when the bot is in easy mode
             card_to_remove_index = random.randint(0, len(self.cards) - 1)  # pick a random index from the cards list
             self.cards.pop(card_to_remove_index)  # remove the card from the bots cards
-        elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.EASY):  # if bot is in medium or hard mode
+        elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.HARD):  # if bot is in medium or hard mode
             worst_card = self.cards[0]  # initiate variable for the worst card as the bots first card
             for card in self.cards:  # loops through the bots cards
                 if card not in alphabet: #check if card is a letter
