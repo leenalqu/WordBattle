@@ -52,7 +52,7 @@ How To Use The Interface Of The Game🃏🧩✨:
 
 
 
-not finshed yet 
+not f yet 
 
 
 
