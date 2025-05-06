@@ -52,15 +52,14 @@ wish luck be on your side 😊
 # How To Use The Interface Of The Game🃏🧩✨:
 
 ## 1. Welcome Page 😊:
-
-    When you run the game you will see a welcome page.At the top, 
-    you can choose between two different themes. 
+When you run the game you will see a welcome page.At the top, 
+you can choose between two different themes. 
 
     ![img.png](img.png)
 
 ## 2. Main Menu Buttons 🔘:
 
-    There are four buttons on the welcome page:
+There are four buttons on the welcome page:
     ![img_1.png](img_1.png)
     - Play: Starts the game.
     - Options: Mute music.
@@ -68,11 +67,11 @@ wish luck be on your side 😊
     - Credits: Names of the people who created the game
    
 ## 3. Bot Difficulty 💪: 
-    After clicking the Play button, you’ll be asked to choose the difficulty level of the bot.
+After clicking the Play button, you’ll be asked to choose the difficulty level of the bot.
 
 ## 4. Coin flip 🪙:
-    A coin flip will decide who plays first—you or the bot.
-    A screen will display the result before the game begins.
+A coin flip will decide who plays first—you or the bot.
+A screen will display the result before the game begins.
 
    ![img_2.png](img_2.png)
 
@@ -82,20 +81,20 @@ wish luck be on your side 😊
 
 ![img_4.png](img_4.png)
 
-    - The word to modify appears at the top.
-    - The timer is in the middle.
-    - Your cards are shown at the bottom.
-      - At the bottom, you’ll also find:
-        - Points 
-        - Number of rounds
-        - Pause Game
-        - Exit Game
-        - Game Rules
-        - Confirm to Next Round
-        - To click a button in the game, just double-click it.
-        - To change a letter in the word:
-          1. Click one of your letter cards.
-          2. Then click the letter in the word you want to replace.
+- The word to modify appears at the top.
+- The timer is in the middle.
+- Your cards are shown at the bottom.
+- At the bottom, you’ll also find:
+  - Points 
+  - Number of rounds
+  - Pause Game
+  - Exit Game
+  - Game Rules
+  - Confirm to Next Round
+  - To click a button in the game, just double-click it.
+  - To change a letter in the word:
+    1. Click one of your letter cards.
+    2. Then click the letter in the word you want to replace.
 
     
 # Software requirements 🌐:
