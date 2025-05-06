@@ -49,10 +49,10 @@ wish luck be on your side 😊
 ##### Ready???? Let’s go 🤗
 
 How To Use The Interface Of The Game🃏🧩✨:
-
-
-
-not f yet 
+1. When you run the game you will see a welcome page
+    in the welcome page there is two theme you can 
+    choose from them in the top of the welcome page
+2. There is four buttons in the welcome page 
 
 
 
