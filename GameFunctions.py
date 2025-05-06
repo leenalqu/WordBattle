@@ -170,16 +170,18 @@ class Game:
 
     # Generate a three letter random word.
     def word_generator(self):
+        vowels ='aeiou'  # List of vowels.
         while True:
             random_word = random.choice(self.words)
-            word_check=self.valid_transformations(random_word)
-            if len(word_check) >=2:
-                return random_word
+            if random_word[1] in vowels:
+                word_check=self.valid_transformations(random_word)
+                if len(word_check) >=4:
+                    return random_word
 
     # Check if the word real or not after the player change it.
     def check_exists(self,player_word):
         if "*" in player_word:
-            for i in range(97,123):  # Letters from a to z.
+            for i in range(97,123):  # Letters from the letter a to letter z.
                 letter=chr(i)
                 check_word=player_word.replace("*",chr(i),1) # It is replacing the star with letter.
                 if check_word in self.words:
@@ -198,19 +200,3 @@ class Game:
             return "Head"
         else:
             return "Tail"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -2,9 +2,6 @@
 
 #importing libraries and modules
 import random
-
-from typing_extensions import Tuple
-
 from GameSettings import GameSettings
 from enum import Enum
 
