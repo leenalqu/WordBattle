@@ -55,16 +55,16 @@ wish luck be on your side 😊
 When you run the game you will see a welcome page.At the top, 
 you can choose between two different themes. 
 
-    ![img.png](img.png)
+![img.png](img.png)
 
 ## 2. Main Menu Buttons 🔘:
 
 There are four buttons on the welcome page:
     ![img_1.png](img_1.png)
-    - Play: Starts the game.
-    - Options: Mute music.
-    - Rules : Displays the game rules.
-    - Credits: Names of the people who created the game
+1.     Play: Starts the game.
+2.     Options: Mute music.
+3.     Rules : Displays the game rules.
+4.     Credits: Names of the people who created the game
    
 ## 3. Bot Difficulty 💪: 
 After clicking the Play button, you’ll be asked to choose the difficulty level of the bot.
