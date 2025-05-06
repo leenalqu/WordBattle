@@ -333,6 +333,7 @@ class GameProgress:
         self.used_card_positions = list(range(7, 15))
         self.previous_word_letters = self.word_letters.copy()
         self.previous_used_card_positions = self.used_card_positions.copy()
+        self.replaced_positions = set()
         # Config_Points
         self.max_points = 3
         self.point_block_length = 55
@@ -936,13 +937,22 @@ class GameProgress:
                         card_position, card_letter = self.selected_card[0]
                         current_letter = self.word_letters[i]
 
+                        if i in self.replaced_positions:
+                            print(f"Position {i} has already been replaced and cannot be replaced again")
+                            return False
+
+                        # Check if the letters are the same as those in the original word
+                        if card_letter.lower() == self.previous_word_letters[i].lower():
+                            print(f"Cannot use same card：{card_letter}")
+                            return False
+
                         if current_letter == card_letter:
                             print(f"Cannot use same card {card_letter} ")
                             self.selected_card = []
                             return True
 
                         # Handle_Previous_Swap
-                        if self.last_swapped_position is not None:
+                        elif self.last_swapped_position is not None:
                             # Same_Position_Swap
                             if self.last_swapped_position == i:
                                 if self.used_card_positions:
@@ -959,7 +969,7 @@ class GameProgress:
                                     f"Restored position {self.last_swapped_position} to {self.original_cards[self.last_swapped_position]}")
 
                         # Store_original_cards
-                        if not self.original_cards:
+                        elif not self.original_cards:
                             self.original_cards = self.word_letters.copy()
 
                         # Update_Current_Word
@@ -1108,6 +1118,7 @@ class GameProgress:
                 self.show_remove_page = False
                 self.show_remove_page_mode = False
                 self.popup_ok_clicks += 1
+                self.replaced_positions.clear()
                 self.current_round = math.floor(self.popup_ok_clicks / 2)
 
                 if self.side_status == 0:
