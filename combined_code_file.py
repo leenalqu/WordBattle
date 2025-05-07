@@ -111,7 +111,7 @@ class GameProgress:
         self.bot = Bot(Bot.Difficulty.EASY, computer_cards)
 
         # Configure settings
-        self.points = 3
+        self.points = 1
         self.side_status = 0
         self.computer_points = 0
         self.bot_correct_answers = 0
@@ -222,6 +222,7 @@ class GameProgress:
         self.image_game_paused_page_0 = pygame.image.load("data/image/game_paused_page_0.png")
         self.image_game_paused_page_1 = pygame.image.load("data/image/game_paused_page_1.png")
         self.image_game_paused_page = self.image_game_paused_page_0
+        self.paused_page_mark = 0
 
         # Config_Rules_Main_Page
         self.image_rules_main_page_0 = pygame.image.load("data/image/rules_main_page_0.png")
@@ -1476,6 +1477,13 @@ class GameProgress:
                         print("[handle_events] Game Unpaused")
                         pygame.time.set_timer(self.timer_event, 1000)
 
+                elif self.show_game_paused_page and self.x_min_rules_main_button <= mouse_x <= self.x_max_rules_main_button and self.y_min_rules_main_button <= mouse_y <= self.y_max_rules_main_button:
+                    self.button_sound.play()
+                    self.show_rules_main_page = True
+                    self.show_game_paused_page = False
+                    self.paused_page_mark = 1
+                    pygame.time.set_timer(self.timer_event, 0)
+
                 elif not (
                         self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page):
                     if self.x_min_rules_main_button <= mouse_x <= self.x_max_rules_main_button and self.y_min_rules_main_button <= mouse_y <= self.y_max_rules_main_button and not self.show_rules_page:
@@ -1484,9 +1492,16 @@ class GameProgress:
                         self.show_game_paused_page = False
                         pygame.time.set_timer(self.timer_event, 0)
                     elif self.show_rules_main_page:
-                        self.button_sound.play()
-                        self.show_rules_main_page = False
-                        pygame.time.set_timer(self.timer_event, 1000)
+                        if self.paused_page_mark == 1:
+                            self.button_sound.play()
+                            self.show_rules_main_page = False
+                            self.show_game_paused_page = True
+                            self.paused_page_mark = 0
+                            pygame.time.set_timer(self.timer_event, 0)
+                        else:
+                            self.button_sound.play()
+                            self.show_rules_main_page = False
+                            pygame.time.set_timer(self.timer_event, 1000)
 
                 # restart
 
