@@ -111,7 +111,7 @@ class GameProgress:
         self.bot = Bot(Bot.Difficulty.EASY, computer_cards)
 
         # Configure settings
-        self.points = 1
+        self.points = 3
         self.side_status = 0
         self.computer_points = 0
         self.bot_correct_answers = 0
@@ -164,6 +164,8 @@ class GameProgress:
         self.card_overlay_color = (33, 33, 33)
         # Color_block
         self.point_block_color = (188, 173, 119)
+        # Color sound
+        self.test_color = (188, 173, 119)
 
         # Config_Background
         self.background_0 = pygame.image.load("data/image/background_0.png")
@@ -184,6 +186,11 @@ class GameProgress:
         self.image_options_page_0 = pygame.image.load("data/image/options_page_0.png")
         self.image_options_page_1 = pygame.image.load("data/image/options_page_1.png")
         self.image_options_page = self.image_options_page_0
+        # Options Page Boxes
+        self.options_box1_rect = pygame.Rect(672, 178, 18, 18)
+        self.options_box2_rect = pygame.Rect(709, 318, 18, 18)
+        self.options_click_sound = 1
+        self.options_background_music = 1
         # Config_Credits_Page
         self.image_credits_page_0 = pygame.image.load("data/image/credits_page_0.png")
         self.image_credits_page_1 = pygame.image.load("data/image/credits_page_1.png")
@@ -236,6 +243,8 @@ class GameProgress:
         pygame.mixer.music.play(-1)
         self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
         self.sound_enabled = True
+        self.sound_mark_click_sound = 1
+        self.sound_mark_background_music = 1
         # Config_Font
         self.font_size_default = 24
         self.font_size_timer = 88
@@ -255,10 +264,10 @@ class GameProgress:
         self.popup_side_changer_height = 150
         self.popup_side_changer_width_button = 100
         self.popup_side_changer_height_button = 30
-        self.popup_rect = pygame.Rect(self.screen_width // 2 - self.popup_side_changer_width // 2,  # x position
-                                      self.screen_height // 2 - self.popup_side_changer_height // 2,  # y position
-                                      self.popup_side_changer_width,  # width
-                                      self.popup_side_changer_height  # height
+        self.popup_rect = pygame.Rect(self.screen_width // 2 - self.popup_side_changer_width // 2,
+                                      self.screen_height // 2 - self.popup_side_changer_height // 2,
+                                      self.popup_side_changer_width,
+                                      self.popup_side_changer_height
                                       )
         self.popup_remove_rect = pygame.Rect(self.screen_width // 2 - 150, self.screen_height // 2 - 75, 300, 150)
         self.button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 25, 100, 30)
@@ -267,11 +276,11 @@ class GameProgress:
         self.popup_side_changer_pos_x_button = self.screen_width // 2 - self.popup_side_changer_width_button // 2
         self.popup_side_changer_pos_y_button = self.screen_width // 2 + 25
         self.popup_side_changer_text = ""
-        self.popup_side_changer_text_player = "COMPUTER THINKING"
-        self.popup_side_changer_text_computer = "IT IS YOUR TURN"
-        self.popup_side_changer_text_button_player = "WAIT"
-        self.popup_side_changer_text_button_computer = "GO"
         self.popup_side_changer_text_button = ""
+        self.popup_side_changer_text_player = "Player Invalid Answer"
+        self.popup_side_changer_text_button_player = "OK"
+        self.popup_side_changer_text_computer = "Computer Invalid Answer"
+        self.popup_side_changer_text_button_computer = "OK"
 
         # Config_Popup_Remove
         self.popup_remove_width = 350
@@ -291,6 +300,8 @@ class GameProgress:
         self.popup_remove_text_button = "OK"
         self.update_side_text()
         print("[__init__] Side Text Updated")
+        self.update_popup_text()
+        print("[__init__] Popup Text Updated")
         self.side_text_box_pos = (self.screen_width // 2, 0)
         # Config_popup_bot_difficulty
         self.popup_bot_difficulty_width = 380
@@ -394,10 +405,14 @@ class GameProgress:
         self.x_min_back_button, self.y_min_back_button = 547, 563
         self.x_max_back_button, self.y_max_back_button = 660, 593
         # Theme
-        self.x_min_theme_0_button, self.y_min_theme_0_button = 4, 4
-        self.x_max_theme_0_button, self.y_max_theme_0_button = 22, 22
-        self.x_min_theme_1_button, self.y_min_theme_1_button = 26, 4
-        self.x_max_theme_1_button, self.y_max_theme_1_button = 44, 22
+        self.x_min_theme_0_button, self.y_min_theme_0_button = 95, 70
+        self.x_max_theme_0_button, self.y_max_theme_0_button = 318, 240
+        self.x_min_theme_1_button, self.y_min_theme_1_button = 95, 263
+        self.x_max_theme_1_button, self.y_max_theme_1_button = 318, 433
+        self.x_min_click_sound_button, self.y_min_click_sound_button = 672, 178
+        self.x_max_click_sound_button, self.y_max_click_sound_button = 690, 196
+        self.x_min_background_music_button, self.y_min_background_music_button = 709, 318
+        self.x_max_background_music_button, self.y_max_background_music_button = 727, 336
         # Play
         self.x_min_play_button, self.y_min_play_button = 64, 525
         self.x_max_play_button, self.y_max_play_button = 137, 549
@@ -418,7 +433,7 @@ class GameProgress:
             self.side_text_box = "YOUR TURN"
             # self.popup_side_changer_text = self.popup_side_changer_text_player
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_player
-        else:
+        elif self.side_status == 1:
             self.side_text_box = "COMPUTER'S TURN"
             # self.popup_side_changer_text = self.popup_side_changer_text_computer
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_computer
@@ -536,6 +551,8 @@ class GameProgress:
             # Overlay
             self.card_overlay_color = (33, 33, 33)
             self.point_block_color = (188, 173, 119)
+            # Color sound
+            self.test_color = (188, 173, 119)
             # Pages
             self.image_welcome_page = self.image_welcome_page_0
             self.image_rules_page = self.image_rules_page_0
@@ -581,6 +598,8 @@ class GameProgress:
             # Overlay
             self.card_overlay_color = (0, 49, 82)
             self.point_block_color = (0, 49, 82)
+            # Color sound
+            self.test_color = (0, 49, 82)
             # Pages
             self.image_welcome_page = self.image_welcome_page_1
             self.image_rules_page = self.image_rules_page_1
@@ -846,36 +865,65 @@ class GameProgress:
         """
         # Theme_0_Button
         if self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button:
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 1:
                 self.button_sound.play()
+                print("[handle_button_click] Theme_0_Button Clicked")
                 self.theme_setting = 0
-                if self.show_rules_page or self.show_options_page or self.show_credits_page:
-                    self.show_welcome_page = True
-                    self.show_rules_page = False
-                    self.show_options_page = False
-                    self.show_credits_page = False
+                # if self.show_rules_page or self.show_options_page or self.show_credits_page:
+                # self.show_welcome_page = True
+                # self.show_rules_page = False
+                # self.show_options_page = False
+                # self.show_credits_page = False
                 # pygame.time.set_timer(self.timer_event, 0)
                 self.update_theme()
+            elif pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 0:
+                self.button_sound.play()
+                pass
 
         # Theme_1_Button
         if self.x_min_theme_1_button <= mouse_x <= self.x_max_theme_1_button and self.y_min_theme_1_button <= mouse_y <= self.y_max_theme_1_button:
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 0:
                 self.button_sound.play()
+                print("[handle_button_click] Theme_1_Button Clicked")
                 self.theme_setting = 1
-                if self.show_rules_page or self.show_options_page or self.show_credits_page:
-                    self.show_welcome_page = True
-                    self.show_rules_page = False
-                    self.show_options_page = False
-                    self.show_credits_page = False
+                # if self.show_rules_page or self.show_options_page or self.show_credits_page:
+                # self.show_welcome_page = True
+                # self.show_rules_page = False
+                # self.show_options_page = False
+                # self.show_credits_page = False
                 # pygame.time.set_timer(self.timer_event, 0)
                 self.update_theme()
+            elif pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 1:
+                self.button_sound.play()
+                pass
+        if self.x_min_click_sound_button <= mouse_x <= self.x_max_click_sound_button and self.y_min_click_sound_button <= mouse_y <= self.y_max_click_sound_button:
+            if pygame.mouse.get_pressed()[0] and self.show_options_page:
+                self.button_sound.play()
+                self.options_click_sound = 1 - self.options_click_sound
+                if self.options_click_sound == 1:
+                    self.button_sound.set_volume(1.0)
+                elif self.options_click_sound == 0:
+                    self.button_sound.set_volume(0.0)
+                print("[handle_button_click] Click Sound Button Clicked")
+
+        if self.x_min_background_music_button <= mouse_x <= self.x_max_background_music_button and self.y_min_background_music_button <= mouse_y <= self.y_max_background_music_button:
+            if pygame.mouse.get_pressed()[0] and self.show_options_page:
+                self.button_sound.play()
+                self.options_background_music = 1 - self.options_background_music
+                if self.options_background_music == 1:
+                    self.sound_enabled = True
+                    pygame.mixer.music.set_volume(0.3)
+                elif self.options_background_music == 0:
+                    self.sound_enabled = False
+                    pygame.mixer.music.set_volume(0)
+                print("[handle_button_click] Background Music Button Clicked")
 
         # Quit_Button
         if self.x_min_quit <= mouse_x <= self.x_max_quit and self.y_min_quit <= mouse_y <= self.y_max_quit and not (
-                self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first or self.show_player_first or self.show_remove_page or self.show_remove_page_mode or self.show_victory_page or self.show_defeat_page):
+                self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first or self.show_player_first or self.show_remove_page or self.show_remove_page_mode or self.show_victory_page or self.show_defeat_page or self.show_rules_main_page):
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
-                print("(handle_button_click) Quit")
+                print("[handle_button_click] Quit")
                 return False
 
         # Confirm_Button
@@ -884,21 +932,33 @@ class GameProgress:
             if pygame.mouse.get_pressed()[0] and self.side_status == 0:
                 self.button_sound.play()
                 self.timer_seconds = 0
+            elif pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
+                print("[handle_button_click] Restart Game.")
+                python = sys.executable
+                script = os.path.abspath(__file__)
+                pygame.quit()
+                os.execv(python, [python, script])
 
         # Sound_Button
         if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button and not (
-                self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first or self.show_player_first):
+                self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first or self.show_player_first or self.show_rules_main_page):
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
                 if self.sound_enabled:
-                    pygame.mixer.music.set_volume(0)
+                    if self.sound_mark_click_sound == 1:
+                        self.button_sound.set_volume(0.0)
+                    if self.sound_mark_background_music == 1:
+                        pygame.mixer.music.set_volume(0.0)
                     self.sound_enabled = False
                     if self.theme_setting == 0:
                         self.current_background = self.background_mute_0
                     if self.theme_setting == 1:
                         self.current_background = self.background_mute_1
                 else:
-                    pygame.mixer.music.set_volume(0.3)
+                    if self.sound_mark_click_sound == 1:
+                        self.button_sound.set_volume(1.0)
+                    if self.sound_mark_background_music == 1:
+                        pygame.mixer.music.set_volume(0.3)
                     self.sound_enabled = True
                     if self.theme_setting == 0:
                         self.current_background = self.background_0
@@ -906,8 +966,6 @@ class GameProgress:
                         self.current_background = self.background_1
                 self.button_sound.play()
         return True
-
-        # Conditions
 
     def check_victory_condition(self):
         """
@@ -926,7 +984,7 @@ class GameProgress:
             self.show_victory_page = True
             pygame.time.set_timer(self.timer_event, 0)
             self.game_paused = True
-            print("(check_victory_condition) Victory")
+            print("[check_victory_condition] Victory")
             return True
         # else:
         # print("No Victory")
@@ -946,7 +1004,7 @@ class GameProgress:
             self.show_defeat_page = True
             pygame.time.set_timer(self.timer_event, 0)
             self.game_paused = True
-            print("(check_failure_condition) Defeat")
+            print("[check_failure_condition] Defeat")
             return True
         # else:
         # print("No Defeat")
@@ -1142,27 +1200,29 @@ class GameProgress:
             if self.side_status == 0:  # Player
                 print("[handle_timer_event] Current Word:", self.word_letters)
                 print("[handle_timer_event] Previous Word:", self.previous_word_letters)
-                if self.word_letters == self.previous_word_letters:  # No word change
-                    print("[handle_timer_event] No Word Changed.")
-                    self.player_answer_status = 0
-                    print(f"[handle_timer_event] Player answer checked(no word change): {self.player_answer_status}")
-                    self.add_penalty_card()
-                    pass
-                else:
-                    print("[handle_timer_event] Word Changed.")
-                    self.check_word_validity()
-                    print("[handle_timer_event] Word validity checked.")
-                    self.update_popup_text()
-                    print(f"[handle_timer_event] Popup Text Updated.")
-                    self.update_side_text()
-                    if self.player_answer_status == 1:
-                        self.points += 1
-                        print("[handle_timer_event] Player Points added one.")
-                        print(f"[handle_timer_event] Player Points: {self.points}")
-                        # print("Current Word:", self.word_letters)
-                        # print("Previous Word:", self.previous_word_letters)
-                    elif self.player_answer_status == 0:
+                if not self.show_remove_page and not self.show_remove_page_mode:
+                    if self.word_letters == self.previous_word_letters:  # No word change
+                        print("[handle_timer_event] No Word Changed.")
+                        self.player_answer_status = 0
+                        print(
+                            f"[handle_timer_event] Player answer checked(no word change): {self.player_answer_status}")
                         self.add_penalty_card()
+                        pass
+                    else:
+                        print("[handle_timer_event] Word Changed.")
+                        self.check_word_validity()
+                        print("[handle_timer_event] Word validity checked.")
+                        self.update_side_text()
+                        if self.player_answer_status == 1:
+                            self.points += 1
+                            print("[handle_timer_event] Player Points added one.")
+                            print(f"[handle_timer_event] Player Points: {self.points}")
+                            # print("Current Word:", self.word_letters)
+                            # print("Previous Word:", self.previous_word_letters)
+                        elif self.player_answer_status == 0:
+                            self.add_penalty_card()
+                        self.update_popup_text()
+                        print(f"[handle_timer_event] Popup Text Updated.")
             elif self.side_status == 1:  # Computer
                 self.check_word_validity()
                 self.update_popup_text()
@@ -1189,15 +1249,14 @@ class GameProgress:
                 pygame.time.set_timer(self.timer_event, 0)
             elif self.points == 4:
                 self.show_popup = False
-                self.game_paused = True
-                pygame.time.set_timer(self.timer_event, 0)
                 self.show_remove_page = True
                 self.game_paused = True
+                pygame.time.set_timer(self.timer_event, 0)
                 print("[handle_timer_event] --- Remove Mode Enables ---")
                 print("[handle_timer_event] Remove mode: Enable")
-                pygame.time.set_timer(self.timer_event, 0)
+                # pygame.time.set_timer(self.timer_event, 0)
 
-            #  Reset original letters and last swapped position at the end of each round
+            # Reset original letters and last swapped position at the end of each round
             self.original_cards = []
             self.last_swapped_position = None
 
@@ -1219,7 +1278,7 @@ class GameProgress:
             if self.button_rect.collidepoint(pos):
                 self.button_sound.play()
                 self.organize_cards()
-                # self.update_side_text()
+                self.update_side_text()
                 # print(f"[handle_popup_click] Side Text Updated")
                 print(f"[handle_popup_click] Card Stack: {self.deck}")
                 self.show_popup = False
@@ -1284,14 +1343,17 @@ class GameProgress:
         elif self.show_popup_bot_difficulty:
             mouse_x, mouse_y = pos
             if self.easy_button_rect.collidepoint(mouse_x, mouse_y):
+                self.button_sound.play()
                 self.bot = Bot(Bot.Difficulty.EASY, self.bot.cards)
                 self.show_popup_bot_difficulty = False
                 print(f"[handle_popup_click] Bot difficulty EASY")
             elif self.medium_button_rect.collidepoint(mouse_x, mouse_y):
+                self.button_sound.play()
                 self.bot = Bot(Bot.Difficulty.MEDIUM, self.bot.cards)
                 self.show_popup_bot_difficulty = False
                 print(f"[handle_popup_click] Bot difficulty MEDIUM")
             elif self.hard_button_rect.collidepoint(mouse_x, mouse_y):
+                self.button_sound.play()
                 self.bot = Bot(Bot.Difficulty.HARD, self.bot.cards)
                 self.show_popup_bot_difficulty = False
                 print(f"[handle_popup_click] Bot difficulty HARD")
@@ -1336,18 +1398,26 @@ class GameProgress:
                 # Welcome_Page_Click
                 if self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
                     if self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
-                        self.button_sound.play()
-                        self.show_popup_bot_difficulty = True
-                        self.show_welcome_page = False
-                        self.show_rules_page = False
-                        self.show_options_page = False
-                        if self.side_status == 0:
-                            self.show_player_first = True
-                            self.show_computer_first = False
-                        elif self.side_status == 1:
-                            self.show_player_first = False
-                            self.show_computer_first = True
-                        self.show_credits_page = False
+                        if self.show_rules_page or self.show_options_page or self.show_credits_page:
+                            self.button_sound.play()
+                            self.show_welcome_page = True
+                            self.show_rules_page = False
+                            self.show_options_page = False
+                            self.show_credits_page = False
+                        elif self.show_welcome_page:
+
+                            self.button_sound.play()
+                            self.show_popup_bot_difficulty = True
+                            self.show_welcome_page = False
+                            self.show_rules_page = False
+                            self.show_options_page = False
+                            if self.side_status == 0:
+                                self.show_player_first = True
+                                self.show_computer_first = False
+                            elif self.side_status == 1:
+                                self.show_player_first = False
+                                self.show_computer_first = True
+                            self.show_credits_page = False
                         pygame.time.set_timer(self.timer_event, 0)
                     elif self.x_min_rules_button <= mouse_x <= self.x_max_rules_button and self.y_min_rules_button <= mouse_y <= self.y_max_rules_button:
                         self.button_sound.play()
@@ -1388,12 +1458,17 @@ class GameProgress:
 
                 elif not (
                         self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page) and self.x_min_game_paused_page <= mouse_x <= self.x_max_game_paused_page and self.y_min_game_paused_page <= mouse_y <= self.y_max_game_paused_page:
-                    if not self.show_game_paused_page and not (self.show_computer_first and self.show_player_first):
+                    if not self.show_game_paused_page and not (
+                            self.show_computer_first and self.show_player_first) and not self.show_rules_main_page:
                         self.button_sound.play()
                         self.game_paused = True
                         self.show_game_paused_page = True
                         print("[handle_events] Game Paused")
                         pygame.time.set_timer(self.timer_event, 0)
+                    elif self.show_rules_main_page and not self.show_game_paused_page:
+                        self.button_sound.play()
+                        self.show_rules_main_page = False
+                        pygame.time.set_timer(self.timer_event, 1000)
                     elif self.show_game_paused_page:
                         self.button_sound.play()
                         self.game_paused = False
@@ -1404,12 +1479,16 @@ class GameProgress:
                 elif not (
                         self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page):
                     if self.x_min_rules_main_button <= mouse_x <= self.x_max_rules_main_button and self.y_min_rules_main_button <= mouse_y <= self.y_max_rules_main_button and not self.show_rules_page:
+                        self.button_sound.play()
                         self.show_rules_main_page = True
                         self.show_game_paused_page = False
                         pygame.time.set_timer(self.timer_event, 0)
                     elif self.show_rules_main_page:
+                        self.button_sound.play()
                         self.show_rules_main_page = False
                         pygame.time.set_timer(self.timer_event, 1000)
+
+                # restart
 
             # Timer_Event
             elif event.type == self.timer_event:
@@ -1437,10 +1516,13 @@ class GameProgress:
         Updates the display after drawing all elements.
         """
         # Draw_Background
-        self.screen.blit(self.current_background, (0, 0))
+        if self.sound_enabled:
+            self.screen.blit(self.current_background, (0, 0))
+        elif not self.sound_enabled:
+            self.screen.blit(self.current_background_mute, (0, 0))
         self.draw_timer()
         self.draw_side_status()
-        # self.draw_coordinate_display()
+        self.draw_coordinate_display()
         self.draw_word()
         self.draw_cards()
         self.draw_selected_card()
@@ -1468,6 +1550,19 @@ class GameProgress:
 
         if self.show_options_page:
             self.screen.blit(self.image_options_page, (0, 0))
+            if self.options_click_sound == 1:
+                self.sound_mark_click_sound = 1
+                pygame.draw.rect(self.screen, self.test_color, self.options_box1_rect)
+                # print("[draw] Options Box 1 checked")
+            else:
+                self.sound_mark_click_sound = 0
+
+            if self.options_background_music == 1:
+                self.sound_mark_background_music = 1
+                pygame.draw.rect(self.screen, self.test_color, self.options_box2_rect)
+                # print("[draw] Options Box 2 checked")
+            else:
+                self.sound_mark_background_music = 0
 
         if self.show_remove_page_mode:
             self.screen.blit(self.image_remove_page_mode, (0, 0))
