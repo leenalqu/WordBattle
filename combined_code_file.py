@@ -76,6 +76,7 @@ class GameProgress:
     """
 
     def __init__(self):
+
         # Initialize Pygame
         pygame.init()
         pygame.mixer.init()
@@ -143,8 +144,10 @@ class GameProgress:
         # Configure Default Theme Settings
         # Color_Coordinate_Box
         self.text_color_coordinate = (33, 33, 33)
+
         # Color_Timer
         self.text_color_timer = (33, 33, 33)
+
         # Color_Popup
         self.popup_color_background = self.popup_color_background = (188, 173, 119)
         self.popup_color_border = self.popup_color_border = (33, 33, 33)
@@ -152,18 +155,24 @@ class GameProgress:
         self.popup_color_button_border = self.popup_color_button_border = (33, 33, 33)
         self.popup_color_text = self.popup_color_text = (188, 173, 119)
         self.popup_color_text_button = self.popup_color_text_button = (33, 33, 33)
+
         # Color_Side_Status
         self.side_text_box_color = (33, 33, 33)
+
         # Color_Current_Word
         self.current_word_text_color = (33, 33, 33)
+
         # Color_Card_Letters
         self.card_text_color = (33, 33, 33)
         self.selected_card_color = (240, 153, 31)
+
         # Color_Round_Counter
         self.round_text_color = (33, 33, 33)
         self.card_overlay_color = (33, 33, 33)
+
         # Color_block
         self.point_block_color = (188, 173, 119)
+
         # Color sound
         self.test_color = (188, 173, 119)
 
@@ -174,27 +183,33 @@ class GameProgress:
         self.background_mute_1 = pygame.image.load("data/image/background_mute_1.png")
         self.current_background = self.background_0
         self.current_background_mute = self.background_mute_0
+
         # Config_Welcome_Page
         self.image_welcome_page_0 = pygame.image.load("data/image/welcome_page_0.png")
         self.image_welcome_page_1 = pygame.image.load("data/image/welcome_page_1.png")
         self.image_welcome_page = self.image_welcome_page_0
+
         # Config_Rules_Page
         self.image_rules_page_0 = pygame.image.load("data/image/rules_page_0.png")
         self.image_rules_page_1 = pygame.image.load("data/image/rules_page_1.png")
         self.image_rules_page = self.image_rules_page_0
+
         # Config_Options_Page
         self.image_options_page_0 = pygame.image.load("data/image/options_page_0.png")
         self.image_options_page_1 = pygame.image.load("data/image/options_page_1.png")
         self.image_options_page = self.image_options_page_0
+
         # Options Page Boxes
         self.options_box1_rect = pygame.Rect(672, 178, 18, 18)
         self.options_box2_rect = pygame.Rect(709, 318, 18, 18)
         self.options_click_sound = 1
         self.options_background_music = 1
+
         # Config_Credits_Page
         self.image_credits_page_0 = pygame.image.load("data/image/credits_page_0.png")
         self.image_credits_page_1 = pygame.image.load("data/image/credits_page_1.png")
         self.image_credits_page = self.image_credits_page_0
+
         # Config_First_Role
         self.player_first_0 = pygame.image.load("data/image/player_first_0.png")
         self.player_first_1 = pygame.image.load("data/image/player_first_1.png")
@@ -205,11 +220,15 @@ class GameProgress:
         if self.value == "Head":
             self.side_status = 0
             self.player_first = self.player_first_0
-            print("[__init__] Player First")  # Player goes first
+
+            # Player goes first.
+            print("[__init__] Player First")
         elif self.value == "Tail":
             self.side_status = 1
             self.computer_first = self.computer_first_0
-            print("[__init__] Computer First")  # Computer goes first
+
+            # Computer goes first.
+            print("[__init__] Computer First")
 
         # Config_Remove_Page
         self.image_remove_page_0 = pygame.image.load("data/image/remove_page_0.png")
@@ -218,6 +237,7 @@ class GameProgress:
         self.image_remove_page_mode_1 = pygame.image.load("data/image/remove_page_mode_1.png")
         self.image_remove_page = self.image_remove_page_0
         self.image_remove_page_mode = self.image_remove_page_mode_0
+
         # Config_Pause_Page
         self.image_game_paused_page_0 = pygame.image.load("data/image/game_paused_page_0.png")
         self.image_game_paused_page_1 = pygame.image.load("data/image/game_paused_page_1.png")
@@ -236,6 +256,7 @@ class GameProgress:
         self.image_defeat_page_1 = pygame.image.load("data/image/defeat_1.png")
         self.image_victory_page = self.image_victory_page_0
         self.image_defeat_page = self.image_defeat_page_0
+
         # Config_Sound
         self.background_music_0 = "data/sound/background_music_0.wav"
         self.background_music_1 = "data/sound/background_music_1.wav"
@@ -246,6 +267,7 @@ class GameProgress:
         self.sound_enabled = True
         self.sound_mark_click_sound = 1
         self.sound_mark_background_music = 1
+
         # Config_Font
         self.font_size_default = 24
         self.font_size_timer = 88
@@ -253,6 +275,7 @@ class GameProgress:
         self.font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default)
         self.font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer)
         self.font_round = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_round)
+
         # Config_Timer
         self.timer_event = pygame.USEREVENT + 1
         self.timer_seconds = self.game_settings.TURN_TIME_LIMIT
@@ -304,6 +327,7 @@ class GameProgress:
         self.update_popup_text()
         print("[__init__] Popup Text Updated")
         self.side_text_box_pos = (self.screen_width // 2, 0)
+
         # Config_popup_bot_difficulty
         self.popup_bot_difficulty_width = 380
         self.popup_bot_difficulty_height = 150
@@ -343,11 +367,14 @@ class GameProgress:
                 y = current_word_y
                 self.word_click_areas.append((x, y, current_word_width, current_word_width))
                 self.selected_word_letters = []
+
         # Config_Card_Letters
         self.card_font_size = 52
         self.card_font = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.card_font_size)
+
         # Initialize card letters array with empty slots
         self.card_letters = [''] * 15
+
         # Fill initial player cards
         for i in range(len(player_cards)):
             self.card_letters[i] = player_cards[i]
@@ -358,12 +385,14 @@ class GameProgress:
         card_y = 449
         for i in range(15):
             self.card_positions.append((card_start_x + i * (card_width + card_spacing), card_y))
+
         # Config_Card_Clickers
         self.card_click_areas = []
         for i in range(15):
             x = card_start_x + i * (card_width + card_spacing)
             y = card_y
             self.card_click_areas.append((x, y, card_width, card_width))
+
         # Config_selected_card
         self.selected_card = []
         self.last_swapped_position = None
@@ -373,6 +402,7 @@ class GameProgress:
         self.previous_used_card_positions = self.used_card_positions.copy()
         self.replaced_positions = set()
         self.star_card_active = False
+
         # Config_Points
         self.max_points = 3
         self.point_block_length = 55
@@ -380,31 +410,40 @@ class GameProgress:
         self.point_block_spacing = 3
         self.point_block_y = 570
         self.point_block_start_x = 238
+
         # Config_Round_Counter
         self.popup_ok_clicks = 2
         self.current_round = 1
         self.round_text_pos = (119, 559)
+
         # Game_Paused_Button
         self.x_min_game_paused_page, self.y_min_game_paused_page = 472, 563
         self.x_max_game_paused_page, self.y_max_game_paused_page = 502, 593
+
         # Quit_Button
         self.x_min_quit, self.y_min_quit = 508, 563
         self.x_max_quit, self.y_max_quit = 538, 593
+
         # Sound_Button
         self.x_min_sound_button, self.y_min_sound_button = 436, 563
         self.x_max_sound_button, self.y_max_sound_button = 466, 593
+
         # Confirm_Button
         self.x_min_confirm_button, self.y_min_confirm_button = 666, 563
         self.x_max_confirm_button, self.y_max_confirm_button = 794, 593
+
         # Rules_Button
         self.x_min_rules_button, self.y_min_rules_button = 455, 525
         self.x_max_rules_button, self.y_max_rules_button = 555, 549
+
         # Rules_Button
         self.x_min_rules_main_button, self.y_min_rules_main_button = 547, 563
         self.x_max_rules_main_button, self.y_max_rules_main_button = 660, 593
+
         # Back_Button
         self.x_min_back_button, self.y_min_back_button = 547, 563
         self.x_max_back_button, self.y_max_back_button = 660, 593
+
         # Theme
         self.x_min_theme_0_button, self.y_min_theme_0_button = 95, 70
         self.x_max_theme_0_button, self.y_max_theme_0_button = 318, 240
@@ -414,12 +453,15 @@ class GameProgress:
         self.x_max_click_sound_button, self.y_max_click_sound_button = 690, 196
         self.x_min_background_music_button, self.y_min_background_music_button = 709, 318
         self.x_max_background_music_button, self.y_max_background_music_button = 727, 336
+
         # Play
         self.x_min_play_button, self.y_min_play_button = 64, 525
         self.x_max_play_button, self.y_max_play_button = 137, 549
+
         # Options
         self.x_min_options_button, self.y_min_options_button = 237, 525
         self.x_max_options_button, self.y_max_options_button = 370, 549
+
         # Credits
         self.x_min_credits_button, self.y_min_credits_button = 638, 525
         self.x_max_credits_button, self.y_max_credits_button = 770, 549
@@ -432,10 +474,12 @@ class GameProgress:
         """
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
+
             # self.popup_side_changer_text = self.popup_side_changer_text_player
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_player
         elif self.side_status == 1:
             self.side_text_box = "COMPUTER'S TURN"
+
             # self.popup_side_changer_text = self.popup_side_changer_text_computer
             self.popup_side_changer_text_button = self.popup_side_changer_text_button_computer
 
@@ -527,12 +571,14 @@ class GameProgress:
         """
         # Config_Color
         if self.theme_setting == 0:
+
             # Color_Coordinate_Box
             self.text_color_coordinate = (33, 33, 33)
+
             # Color_Timer
             self.text_color_timer = (33, 33, 33)
-            # Color_Popup
 
+            # Color_Popup
             self.popup_color_background = (188, 173, 119)
             self.popup_color_border = (33, 33, 33)
             self.popup_color_button = (33, 33, 33)
@@ -542,18 +588,24 @@ class GameProgress:
 
             # Color_Side_Status
             self.side_text_box_color = (33, 33, 33)
+
             # Color_Current_Word
             self.current_word_text_color = (33, 33, 33)
+
             # Color_Card_Letters
             self.card_text_color = (33, 33, 33)
             self.selected_card_color = (240, 153, 31)
+
             # Color_Round_Counter
             self.round_text_color = (33, 33, 33)
+
             # Overlay
             self.card_overlay_color = (33, 33, 33)
             self.point_block_color = (188, 173, 119)
+
             # Color sound
             self.test_color = (188, 173, 119)
+
             # Pages
             self.image_welcome_page = self.image_welcome_page_0
             self.image_rules_page = self.image_rules_page_0
@@ -575,32 +627,41 @@ class GameProgress:
                 pygame.mixer.music.set_volume(0.3)
 
         elif self.theme_setting == 1:
+
             # Color_Coordinate_Box
             self.text_color_coordinate = (0, 49, 82)
+
             # Color_Timer
             self.text_color_timer = (228, 222, 215)
-            # Color_Popup
 
+            # Color_Popup
             self.popup_color_background = (228, 222, 215)
             self.popup_color_border = (0, 49, 82)
             self.popup_color_button = (0, 49, 82)
             self.popup_color_button_border = (0, 49, 82)
             self.popup_color_text = (228, 222, 215)
             self.popup_color_text_button = (0, 49, 82)
+
             # Color_Side_Status
             self.side_text_box_color = (228, 222, 215)
+
             # Color_Current_Word
             self.current_word_text_color = (228, 222, 215)
+
             # Color_Card_Letters
             self.card_text_color = (0, 49, 82)
             self.selected_card_color = (240, 153, 31)
+
             # Color_Round_Counter
             self.round_text_color = (228, 222, 215)
+
             # Overlay
             self.card_overlay_color = (0, 49, 82)
             self.point_block_color = (0, 49, 82)
+
             # Color sound
             self.test_color = (0, 49, 82)
+
             # Pages
             self.image_welcome_page = self.image_welcome_page_1
             self.image_rules_page = self.image_rules_page_1
@@ -639,9 +700,11 @@ class GameProgress:
         """
         # Draw_Points_Blocks
         for i in range(self.max_points):
+
             # Calculate_Block_Position
             x = self.point_block_start_x + i * (self.point_block_length + self.point_block_spacing)
             rect = pygame.Rect(x, self.point_block_y, self.point_block_length, self.point_block_height)
+
             # Draw_Active_Blocks
             if i >= (self.max_points - (self.points - 1)):
                 pygame.draw.rect(self.screen, self.point_block_color, rect)
@@ -687,6 +750,7 @@ class GameProgress:
             - Historical card usage data
         """
         for i, pos in enumerate(self.card_positions[:self.game_settings.MAX_CARDS]):
+
             # Only draw unused cards
             if i not in self.used_card_positions:
                 letter_text = self.card_font.render(self.card_letters[i], True, self.card_text_color)
@@ -864,6 +928,7 @@ class GameProgress:
             - Sound toggle button
             - Remove button (Developing)
         """
+
         # Theme_0_Button
         if self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button:
             if pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 1:
@@ -1007,6 +1072,7 @@ class GameProgress:
             self.game_paused = True
             print("[check_failure_condition] Defeat")
             return True
+
         # else:
         # print("No Defeat")
         return False
@@ -1083,7 +1149,6 @@ class GameProgress:
                         if card_letter.lower() == self.previous_word_letters[i].lower():
                             print(f"[handle_word_click] Cannot use same card：{card_letter}")
                             return False
-
                         if current_letter == card_letter:
                             print(f"[handle_word_click] Cannot use same card {card_letter} ")
                             self.selected_card = []
@@ -1091,12 +1156,14 @@ class GameProgress:
 
                         # Handle_Previous_Swap
                         elif self.last_swapped_position is not None:
+
                             # Same_Position_Swap
                             if self.last_swapped_position == i:
                                 if self.used_card_positions:
                                     last_card_position = self.used_card_positions.pop()
                                     print(
                                         f"[handle_word_click] Restored previous card at position {last_card_position}")
+
                             # Different_Position_Swap
                             else:
                                 self.word_letters[self.last_swapped_position] = self.original_cards[
@@ -1280,6 +1347,7 @@ class GameProgress:
                 self.button_sound.play()
                 self.organize_cards()
                 self.update_side_text()
+
                 # print(f"[handle_popup_click] Side Text Updated")
                 print(f"[handle_popup_click] Card Stack: {self.deck}")
                 self.show_popup = False
@@ -1374,15 +1442,19 @@ class GameProgress:
             bool: True if the game should continue running, False if it should quit.
         """
         for event in pygame.event.get():
+
             # Quit_Event
             if event.type == pygame.QUIT:
                 return False
+
             # Mouse_Wheel_Event
             elif event.type == pygame.MOUSEWHEEL:
                 continue
+
             # Mouse_Click_Event
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
+
                 # print("[handle_events] Click")
                 if not self.handle_button_click(mouse_x, mouse_y):
                     return False
@@ -1396,6 +1468,7 @@ class GameProgress:
                 if not self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
                     self.handle_card_click(mouse_x, mouse_y)
                     self.handle_word_click(mouse_x, mouse_y)
+
                 # Welcome_Page_Click
                 if self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page:
                     if self.x_min_play_button <= mouse_x <= self.x_max_play_button and self.y_min_play_button <= mouse_y <= self.y_max_play_button:
@@ -1504,7 +1577,6 @@ class GameProgress:
                             pygame.time.set_timer(self.timer_event, 1000)
 
                 # restart
-
             # Timer_Event
             elif event.type == self.timer_event:
                 if not (self.show_victory_page or self.show_defeat_page):
@@ -1630,6 +1702,7 @@ class GameProgress:
         while running:
             running = self.handle_events()
             self.draw()
+
         # Quit Pygame
         pygame.mixer.music.stop()
         pygame.quit()
