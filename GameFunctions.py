@@ -1,46 +1,14 @@
+# Functions class game created by Raghad Aljubran (5635869).
+#importing libraries
 import random
 import string
 
-# Functions class game created by Raghad Aljubran (5635869).
-"""
-This file contains classes and functions to be used in the game loop and interface.
- 
-1- class game contain 12 functions :
-    1-(__init__): for storing the three letter words by using filter.
-
-    2-(load_letter_words): take the  words from the file and put them in a list
-        with error handling.
-        
-    3-(valid_transformations): returns a list of valid transformations
-        of a word.
-        
-    4-(is_one_letter_dif): takes two words and compare them if they differ
-        by one letter only.
-        
-    5-(fisher_shuffle): shuffles a list using fisher algorithm.
-    
-    6-(star_card): returns a star card or a useful letter random for the
-        stack.
-        
-    7-(card_stack): generate a stack of 40 cards uses two functions
-        (fisher_shuffle and star_card).
-        
-    8,9-( partition),(quicksort): algorithm to sort player cards.
-    
-    10-(word_generator): generates a word for the game and uses (valid_transformations)
-        to check if the word can be changed 2 or more.
-        
-    11-(check_exists): checks if the word that the player changed is in the words list
-        and it handel both word with a star and word without a star.
-        
-    12-(coin_flip) : decide who play first human or bot.
-    
- 2-class Queue : used in the validation function in class Game
- 
-"""
 
 # Class Queue to be used in the class Game.
 class Queue:
+    """
+    class Queue : used in the validation function in class Game
+    """
     def __init__(self):
         self.items=[]
 
@@ -62,6 +30,41 @@ class Queue:
 
 # Class Game is full of functions that will be called in the main game class.
 class Game:
+    """
+    This class contain functions to be used in the game loop and interface.
+
+    1- class game contain 12 functions :
+        1-(__init__): for storing the three letter words by using filter.
+
+        2-(load_letter_words): take the  words from the file and put them in a list
+            with error handling.
+
+        3-(valid_transformations): returns a list of valid transformations
+            of a word.
+
+        4-(is_one_letter_dif): takes two words and compare them if they differ
+            by one letter only.
+
+        5-(fisher_shuffle): shuffles a list using fisher algorithm.
+
+        6-(star_card): returns a star card or a useful letter random for the
+            stack.
+
+        7-(card_stack): generate a stack of 40 cards uses two functions
+            (fisher_shuffle and star_card).
+
+        8,9-( partition),(quicksort): algorithm to sort player cards.
+
+        10-(word_generator): generates a word for the game and uses (valid_transformations)
+            to check if the word can be changed 2 or more.
+
+        11-(check_exists): checks if the word that the player changed is in the words list
+            and it handel both word with a star and word without a star.
+
+        12-(coin_flip) : decide who play first human or bot.
+
+    """
+
     # Initializes the Game class.
     def __init__(self):
         # Lode all the words in english from a file by calling load letter words function.
