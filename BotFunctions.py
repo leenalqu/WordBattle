@@ -290,19 +290,29 @@ class Bot:
         Discard a card from the bot.
         """
         alphabet = self.letter_frequencies.keys() # all english letters (from keys of letter_frequencies dictionary)
+
         if self.difficulty_level == Bot.Difficulty.EASY:  # when the bot is in easy mode
             card_to_remove_index = random.randint(0, len(self.cards) - 1)  # pick a random index from the cards list
             self.cards.pop(card_to_remove_index)  # remove the card from the bots cards
+
         elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.HARD):  # if bot is in medium or hard mode
             worst_card = self.cards[0]  # initiate variable for the worst card as the bots first card
             for card in self.cards:  # loops through the bots cards
-                if card not in alphabet: #check if card is a letter
-                    continue # skip special cards
-                # checks if the current letter is less common
-                elif self.letter_frequencies[card] < self.letter_frequencies[worst_card]:
-                    worst_card = card  # sets the current letter as the worst
+                try: # tries the following code
+                    # checks if the current letter is less common
+                    if self.letter_frequencies[card] < self.letter_frequencies[worst_card]:
+                        worst_card = card  # sets the current letter as the worst
+                except KeyError:
+                    # Runs when the frequency of the star card is checked
+                    # (which returns an error because it is not in the letter_frequencies dictionary)
+                    if worst_card not in alphabet: # if the initial worst card is a special card
+                        worst_card = card # Set the worst card to the current card.
+                    else: # This case means the current card is a special card.
+                        continue  # Skip the special card and continue the loop.
+
             self.cards.remove(worst_card)  # remove the worst card from bots cards
-        else:
+
+        else: # This case means the bot difficulty level wasn't found.
             raise Exception("\nError: Unknown difficulty mode was set for Bot")
 
     def will_answer_or_not(self) -> bool:
@@ -384,7 +394,8 @@ class Bot:
 
 #testing
 if __name__ == "__main__":
-    b = Bot(Bot.Difficulty.MEDIUM, ['a','e','f','i','k','r','o'])
-    out = b.next_word("cat")
+    b = Bot(Bot.Difficulty.MEDIUM, ['a', '*', 'e','f','i','k','r','o'])
+    b.discard_card()
+    out = b.cards
     print(out)
     ...
