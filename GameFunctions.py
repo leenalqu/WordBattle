@@ -1,8 +1,10 @@
 # Functions class game created by Raghad Aljubran (5635869).
-#importing libraries
+
+#importing built-in libraries
 import random
 import string
-
+#importing custom module
+from GameSettings import GameSettings
 
 # Class Queue to be used in the class Game.
 class Queue:
@@ -67,10 +69,13 @@ class Game:
 
     # Initializes the Game class.
     def __init__(self):
+        # Creating an object for game settings class
+        self.object_settings=GameSettings()
         # Lode all the words in english from a file by calling load letter words function.
         self.words = self.load_letter_words("words_alpha.txt")
         # Filter out only the three letters words.
-        self.words = list((filter(lambda word:len(word) == 3,self.words)))
+        self.words = list((filter(lambda word:len(word) ==self.object_settings.WORD_LENGTH,self.words)))
+
 
     # Loading the words from a file with error handel.
     def load_letter_words(self, filename):
@@ -203,3 +208,5 @@ class Game:
             return "Head"
         else:
             return "Tail"
+
+
