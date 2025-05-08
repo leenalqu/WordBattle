@@ -91,12 +91,31 @@ class Bot:
 
 
     class Difficulty(Enum):
+        """
+        Class for the bot's difficulty level constants.
+            (Child class of Enum)
+
+        EASY: Difficulty
+            - Represents the difficulty of the easiest bot to beat.
+        MEDIUM: Difficulty
+            - Represents the difficulty of a normal level bot.
+        HARD: Difficulty
+            - Represents the difficulty of the smartest bot.
+        """
         EASY: str = "easy"
         MEDIUM: str = "medium"
         HARD: str = "hard"
 
 
     class Output(Enum):
+        """
+        Class for the bot's output constants.
+            (Child class of Enum)
+
+        THINKING: Difficulty
+            - Represents the output that the bot returns when it is
+                not ready to answer (or won't answer at all).
+        """
         THINKING: str = "thinking"
 
     game_settings = GameSettings()  # Initiate game settings object to stores game settings constants.

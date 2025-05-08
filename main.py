@@ -267,8 +267,8 @@ class GameProgress:
         self.popup_side_changer_text_button = None
         self.popup_side_changer_text_player = "Player Invalid Answer"
         self.popup_side_changer_text_computer = "Computer Invalid Answer"
-        self.popup_side_changer_text_button_player = "Continue"
-        self.popup_side_changer_text_button_computer = "Start My Turn!"
+        self.popup_side_changer_text_button_player = "COMPUTER'S TURN"
+        self.popup_side_changer_text_button_computer = "START MY TURN"
 
         # Configure Popup (Remove Mode)
         self.popup_remove_width = 300
@@ -408,16 +408,16 @@ class GameProgress:
     def update_popup_text(self):
         if self.side_status == 0:
             if self.player_answer_status == 0:
-                self.popup_side_changer_text_player = "PLAYER ANSWERED UNSUCCESSFUL"
+                self.popup_side_changer_text_player = "YOU ANSWERED UNSUCCESSFULLY (+1 CARD)"
             elif self.player_answer_status == 1:
-                self.popup_side_changer_text_player = "PLAYER ANSWERED SUCCESSFUL"
+                self.popup_side_changer_text_player = "YOU ANSWERED SUCCESSFULLY"
             self.popup_side_changer_text = self.popup_side_changer_text_player
             print(f"[update_popup_text] Popup text (Player) updated")
         elif self.side_status == 1:
             if self.computer_answer_status == 0:
-                self.popup_side_changer_text_computer = "COMPUTER ANSWERED UNSUCCESSFUL"
+                self.popup_side_changer_text_computer = "COMPUTER ANSWERED UNSUCCESSFULLY (+1 CARD)"
             elif self.computer_answer_status == 1:
-                self.popup_side_changer_text_computer = "COMPUTER ANSWERED SUCCESSFUL"
+                self.popup_side_changer_text_computer = "COMPUTER ANSWERED SUCCESSFULLY"
             self.popup_side_changer_text = self.popup_side_changer_text_computer
             print(f"[update_popup_text] Popup text (Computer) updated")
 
@@ -854,16 +854,16 @@ class GameProgress:
                 return False
 
         # Confirm_Button
-        if self.x_min_confirm_button <= mouse_x <= self.x_max_confirm_button and self.y_min_confirm_button <= mouse_y <= self.y_max_confirm_button and not (self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first_page or self.show_player_first_page):
-            if pygame.mouse.get_pressed()[0] and self.side_status == 0:
+        if self.x_min_confirm_button <= mouse_x <= self.x_max_confirm_button and self.y_min_confirm_button <= mouse_y <= self.y_max_confirm_button:
+            if pygame.mouse.get_pressed()[0] and self.side_status == 0 and not (self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first_page or self.show_player_first_page):
                 self.button_sound.play()
                 self.timer_seconds = 0
 
             elif pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
+                self.button_sound.play()
                 print(f"[handle_button_click] Button (Restart) was clicked")
                 python = sys.executable
                 script = os.path.abspath(__file__)
-                pygame.quit()
                 os.execv(python, [python, script])
 
         # Sound_Button
@@ -871,12 +871,7 @@ class GameProgress:
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
                 if self.sound_enabled:
-                    if self.marker_click_sound_enable == 1:
-                        self.button_sound.set_volume(0.0)
-
-                    if self.marker_background_music_enable == 1:
-                        pygame.mixer.music.set_volume(0.0)
-
+                    pygame.mixer.music.set_volume(0.0)
                     self.sound_enabled = False
                     if self.theme_setting == 0:
                         self.image_current_background = self.image_background_mute_0
@@ -884,11 +879,7 @@ class GameProgress:
                     elif self.theme_setting == 1:
                         self.image_current_background = self.image_background_mute_1
                 else:
-                    if self.marker_click_sound_enable == 1:
-                        self.button_sound.set_volume(1.0)
-
-                    if self.marker_background_music_enable == 1:
-                        pygame.mixer.music.set_volume(0.3)
+                    pygame.mixer.music.set_volume(0.3)
 
                     self.sound_enabled = True
                     if self.theme_setting == 0:
@@ -1005,12 +996,12 @@ class GameProgress:
                         # Check if the letters are the same as those in the original word
                         if previous_card.lower() == self.previous_word_cards[i].lower():
                             print(f"[handle_word_click] Cannot replace same card：{previous_card}")
-                            self.notification.show_message_box("CANNOT REPLACE SAME CARD")
+                            self.notification.show_message_box("CANNOT SWAP SAME CARD")
                             return False
 
                         if current_card == previous_card:
                             print(f"[handle_word_click] Cannot replace same card: {previous_card} ")
-                            self.notification.show_message_box("CANNOT REPLACE SAME CARD")
+                            self.notification.show_message_box("CANNOT SWAP SAME CARD")
                             self.selected_card = []
                             return True
 
@@ -1370,7 +1361,7 @@ class GameProgress:
                             self.show_options_page = False
                             if self.side_status == 0:
                                 self.show_player_first_page = True
-                                self.notification.show_message_box("THE COIN IS HEAD")
+                                #self.notification.show_message_box("THE COIN IS HEAD")
                                 self.show_computer_first_page = False
                                 valid_cards = []
                                 valid_positions = []
@@ -1386,7 +1377,7 @@ class GameProgress:
                             elif self.side_status == 1:
                                 self.show_player_first_page = False
                                 self.show_computer_first_page = True
-                                self.notification.show_message_box("THE COIN IS TAIL")
+                                #self.notification.show_message_box("THE COIN IS TAIL")
 
                             self.show_credits_page = False
                         pygame.time.set_timer(self.timer_event, 0)
@@ -1515,10 +1506,11 @@ class GameProgress:
         #self.draw_coordinate_display()
         if not self.show_popup:
             self.draw_word()
+            self.draw_cards()
             if self.side_status == 0:
-                self.draw_cards()
+                self.draw_selected_card()
 
-        self.draw_selected_card()
+        
         self.draw_round_counter()
         self.draw_card_overlay()
         self.draw_points()
@@ -1554,7 +1546,7 @@ class GameProgress:
             if self.options_background_music == 1:
                 self.marker_background_music_enable = 1
                 pygame.draw.rect(self.screen, self.color_option_button, self.options_box2_rect)
-                
+
             else:
                 self.marker_background_music_enable = 0
 
