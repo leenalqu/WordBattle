@@ -1,8 +1,14 @@
 # Main loop and game setup, by Leen (5663960).
 
-import time # Importing time to be able to time players
-from GameFunctions import Game # Importing functions
-from BotFunctions import Bot # Importing the bot to use as player 2.
+
+# Import time to be able to time players
+import time
+
+# Import functions
+from GameFunctions import Game
+
+# Import the bot to use as player 2.
+from BotFunctions import Bot
 
 
 class Player:
@@ -15,31 +21,32 @@ class Player:
         The player's name.
     cards : list
         The player's letter cards.
-    streak : int
-        The player's win streak.
     used_words : set
         The words that the player has used.
     """
-    def __init__(self, name, cards=None, streak=0):
+    def __init__(self, name, cards=None):
         """
         Initializing a player's instance.
 
         Parameters
         ----------
-    name : str
-        Player's name.
-    cards : list
-        Player's letter cards, defaults to empty list.
-    streak : int
-        Player's win streak, defaults to 0.
+        name : str
+            Player's name.
+        cards : list
+            Player's letter cards, defaults to empty list.
         """
         self.name = name
         if cards is None:
             cards = []
-        self.cards = cards # The player's current stack of cards.
-        self.streak = streak # The number of continuous wins.
-        self.used_words = set() # A set of the words that have been used by the player.
-    def add_card(self, letter): # Adds a letter to the player's stack of cards.
+
+        # The player's current stack of cards.
+        self.cards = cards
+
+        # A set of the words that have been used by the player.
+        self.used_words = set()
+
+    # Add a letter to the player's stack of cards.
+    def add_card(self, letter):
         """
         Adds a card to the player's letter cards.
 
@@ -49,37 +56,49 @@ class Player:
             The letter to add to the player's letter cards.
         """
         self.cards.append(letter)
-    def remove_cards(self, letter): # Removes a letter from player's stack of cards.
+
+    # Remove a letter from the player's cards.
+    def remove_cards(self, letter):
         """
         Removes a card from the player's letter cards.
 
         Parameters
         ----------
         letter : str
-            The letter to add to the player's letter cards.
+            The letter to remove from the player's letter cards.
         """
-        if letter in self.cards: # Makes sure the letter exists.
+
+        # Make sure the letter exists.
+        if letter in self.cards:
             self.cards.remove(letter)
+
+    # Checks if the player has used all of their cards.
     def won_game(self):
         """
         Checks if the player has used all of their cards.
 
-        returns
+        Returns
         --------
         Bool:
             True if player has used all of their cards, otherwise False.
         """
-        return len(self.cards) == 0 # The winner is announced when they finish all their cards.
+
+        # The winner is announced when they finish all their cards.
+        return len(self.cards) == 0
 
 # The game setup.
-game = Game() # Creating the game's interface.
+game = Game()
 deck = game.card_stack()
 used_cards = []
+
+# Pass cards for player 1 and player 2.
 player1_cards = [deck.pop() for _ in range(7)]
 player2_cards = [deck.pop() for _ in range(7)]
-player1 = Player(input("Your name: "), player1_cards) # Asking player 1 for their name.
 
-# Keeps asking for a difficulty level until a valid answer is given.
+# Create player 1 using input name.
+player1 = Player(input("Your name: "), player1_cards)
+
+# Keep asking for a difficulty level until a valid answer is given.
 while True:
     difficulty_input= input("Your difficulty level (easy/medium/hard): ").lower()
     if difficulty_input in ["easy" , "medium" , "hard"]:
@@ -87,106 +106,183 @@ while True:
         break
     else:
         print("Invalid choice. Please enter the right difficulty level. ")
-player2 = Bot(difficulty_enum, player2_cards) # creating bot player with its cards
 
-# Starting the game.
-result = game.coin_flip() # Tosses a coin to decide who goes first.
+# Create a bot player with its cards.
+player2 = Bot(difficulty_enum, player2_cards)
+
+# Start the game.
+# Toss a coin to decide who goes first.
+result = game.coin_flip()
+
+# Determine who goes first based on the result.
 if result == "Head":
     current_player = player1
-    print(f"{current_player.name} starts the game!") # Player1 starts.
+
+    # Player1 starts.
+    print(f"{current_player.name} starts the game!")
 else:
     current_player = player2
-    print("Bot starts the game!")  # Bot starts.
-current_word = game.word_generator().title() # Generates the starting word.
+
+    # The bot starts.
+    print("Bot starts the game!")
+
+# Generate the starting word.
+current_word = game.word_generator().title()
 print(f"The starting word is: {current_word}")
 
-# main game loop
+# Main game loop.
 while True:
-    if player1.won_game(): # Checks if anyone has won.
-        print(f"{player1.name} won the game!") # Player1 wins.
+
+    # Check if anyone has won.
+    if player1.won_game():
+
+        # Player1 wins.
+        print(f"{player1.name} won the game!")
         winner = player1.name
         break
     elif player2.won_game():
-        print("The bot has won the game!") # Bot wins.
+
+        # Bot wins.
+        print("The bot has won the game!")
         winner = player2
         break
     if current_player == player1:
         print(f"Your current cards: {player1.cards}")
-        start_time = time.time() # Starts the timer.
-        print(f"{player1.name}, it's you're turn. The word is: {current_word}")
+
+        # Start the timer.
+        start_time = time.time()
+        print(f"{player1.name}, it's your turn. The word is: {current_word}")
         new_word = input("Enter a new word by changing one letter: ")
-        end_time = time.time() # Ends the timer
-        time_taken = end_time - start_time # Calculates the time taken.
-        if time_taken <= 15: # Checks if the player answered in time.
-            if game.check_exists(new_word): # Checks if the new word is valid.
-                # Checks that the word is only 1 letter different.
+
+        # End the timer.
+        end_time = time.time()
+
+        # Calculate the time taken.
+        time_taken = end_time - start_time
+
+        # Check if the player answered within 15 seconds.
+        if time_taken <= 15:
+
+            # Check if the new word is valid.
+            if game.check_exists(new_word):
+
+                # Check that the word differs by only 1 letter.
                 if game.is_one_letter_dif(current_word, new_word):
-                    for i in range(0, 3) : # Goes through the letters.
-                        if current_word[i] != new_word[i]: # Finds the changed letter.
+
+                    # Go through the letters.
+                    for i in range(0, 3) :
+
+                        # Find the changed letter.
+                        if current_word[i] != new_word[i]:
                             changed_letter = new_word[i]
-                            if changed_letter in player1.cards: # Checks if the player has the letter in their stack
-                                player1.remove_cards(changed_letter) # Removes it.
+
+                            # Check if the player has the letter in their stack.
+                            if changed_letter in player1.cards:
+                                player1.remove_cards(changed_letter)
                                 game.quicksort(player1.cards)
                                 used_cards.append(changed_letter)
-                                current_word = new_word # Updates the current word.
-                                player1.used_words.add(current_word) # Adds it to used words.
+
+                                # Update the current word.
+                                current_word = new_word
+
+                                # Add it to used words.
+                                player1.used_words.add(current_word)
                                 current_player = player2
                             else:
                                 if not deck:
                                     deck = game.fisher_shuffle(used_cards.copy())
                                     used_cards = []
-                                player1.add_card(deck.pop()) # Give the player a penalty.
+
+                                # Give the player a penalty.
+                                player1.add_card(deck.pop())
                                 game.quicksort(player1.cards)
-                                current_player = player2 # Switch turns
+
+                                # Switch turns.
+                                current_player = player2
         else:
             if not deck:
+
+                # Shuffle used cards and put them back into the deck.
                 deck = game.fisher_shuffle(used_cards.copy())
                 used_cards = []
-            player1.add_card(deck.pop()) # Give a penalty card for taking too long.
-            game.quicksort(player1.cards)
-            current_player = player2 # Switch turns.
 
-    # bot's turn
+            # Give a penalty card for taking too long.
+            player1.add_card(deck.pop())
+            game.quicksort(player1.cards)
+
+            # Switch turns.
+            current_player = player2
+
+    # Bot's turn.
     elif current_player == player2:
         print(f"Your current cards: {player2.cards}")
         print(f"It's the bot's turn. The word is: {current_word}")
-        current_timer = 0 # timer for the bot
-        bot_word = player2.play_turn(current_word, current_timer) # Get the bot's move.
 
-        while bot_word == Bot.Output.THINKING: # If the bot is still thinking.
-            time.sleep(1) # Wait 1 second
-            current_timer += 1 # increase the timer.
-            bot_word = player2.play_turn(current_word, current_timer) # Check again for bot's move.
-        time.sleep(0.5) # Wait a bit to make it feel more natural.
+        # Timer for the bot.
+        current_timer = 0
+
+        # Get the bot's move.
+        bot_word = player2.play_turn(current_word, current_timer)
+
+        # If the bot is still thinking.
+        while bot_word == Bot.Output.THINKING:
+
+            # Wait 1 second.
+            time.sleep(1)
+
+            # Increase the timer.
+            current_timer += 1
+
+            # Check again for bot's move.
+            bot_word = player2.play_turn(current_word, current_timer)
+
+        # Wait a bit to make it feel more natural.
+        time.sleep(0.5)
         print(f"The bot changed the word to: {bot_word}")
         print(f"New current word is: {current_word}")
 
-        if game.check_exists(bot_word): # Checks if the word is valid.
-            # Checks that the word is only 1 letter different.
+        # Check if the word is valid.
+        if game.check_exists(bot_word):
+
+            # Check that the word differs by only 1 letter.
             if game.is_one_letter_dif(current_word, bot_word):
-                for i in range(0, 3): # Goes through the letters.
+
+                # Go through the letters.
+                for i in range(3):
                     if current_word[i] != bot_word[i]:
                         changed_letter = bot_word[i]
-                        if changed_letter in player2.cards: # Checks if the bot has the letter in its stack.
-                            player2.remove_cards(changed_letter) # Remove it
+
+                        # Check if the bot has the letter in its stack.
+                        if changed_letter in player2.cards:
+                            player2.remove_cards(changed_letter)
                             game.quicksort(player2.cards)
                             used_cards.append(changed_letter)
-                            current_word = bot_word # Updates current word.
+
+                            # Update current word.
+                            current_word = bot_word
                             current_player = player1
                             player2.end_turn()
                         else:
                             if not deck:
                                 deck = game.fisher_shuffle(used_cards.copy())
                                 used_cards = []
-                            player2.add_card(deck.pop()) # Gives the bot a penalty card.
+
+                            # Give the bot a penalty card.
+                            player2.add_card(deck.pop())
                             game.quicksort(player2.cards)
-                            current_player = player1 # Switch turns
+
+                            # Switch turns.
+                            current_player = player1
                             player2.end_turn()
         else:
             if not deck:
                 deck = game.fisher_shuffle(used_cards.copy())
                 used_cards = []
-            player2.add_card(deck.pop()) # Bot gets a penalty if the word is invalid.
+
+            # Bot gets a penalty if the word is invalid.
+            player2.add_card(deck.pop())
             game.quicksort(player2.cards)
-            current_player = player1 # Switch turns
+
+            # Switch turns.
+            current_player = player1
             player2.end_turn()

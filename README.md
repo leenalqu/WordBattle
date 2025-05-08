@@ -52,17 +52,18 @@ wish luck be on your side 😊
 # How To Use The Interface Of The Game🃏🧩✨:
 
 ## 1. Welcome Page 😊:
-When you run the game you will see a welcome page.At the top, 
-you can choose between two different themes. 
-
-![img.png](img.png)
+When you run the game you will see a welcome page.
+There you will have the game name and four buttons.
 
 ## 2. Main Menu Buttons 🔘:
 
 There are four buttons on the welcome page:
     ![img_1.png](img_1.png)
 1.     Play: Starts the game.
-2.     Options: Mute music.
+2.     Options: Mute music,change theme.
+
+    ![img_5.png](img_5.png)
+
 3.     Rules : Displays the game rules.
 4.     Credits: Names of the people who created the game
    
