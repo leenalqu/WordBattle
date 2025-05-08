@@ -58,7 +58,7 @@ class Game:
         8,9-( partition),(quicksort): algorithm to sort player cards.
 
         10-(word_generator): generates a word for the game and uses (valid_transformations)
-            to check if the word can be changed 2 or more.
+            to check if the word can be changed 4 or more.
 
         11-(check_exists): checks if the word that the player changed is in the words list
             and it handel both word with a star and word without a star.
@@ -69,6 +69,9 @@ class Game:
 
     # Initializes the Game class.
     def __init__(self):
+        """
+        For storing the three letter words by using filter.
+        """
         # Creating an object for game settings class
         self.object_settings=GameSettings()
         # Lode all the words in english from a file by calling load letter words function.
@@ -79,6 +82,10 @@ class Game:
 
     # Loading the words from a file with error handel.
     def load_letter_words(self, filename):
+        """
+         Take the words from the file and put them in a list
+            with error handling.
+        """
         try:
             with open(filename,'r') as file:
                 words = {line.strip().lower () for line in file.readlines()}  # Using a set for faster lookup.
@@ -89,6 +96,9 @@ class Game:
 
     # Generate all valid transformations for a word using BFS.
     def valid_transformations(self,random_word):
+        """
+        Returns a list of valid transformations of a word.
+        """
         # Using class queue.
         queue = Queue()
         queue.append(random_word)
@@ -109,6 +119,10 @@ class Game:
 
     # Check if two words differ by exactly one letter.
     def is_one_letter_dif(self,word1,word2):
+        """
+        Takes two words and compare them if they differ
+            by one letter only.
+        """
         if len(word1) != len(word2):
             return False
         if word1 == word2:
@@ -123,6 +137,9 @@ class Game:
 
     # Shuffling generator using fisher yates shuffle.
     def fisher_shuffle(self,cards):
+        """
+        Shuffles a list using fisher algorithm.
+        """
         for i in range(len(cards) - 1,0,-1):
             j = random.randint(0,i)
             cards[i],cards[j] = cards[j],cards[i]
@@ -130,6 +147,9 @@ class Game:
 
     # Function star card random u might or might not get a * if you don't get a star card you will be given a useful letter.
     def star_card(self):
+        """
+        Returns a star card or a useful letter random for the stack.
+        """
         value = random.randint(0,1)
         if value == 0:
             return "*"
@@ -144,6 +164,10 @@ class Game:
 
     # Function will return a list of 40 cards shuffled.
     def card_stack(self):
+        """
+        Generate a stack of 40 cards uses two functions
+            (fisher_shuffle and star_card).
+        """
         letters = list(string.ascii_lowercase)
         list_range = range(0,len(letters))
         cards = []
@@ -156,6 +180,9 @@ class Game:
 
     # Sorting player cards in alphabet order using quick sort algorithm(need to be called in the main loop every time a new letter is added).
     def partition(self,list1,low,high):
+        """
+        Algorithm to sort player cards.
+        """
         pivot = list1[high]
         i = low - 1
 
@@ -168,6 +195,9 @@ class Game:
         return i + 1
 
     def quicksort(self,list1,low=0,high=None):
+        """
+        Algorithm to sort player cards.
+        """
         if high is None:
             high = len(list1) - 1
 
@@ -178,6 +208,10 @@ class Game:
 
     # Generate a three letter random word.
     def word_generator(self):
+        """
+        Generates a word for the game and uses (valid_transformations)
+            to check if the word can be changed 4 or more.
+        """
         vowels ='aeiou'  # List of vowels.
         while True:
             random_word = random.choice(self.words)
@@ -188,6 +222,10 @@ class Game:
 
     # Check if the word real or not after the player change it.
     def check_exists(self,player_word):
+        """
+        Checks if the word that the player changed is in the words list
+            and it handel both word with a star and word without a star.
+        """
         if "*" in player_word:
             for i in range(97,123):  # Letters from the letter a to letter z.
                 letter=chr(i)
@@ -203,6 +241,9 @@ class Game:
 
     # Decide who play first.
     def coin_flip(self):
+        """
+        Decide who play first human or bot
+        """
         value = random.randint(0,1)
         if value == 0:
             return "Head"
