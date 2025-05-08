@@ -1,5 +1,8 @@
-# The file contains functions for the bot that plays against the player.
+"""
+Functions for the bot that plays against the player.
+"""
 # Developed by Hasan Alwazzan (5640356).
+
 
 # Importing libraries and modules.
 import random
@@ -58,10 +61,14 @@ class Bot:
         - End the bots turn.
 
     next_word(current_word):
-        - Return the bots answer and the card that it used to get that answer.
+        - Return the bots answer and the card that it used to
+            get that answer (but if no word is found Return None).
 
     letter_frequency_sort(cards_list):
-        - Sort the cards based on letter distribution.
+        - Variation of the insertion sort algorithm:
+            Sort cards based on the letter frequency distribution
+            and any Special cards (e.g. Star cards) are placed at
+            the end of the sorted list.
 
     discard_card():
         - Discard the worst card from the bot.
@@ -144,7 +151,7 @@ class Bot:
         self.current_turn_will_answer_or_not = False  # Initial variable for whether the bot will answer this turn.
         self.current_turn_answer_time = 0  # Initial variable for how long the bot will take to answer this turn.
         self.current_turn_answer = ""  # Initial variable for the bots answer in this turn.
-        self.current_turn_card_used = "" # Initial variable for the card the bot will play in this turn.
+        self.current_turn_card_used = ""  # Initial variable for the card the bot will play in this turn.
 
         self.difficulty_settings = {  # Dictionary for the settings based on the chosen difficulty mode.
             Bot.Difficulty.EASY: {  # Difficulty mode.
@@ -161,7 +168,7 @@ class Bot:
                 "WORD_FREQUENCY_CUTOFF": 2.9838168355859476e-06
             },
             Bot.Difficulty.HARD: {
-                "ANSWER_PROBABILITY": 1, # Hard bot uses Highest answer probability possible
+                "ANSWER_PROBABILITY": 1,  # Hard bot uses Highest answer probability possible
                 "AVERAGE_ANSWER_TIME": 0.366 * Bot.game_settings.TURN_TIME_LIMIT,
                 "VARIANCE_ANSWER_TIME": 0.133 * Bot.game_settings.TURN_TIME_LIMIT,
                 "WORD_FREQUENCY_CUTOFF": 0  # The hard bot doesn't have a cut-off and can use all words.
@@ -193,7 +200,7 @@ class Bot:
             - How much time has passed since the start of the bots turn.
         """
         # Initial code for the turn (which runs once per turn).
-        current_word = current_word.lower() # Converts current word to lowercase (bot only works with lowercase).
+        current_word = current_word.lower()  # Converts current word to lowercase (bot only works with lowercase).
         if not self.ran_current_turn_code:  # Makes sure the code in this statement only runs once in a turn.
             self.current_turn_will_answer_or_not = self.will_answer_or_not()  # Whether the bot will answer this turn.
             self.current_turn_answer_time = self.answer_time()  # How long the bot will take to answer this turn.
@@ -220,8 +227,8 @@ class Bot:
 
     def next_word(self, current_word: str) -> tuple:
         """
-        Return the bots answer as a string,
-            but if no word is found Return None.
+        Return the bots answer and the card that it used to
+            get that answer (but if no word is found Return None).
 
         Parameters
         ----------
@@ -229,17 +236,18 @@ class Bot:
             - The current word in the game that the bot must change.
         """
         # Declaring variables
-        alphabet = self.letter_frequencies.keys() # All english letters (from keys of letter_frequencies dictionary).
-        star_card = "*" # variable to define the star card.
-        star_card_word = "" # Initialize a variable for the answer that uses the star card.
+        alphabet = self.letter_frequencies.keys()  # All english letters (from keys of letter_frequencies dictionary).
+        star_card = "*"  # variable to define the star card.
+        star_card_word = ""  # Initialize a variable for the answer that uses the star card.
         neighbor_suggestions = []  # Word suggestions (neighbor is a word with 1 letter changed from the current word).
         cards_list = self.cards  # The bots cards.
         if self.difficulty_level == Bot.Difficulty.HARD:  # If the bot is in hard mode.
-            cards_list = self.letter_frequency_sort(cards_list) # Sort cards by least frequency to use hard cards first.
+            # Sort cards by least frequency to use hard cards first.
+            cards_list = self.letter_frequency_sort(cards_list)
 
         # Getting neighbor suggestions.
         for card in cards_list:  # Loops through the bots cards.
-            if card in alphabet: # Make sure card is a letter (avoid any special cards).
+            if card in alphabet:  # Make sure card is a letter (avoid any special cards).
                 for j in range(len(current_word)):  # Loops the amount of letters in the current word.
                     # Swapping 1 letter from the word.
                     characters = list(current_word)  # List of characters of the current word.
@@ -249,9 +257,9 @@ class Bot:
                     if new_word in self.bot_words and new_word != current_word and new_word not in neighbor_suggestions:
                         # Add suggestion to list with the card used to get it.
                         neighbor_suggestions.append((new_word, card))
-                        break # Stop looking for words using this card (only takes the first suggestion).
-            elif card == star_card: # If the current card is a star card.
-                for letter in alphabet: # Loop through all english letters.
+                        break  # Stop looking for words using this card (only takes the first suggestion).
+            elif card == star_card:  # If the current card is a star card.
+                for letter in alphabet:  # Loop through all english letters.
                     for k in range(len(current_word)):  # Loops the amount of letters in the current word.
                         # Swapping 1 letter from the word.
                         characters = list(current_word)  # List of characters of the current word.
@@ -260,16 +268,16 @@ class Bot:
                         # Make sure the word is a real word, & it is not the current word, & not one of the suggestions.
                         if new_word in self.bot_words and new_word != current_word:
                             characters = list(new_word)  # List of characters of the new word.
-                            characters[k] = star_card # Replace the changed letter with the star card.
+                            characters[k] = star_card  # Replace the changed letter with the star card.
                             star_card_word = "".join(characters)  # Join back the list into a string.
-                            break # Stop looking for words using this card (only takes the first suggestion).
+                            break  # Stop looking for words using this card (only takes the first suggestion).
             else:
                 # Stop the program if an unknown card is found (edge case).
                 raise Exception("\nError: Unknown card was found in Bot's card list")
 
         # Selecting the next word from neighbor suggestions.
         if neighbor_suggestions:  # Suggestions are found (meaning if the neighbor_suggestions list is not empty).
-            match self.difficulty_level: # Check difficulty level of the bot, and run the code that matches it.
+            match self.difficulty_level:  # Check difficulty level of the bot, and run the code that matches it.
                 case Bot.Difficulty.EASY | Bot.Difficulty.MEDIUM:  # If bot in easy or medium modes.
                     random_index = random.randint(0, len(neighbor_suggestions) - 1)  # Get random suggestion index.
                     next_word = neighbor_suggestions[random_index]  # Choose random suggestion.
@@ -278,17 +286,18 @@ class Bot:
                     # Uses first suggestion because it's the one that uses the hardest card.
                     next_word = neighbor_suggestions[0]
                     return next_word
-                case _: # Edge case that triggers only if the difficulty of the bot was set to something invalid.
+                case _:  # Edge case that triggers only if the difficulty of the bot was set to something invalid.
                     raise Exception("\nError: Unknown difficulty mode was set for Bot")
         # In the case that that bot doesn't find any normal answers.
-        elif star_card_word: # Check whether an answer using the star card has been found.
-            return star_card_word, star_card # Return the word and the card used
-        else: # If the bot failed to find a valid word using its cards
-            return None, None # one none for the word and the other for the letter used
+        elif star_card_word:  # Check whether an answer using the star card has been found.
+            return star_card_word, star_card  # Return the word and the card used
+        else:  # If the bot failed to find a valid word using its cards
+            return None, None  # one none for the word and the other for the letter used
 
-    def letter_frequency_sort(self, cards_list: list[str]) -> list[str]:  # A variation of insertion sort.
+    def letter_frequency_sort(self, cards_list: list[str]) -> list[str]:
         """
-        Sort cards based on the letter frequency distribution
+        Variation of the insertion sort algorithm:
+            Sort cards based on the letter frequency distribution
             in the English language, and any Special cards
             (e.g. Star cards) are placed at the end of the sorted list.
 
@@ -298,11 +307,11 @@ class Bot:
             - List of cards (letters and special cards).
         """
         letter_cards, special_cards = [], []  # Initiate empty lists to separate the letter cards from special ones.
-        alphabet = self.letter_frequencies.keys() # All english letters (from keys of letter_frequencies dictionary).
+        alphabet = self.letter_frequencies.keys()  # All english letters (from keys of letter_frequencies dictionary).
         for card in cards_list:  # Loop through cards.
-            if card in alphabet: # If a card is a letter.
+            if card in alphabet:  # If a card is a letter.
                 letter_cards.append(card)  # Add it to the letter cards list.
-            else: # This means it's a special card
+            else:  # This means it's a special card
                 special_cards.append(card)  # Add it to the special cards list.
 
         # Sort the letter cards using insertion sort.
@@ -322,7 +331,7 @@ class Bot:
         """
         Discard a card from the bot.
         """
-        alphabet = self.letter_frequencies.keys() # All english letters (from keys of letter_frequencies dictionary).
+        alphabet = self.letter_frequencies.keys()  # All english letters (from keys of letter_frequencies dictionary).
 
         if self.difficulty_level == Bot.Difficulty.EASY:  # When the bot is in easy mode.
             card_to_remove_index = random.randint(0, len(self.cards) - 1)  # Pick a random index from the cards list.
@@ -331,21 +340,23 @@ class Bot:
         elif self.difficulty_level in (Bot.Difficulty.MEDIUM, Bot.Difficulty.HARD):  # If bot is in medium or hard mode.
             worst_card = self.cards[0]  # Initiate variable for the worst card as the bots first card.
             for card in self.cards:  # Loops through the bots cards.
-                try: # Tries the following code.
+                try:  # Tries the following code.
                     # Checks if the current letter is less common.
                     if self.letter_frequencies[card] < self.letter_frequencies[worst_card]:
                         worst_card = card  # Sets the current letter as the worst.
                 except KeyError:
                     # Runs when the frequency of the star card is checked.
                     # (Which returns an error because it is not in the letter_frequencies dictionary).
-                    if worst_card not in alphabet: # If the initial worst card is a special card.
-                        worst_card = card # Set the worst card to the current card.
-                    else: # This case means the current card is a special card.
+                    if worst_card not in alphabet:  # If the initial worst card is a special card.
+                        worst_card = card  # Set the worst card to the current card.
+                    else:  # This case means the current card is a special card.
                         continue  # Skip the special card and continue the loop.
             self.cards.remove(worst_card)  # Remove the worst card from bots cards.
 
-        else: # This case means the bot difficulty level wasn't found.
+        else:  # This case means the bot difficulty level wasn't found.
             raise Exception("\nError: Unknown difficulty mode was set for Bot")
+
+        return None
 
     def will_answer_or_not(self) -> bool:
         """
@@ -404,7 +415,8 @@ class Bot:
         letter: str
             - The letter of the card.
         """
-        self.cards.append(letter.lower()) # Add card to bots card list.
+        self.cards.append(letter.lower())  # Add card to bots card list.
+        return None
 
     def remove_cards(self, letter: str) -> None:
         """
@@ -415,11 +427,12 @@ class Bot:
         letter: str
             - The letter of the card.
         """
-        if letter.lower() in self.cards: # Makes sure the letter is in the cards list.
-            self.cards.remove(letter.lower()) # Remove the card.
+        if letter.lower() in self.cards:  # Makes sure the letter is in the cards list.
+            self.cards.remove(letter.lower())  # Remove the card.
+        return None
 
     def won_game(self) -> bool:
         """
         Return whether the bot has won the game.
         """
-        return len(self.cards) == 0 # The winner is announced when they finish all their cards.
+        return len(self.cards) == 0  # The winner is announced when they finish all their cards.
