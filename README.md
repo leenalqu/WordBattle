@@ -64,8 +64,6 @@ There you will have the game name and four buttons.
 
 There are four buttons on the welcome page:
 
-![img_7.png](img_7.png)
-
 1.     Play: Starts the game.
 2.     Options: Mute music,change theme.
 3.     Rules : Displays the game rules.
@@ -78,13 +76,9 @@ After clicking the Play button, you’ll be asked to choose the difficulty level
 A coin flip will decide who plays first—you or the bot.
 A screen will display the result before the game begins.
 
-   ![img_2.png](img_2.png)
-
-   ![img_3.png](img_3.png)
 
 ## 5. Gameplay Interface 🕹️:
 
-![img_4.png](img_4.png)
 
 - The word to modify appears at the top.
 - The timer is in the middle.

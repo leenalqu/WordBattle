@@ -72,7 +72,7 @@ class Game:
         # Creating an object for game settings class
         self.object_settings=GameSettings()
         # Lode all the words in english from a file by calling load letter words function.
-        self.words = self.load_letter_words("words_alpha.txt")
+        self.words = self.load_letter_words("data/words_alpha.txt")
         # Filter out only the three letters words.
         self.words = list((filter(lambda word:len(word) ==self.object_settings.WORD_LENGTH,self.words)))
 
