@@ -1,3 +1,32 @@
+# WORD BATTLE
+
+# Implemented Algorithms:
+- Fisher Yates [Game().fisher_shuffle()]
+- Quick Sort [Game().quicksort()]
+- Insertion [Sort Bot().letter_frequency_sort()]
+- Graph BFS [Game().valid_transformations() and Bot().next_word()]
+ 
+# Implemented data structures:
+- Graph [Represented by the dictionaries: Game().words & Bot().bot_words]
+- Queue
+ 
+# Uncommon data types:
+- Enum [Bot.Difficulty and Bot.Output]
+ 
+# Programming Techniques:
+- Graphical Interface [pygame]
+- Classes [OOP]
+- Modules
+- JSON file loading
+- lambda
+- filter
+
+# Debugging:
+- Raising Exceptions
+- Exception Handling
+- Print Statements
+
+
 # Game Overview:
    [ The Word Battle 🃏
     welcome to our game the high risk card game 
