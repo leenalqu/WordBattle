@@ -3,7 +3,7 @@
 # Implemented Algorithms:
 - Fisher Yates [Game().fisher_shuffle()]
 - Quick Sort [Game().quicksort()]
-- Insertion [Sort Bot().letter_frequency_sort()]
+- Insertion Sort [Bot().letter_frequency_sort()]
 - Graph BFS [Game().valid_transformations() and Bot().next_word()]
  
 # Implemented data structures:
@@ -15,11 +15,12 @@
  
 # Programming Techniques:
 - Graphical Interface [pygame]
-- Classes [OOP]
+- OOP [Classes]
 - Modules
 - JSON file loading
 - lambda
 - filter
+- Annotations
 
 # Debugging:
 - Raising Exceptions

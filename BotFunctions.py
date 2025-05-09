@@ -247,6 +247,7 @@ class Bot:
 
         # Getting neighbor suggestions.
         for card in cards_list:  # Loops through the bots cards.
+
             if card in alphabet:  # Make sure card is a letter (avoid any special cards).
                 for j in range(len(current_word)):  # Loops the amount of letters in the current word.
                     # Swapping 1 letter from the word.
@@ -258,6 +259,7 @@ class Bot:
                         # Add suggestion to list with the card used to get it.
                         neighbor_suggestions.append((new_word, card))
                         break  # Stop looking for words using this card (only takes the first suggestion).
+
             elif card == star_card:  # If the current card is a star card.
                 for letter in alphabet:  # Loop through all english letters.
                     for k in range(len(current_word)):  # Loops the amount of letters in the current word.
@@ -271,8 +273,9 @@ class Bot:
                             characters[k] = star_card  # Replace the changed letter with the star card.
                             star_card_word = "".join(characters)  # Join back the list into a string.
                             break  # Stop looking for words using this card (only takes the first suggestion).
+
             else:
-                # Stop the program if an unknown card is found (edge case).
+                # Display error message if an unknown card is found (edge case).
                 raise Exception("\nError: Unknown card was found in Bot's card list")
 
         # Selecting the next word from neighbor suggestions.
@@ -342,7 +345,7 @@ class Bot:
             for card in self.cards:  # Loops through the bots cards.
                 try:  # Tries the following code.
                     # Checks if the current letter is less common.
-                    if self.letter_frequencies[card] < self.letter_frequencies[worst_card]:
+                    if self.letter_frequencies[card] < self.letter_frequencies[worst_card]:  # Breakpoint here
                         worst_card = card  # Sets the current letter as the worst.
                 except KeyError:
                     # Runs when the frequency of the star card is checked.
