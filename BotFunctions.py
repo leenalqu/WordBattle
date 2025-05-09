@@ -155,22 +155,22 @@ class Bot:
 
         self.difficulty_settings = {  # Dictionary for the settings based on the chosen difficulty mode.
             Bot.Difficulty.EASY: {  # Difficulty mode.
-                "ANSWER_PROBABILITY": 0.95,  # Determines how often the bot plays its turn (doesn't run down the timer).
+                "ANSWER_PROBABILITY": 0.9,  # Determines how often the bot plays its turn (doesn't run down the timer).
                 "AVERAGE_ANSWER_TIME": 0.566 * Bot.game_settings.TURN_TIME_LIMIT,  # Mean answer time.
                 "VARIANCE_ANSWER_TIME": 0.133 * Bot.game_settings.TURN_TIME_LIMIT,  # How varied the answer times are.
                 # Determines the cut-off that determines which words are included in the bots dictionary of words.
                 "WORD_FREQUENCY_CUTOFF": 5.752713813881526e-06  # (Word frequency means how common the word is).
             },
             Bot.Difficulty.MEDIUM: {
-                "ANSWER_PROBABILITY": 0.97,
+                "ANSWER_PROBABILITY": 0.95,
                 "AVERAGE_ANSWER_TIME": 0.466 * Bot.game_settings.TURN_TIME_LIMIT,
                 "VARIANCE_ANSWER_TIME": 0.133 * Bot.game_settings.TURN_TIME_LIMIT,
                 "WORD_FREQUENCY_CUTOFF": 2.9838168355859476e-06
             },
             Bot.Difficulty.HARD: {
                 "ANSWER_PROBABILITY": 1,  # Hard bot uses Highest answer probability possible
-                "AVERAGE_ANSWER_TIME": 0.366 * Bot.game_settings.TURN_TIME_LIMIT,
-                "VARIANCE_ANSWER_TIME": 0.133 * Bot.game_settings.TURN_TIME_LIMIT,
+                "AVERAGE_ANSWER_TIME": 0.266 * Bot.game_settings.TURN_TIME_LIMIT,
+                "VARIANCE_ANSWER_TIME": 0.066 * Bot.game_settings.TURN_TIME_LIMIT,
                 "WORD_FREQUENCY_CUTOFF": 0  # The hard bot doesn't have a cut-off and can use all words.
             }
         }
