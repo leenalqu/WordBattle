@@ -286,3 +286,16 @@ while True:
             # Switch turns.
             current_player = player1
             player2.end_turn()
+
+# Testing my code.
+if __name__ == "__main__":
+    L_player = Player("Leen", ["A, B, C, D"])
+
+    # Test add_card.
+    L_player.add_card("H")
+
+    # Test remove_card.
+    L_player.remove_cards("A")
+
+    # Test won_game; I'm expecting a 'False'.
+    L_player.won_game()
