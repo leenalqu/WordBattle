@@ -2,10 +2,7 @@
 import os
 import sys
 import math
-import random
-
 import pygame
-
 from BotFunctions import Bot
 from GameFunctions import Game
 from GameSettings import GameSettings
@@ -954,18 +951,19 @@ class GameProgress:
             if pygame.mouse.get_pressed()[0] and self.side_status == 0 and not (self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first_page or self.show_player_first_page):
                 self.button_sound.play()
                 self.timer_seconds = 0
+                print(f"[handle_button_click] Button (Confirm) was clicked")
 
-            elif pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
+            if pygame.mouse.get_pressed()[0] and self.show_game_paused_page:
                 self.button_sound.play()
-                print(f"[handle_button_click] Button (Restart) was clicked")
-                python = sys.executable
-                script = os.path.abspath(__file__)
-                os.execv(python, [python, script])
-
+                self.theme_setting = 1 - self.theme_setting
+                self.update_theme()
+                print(f"[handle_button_click] Button (Theme) was clicked")
+                
         # Sound_Button
         if self.x_min_sound_button <= mouse_x <= self.x_max_sound_button and self.y_min_sound_button <= mouse_y <= self.y_max_sound_button and not (self.show_welcome_page or self.show_rules_page or self.show_options_page or self.show_credits_page or self.show_computer_first_page or self.show_player_first_page or self.show_rules_main_page):
             if pygame.mouse.get_pressed()[0]:
                 self.button_sound.play()
+                print(f"[handle_button_click] Button (Mute) was clicked")
                 if self.sound_enabled:
                     pygame.mixer.music.set_volume(0.0)
                     self.sound_enabled = False
