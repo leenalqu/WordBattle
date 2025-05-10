@@ -274,7 +274,7 @@ class Bot:
                             star_card_word = "".join(characters)  # Join back the list into a string.
                             break  # Stop looking for words using this card (only takes the first suggestion).
 
-            else:
+            else:  # Breakpoint here (to find what was the invalid card used)
                 # Display error message if an unknown card is found (edge case).
                 raise Exception("\nError: Unknown card was found in Bot's card list")
 
