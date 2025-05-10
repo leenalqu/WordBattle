@@ -1350,8 +1350,9 @@ class GameProgress:
             - Restores previous state.
         """
         current_word_str = ''.join(self.word_cards).lower()
+        previous_word_str = ''.join(self.previous_word_cards).lower()
 
-        if self.logic.check_exists(current_word_str):
+        if self.logic.check_exists(current_word_str, previous_word_str):
             if self.side_status == 0:
                 self.player_answer_status = 1
                 self.notification.show_message_box("VALID WORD")
