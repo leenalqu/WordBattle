@@ -291,6 +291,7 @@ class GameProgress:
         self.background_music_1 = "data/sound/background_music_1.wav"
         self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
         self.sound_enabled = True
+
         pygame.mixer.music.load(self.background_music_0)
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
@@ -301,38 +302,52 @@ class GameProgress:
         self.font_size_round = 34
         self.font_size_cards = 52
         self.font_size_word = 88
-        self.font_default = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default)
-        self.font_timer = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer)
-        self.font_round = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_round)
-        self.font_cards = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_cards)
-        self.font_word = pygame.font.Font("data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_word)
 
-        #Configure first-hand player
+        # Load fonts.
+        self.font_default = pygame.font.Font(
+            "data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_default
+        )
+        self.font_timer = pygame.font.Font(
+            "data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_timer
+        )
+        self.font_round = pygame.font.Font(
+            "data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_round
+        )
+        self.font_cards = pygame.font.Font(
+            "data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_cards
+        )
+        self.font_word = pygame.font.Font(
+            "data/font/AaHuanMengKongJianXiangSuTi-2.ttf", self.font_size_word
+        )
+
+        #Configure first-hand player.
         self.value = self.logic.coin_flip()
         print(f"[__init__] {self.value}")
+
         if self.value == "Head":
             self.side_status = 0
             self.image_player_first_page = self.image_player_first_0
             print(f"[__init__] Player goes first")
+
         elif self.value == "Tail":
             self.side_status = 1
             self.image_computer_first_page = self.image_computer_first_0
             print(f"[__init__] Computer goes first")
 
-        # Configure selection buttons
+        # Configure selection buttons.
         self.options_box1_rect = pygame.Rect(672, 178, 18, 18)
         self.options_box2_rect = pygame.Rect(709, 318, 18, 18)
         self.options_click_sound = 1
         self.options_background_music = 1
 
-        # Configure timer
+        # Configure timer.
         self.timer_x = 301
         self.timer_y = 248
         self.timer_event = pygame.USEREVENT + 1
         self.timer_seconds = self.game_settings.TURN_TIME_LIMIT
         pygame.time.set_timer(self.timer_event, 1000)
 
-        # Configure popup
+        # Configure popup.
         self.popup_side_changer_width = 800
         self.popup_side_changer_height = 123
         self.popup_side_changer_width_button = 260
@@ -350,7 +365,7 @@ class GameProgress:
         self.popup_side_changer_text_button_player = "COMPUTER'S TURN"
         self.popup_side_changer_text_button_computer = "START MY TURN"
 
-        # Configure popup (Remove Mode)
+        # Configure popup (remove mode).
         self.popup_remove_width = 300
         self.popup_remove_height = 123
         self.popup_remove_width_button = 100
@@ -367,7 +382,7 @@ class GameProgress:
         self.popup_remove_text_no = "No"
         self.popup_remove_text_button = "OK"
         
-       # Configure popup (Bot Difficulty)
+       # Configure popup (bot difficulty).
         self.popup_bot_difficulty_width = 800
         self.popup_bot_difficulty_height = 123
         self.popup_bot_difficulty_difficulty_button_width = 100
@@ -379,7 +394,7 @@ class GameProgress:
         self.popup_bot_difficulty_medium_button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 10, self.popup_bot_difficulty_difficulty_button_width, self.popup_bot_difficulty_difficulty_button_height)
         self.popup_bot_difficulty_hard_button_rect = pygame.Rect(self.screen_width // 2 + 70, self.screen_height // 2 + 10, self.popup_bot_difficulty_difficulty_button_width, self.popup_bot_difficulty_difficulty_button_height)
 
-        # Configure word
+        # Configure word.
         self.word_card_1 = self.word_cards[0]
         self.word_card_2 = self.word_cards[1]
         self.word_card_3 = self.word_cards[2]
@@ -566,7 +581,10 @@ class GameProgress:
                 new_previous_cards[i] = card
 
         self.player_cards = new_previous_cards
-        self.used_card_positions = [i for i in range(len(self.player_cards)) if i >= len(non_empty_cards) or self.player_cards[i] == '']
+        self.used_card_positions = [
+            i for i in range(len(self.player_cards))
+            if i >= len(non_empty_cards) or self.player_cards[i] == ''
+        ]
         self.previous_word_cards = self.word_cards.copy()
         self.previous_used_card_positions = self.used_card_positions.copy()
 
@@ -584,7 +602,8 @@ class GameProgress:
         Affects text colors, popup styles, backgrounds, and page images.
         """
         if self.theme_setting == 0:
-            # Color settings
+
+            # Color theme settings.
             self.color_text_coordinate = (33, 33, 33)
             self.color_text_timer = (33, 33, 33)
             self.color_popup_background = (188, 173, 119)
@@ -601,9 +620,14 @@ class GameProgress:
             self.color_card_overlay = (33, 33, 33)
             self.color_point_block = (188, 173, 119)
             self.color_option_button = (188, 173, 119)
-            if hasattr(self, 'notification'): self.notification.update_colors(background_color=(188, 173, 119), border_color=(33, 33, 33), text_color=(33, 33, 33))
 
-            # Page settings
+            if hasattr(self, 'notification'):
+                self.notification.update_colors(
+                    background_color=(188, 173, 119),
+                    border_color=(33, 33, 33), text_color=(33, 33, 33)
+                )
+
+            # Page settings.
             self.image_welcome_page = self.image_welcome_page_0
             self.image_rules_page = self.image_rules_page_0
             self.image_options_page = self.image_options_page_0
@@ -619,13 +643,14 @@ class GameProgress:
             self.image_remove_page = self.image_remove_page_0
             self.image_remove_mode_page = self.image_remove_page_mode_0
 
-            # Audio settings
+            # Audio settings.
             if self.sound_enabled:
                 pygame.mixer.music.load(self.background_music_0)
                 pygame.mixer.music.play(-1)
                 pygame.mixer.music.set_volume(0.3)
 
         elif self.theme_setting == 1:
+
             # Color settings
             self.color_text_coordinate = (0, 49, 82)
             self.color_text_timer = (228, 222, 215)
@@ -643,9 +668,15 @@ class GameProgress:
             self.color_card_overlay = (0, 49, 82)
             self.color_point_block = (0, 49, 82)
             self.color_option_button = (0, 49, 82)
-            if hasattr(self, 'notification'): self.notification.update_colors(background_color=(228, 222, 215), border_color=(0, 49, 82), text_color=(0, 49, 82))
 
-            # Page settings
+            if hasattr(self, 'notification'):
+                self.notification.update_colors(
+                    background_color=(228, 222, 215),
+                    border_color=(0, 49, 82),
+                    text_color=(0, 49, 82)
+                )
+
+            # Page settings.
             self.image_welcome_page = self.image_welcome_page_1
             self.image_rules_page = self.image_rules_page_1
             self.image_options_page = self.image_options_page_1
@@ -661,7 +692,7 @@ class GameProgress:
             self.image_remove_page = self.image_remove_page_1
             self.image_remove_mode_page = self.image_remove_page_mode_1
 
-            # Audio settings
+            # Audio settings.
             if self.sound_enabled:
                 pygame.mixer.music.load(self.background_music_1)
                 pygame.mixer.music.play(-1)
@@ -669,73 +700,89 @@ class GameProgress:
 
     def draw_timer(self):
         """
-        Draw game timer
+        Draw the game timer.
 
-        Displays remaining time on screen in "00:XX" format
+        Displays remaining time on screen in "00:XX" format.
         """
-        timer_text = self.font_timer.render(f"00:{self.timer_seconds:02d}", True, self.color_text_timer)
+        timer_text = self.font_timer.render(
+            f"00:{self.timer_seconds:02d}", True, self.color_text_timer
+        )
         self.screen.blit(timer_text, (self.timer_x, self.timer_y))
 
     def draw_points(self):
         """
-        Draw points blocks
+        Draw the points blocks.
 
-        Display current points using blue blocks arranged horizontally, maximum 8 blocks
-        Display from left to right, points reduction removes blocks from left to right
+        Display current points using blue blocks arranged horizontally, maximum 8 blocks.
+        Display from left to right, points reduction removes blocks from left to right.
         """
         for i in range(self.point_maximum):
 
             # Calculate block position
-            x = self.point_block_x + i * (self.point_block_length + self.point_block_spacing)
-            rect = pygame.Rect(x, self.point_block_y, self.point_block_length, self.point_block_height)
+            x = self.point_block_x + i * (
+                    self.point_block_length + self.point_block_spacing
+            )
+            rect = pygame.Rect(
+                x, self.point_block_y,
+                self.point_block_length, self.point_block_height
+            )
 
-            # Draw blocks
+            # Draw blocks.
             if i >= (self.point_maximum - (self.points - 1)):
                 pygame.draw.rect(self.screen, self.color_point_block, rect)
 
     def draw_side_status(self):
         """
-        Draw the current side status text box
+        Draw the current side status text box.
 
-        Renders and displays the current player's turn status at the top of the screen
+        Renders and displays the current player's turn status at the top of the screen.
         """
-        text = self.font_default.render(self.side_text_box, True, self.color_text_side_box)
-        self.screen.blit(text, (self.side_text_box_pos[0] - text.get_width() // 2, self.side_text_box_pos[1]))
+        text = self.font_default.render(
+            self.side_text_box, True, self.color_text_side_box
+        )
+        self.screen.blit(
+            text, (self.side_text_box_pos[0] - text.get_width() // 2,
+                   self.side_text_box_pos[1])
+        )
 
     def draw_word(self):
         """
-        Draw the current word letters in the game
+        Draw the current word letters in the game.
 
         Renders each letter of the current word in the designated positions
-        with proper centering and spacing
+        with proper centering and spacing.
         """
         for i, pos in enumerate(self.word_card_positions):
-            letter_text = self.font_word.render(self.word_cards[i], True, self.color_text_word)
+            letter_text = self.font_word.render(
+                self.word_cards[i], True, self.color_text_word
+            )
             text_x = pos[0] + 47 - letter_text.get_width() // 2
             text_y = pos[1] + 47 - letter_text.get_height() // 2
             self.screen.blit(letter_text, (text_x, text_y))
 
     def draw_cards(self):
         """
-        Draw the card letters in a centered layout
+        Draw the card letters in a centered layout.
 
         Dynamically positions and renders available card letters:
-            - Centers remaining cards based on total available space
-            - Excludes previously used cards from display
-            - Updates click areas for each visible card
-            - Maintains consistent spacing between cards
+            - Centers remaining cards based on total available space.
+            - Excludes previously used cards from display.
+            - Updates click areas for each visible card.
+            - Maintains consistent spacing between cards.
 
         Card positions are calculated using:
-            - Total screen width
-            - Number of unused cards
-            - Card width and spacing
-            - Historical card usage data
+            - Total screen width.
+            - Number of unused cards.
+            - Card width and spacing.
+            - Historical card usage data.
         """
         for i, pos in enumerate(self.card_positions[:self.game_settings.MAX_CARDS]):
 
-            # Only draw unused cards
+            # Only draw unused cards.
             if i not in self.used_card_positions:
-                letter_text = self.font_cards.render(self.player_cards[i], True, self.color_text_cards)
+                letter_text = self.font_cards.render(
+                    self.player_cards[i], True, self.color_text_cards
+                )
                 text_x = pos[0] + 25 - letter_text.get_width() // 2
                 text_y = pos[1] + 25 - letter_text.get_height() // 2
                 self.screen.blit(letter_text, (text_x, text_y))
@@ -746,10 +793,15 @@ class GameProgress:
         for i, letter in enumerate(self.selected_card):
             if isinstance(letter, tuple):
                 position, letter = letter
-                text_x = self.card_positions[position][0] + 25 - font.size(letter)[0] // 2
+                text_x = (
+                        self.card_positions[position][0] + 25 - font.size(letter)[0] // 2
+                )
             else:
                 text_x = self.screen_width - 150 + i * 20
-            letter_text = font.render(str(letter), True, self.color_text_selected_card)
+
+            letter_text = font.render(
+                str(letter), True, self.color_text_selected_card
+            )
             self.screen.blit(letter_text, (text_x, start_y))
 
     def draw_card_overlay(self):
@@ -760,75 +812,168 @@ class GameProgress:
 
     def draw_coordinate_display(self):
         """
-        Draw mouse coordinate display
+        Draw mouse coordinate display.
 
         Shows the current X and Y coordinates of the mouse cursor
-        in the top-left corner of the screen
+        in the top-left corner of the screen.
         """
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        text = self.font_default.render(f"X: {mouse_x}, Y: {mouse_y}", True, self.color_text_coordinate)
+        text = self.font_default.render(
+            f"X: {mouse_x}, Y: {mouse_y}", True, self.color_text_coordinate
+        )
         text_rect = text.get_rect()
         text_rect.topleft = (650, 0)
         self.screen.blit(text, text_rect)
 
     def draw_popup(self):
         """
-        Draw the side change popup
+        Draw the side change popup.
 
         Creates a semi-transparent overlay and displays a popup message
-        when the active player changes, with an OK button to dismiss
+        when the active player changes, with an OK button to dismiss.
         """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
-        pygame.draw.rect(self.screen, self.color_popup_background, self.popup_rect)
-        pygame.draw.rect(self.screen, self.color_popup_border, self.popup_rect, 5)
-        popup_text_render = self.font_default.render(self.popup_side_changer_text, True, self.color_popup_text_button)
-        self.screen.blit(popup_text_render, (self.popup_rect.centerx - popup_text_render.get_width() // 2, self.popup_rect.centery - 40))
-        pygame.draw.rect(self.screen, self.color_popup_button, self.popup_button_rect)
-        pygame.draw.rect(self.screen, self.color_popup_button_border, self.popup_button_rect, 2)
-        button_text_render = self.font_default.render(self.popup_side_changer_text_button, True, self.color_popup_text)
-        self.screen.blit(button_text_render, (self.popup_button_rect.centerx - button_text_render.get_width() // 2, self.popup_button_rect.centery - button_text_render.get_height() // 2))
+
+        pygame.draw.rect(
+            self.screen, self.color_popup_background, self.popup_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_border, self.popup_rect, 5
+        )
+        popup_text_render = self.font_default.render(
+            self.popup_side_changer_text, True, self.color_popup_text_button
+        )
+        self.screen.blit(
+            popup_text_render,
+            (
+                self.popup_rect.centerx - popup_text_render.get_width() // 2,
+                self.popup_rect.centery - 40)
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_button, self.popup_button_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_button_border, self.popup_button_rect, 2
+        )
+        button_text_render = self.font_default.render(
+            self.popup_side_changer_text_button, True, self.color_popup_text
+        )
+        self.screen.blit(
+            button_text_render,
+        (
+            self.popup_button_rect.centerx - button_text_render.get_width() // 2,
+            self.popup_button_rect.centery - button_text_render.get_height() // 2
+            )
+        )
 
     def draw_popup_remove(self):
         """
-        Draw the remove mode popup
+        Draw the remove mode popup.
 
-        Same content as above
+        Same content as above.
         """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
-        pygame.draw.rect(self.screen, self.color_popup_background, self.popup_remove_rect)
-        pygame.draw.rect(self.screen, self.color_popup_border, self.popup_remove_rect, 5)
-        popup_text_render = self.font_default.render(self.popup_remove_text, True, self.color_popup_text_button)
-        self.screen.blit(popup_text_render, (self.popup_remove_rect.centerx - popup_text_render.get_width() // 2, self.popup_remove_rect.centery - 40))
-        pygame.draw.rect(self.screen, self.color_popup_button, self.popup_remove_yes_button_rect)
-        pygame.draw.rect(self.screen, self.color_popup_button_border, self.popup_remove_yes_button_rect, 2)
-        yes_text_render = self.font_default.render(self.popup_remove_text_yes, True, self.color_popup_text)
-        self.screen.blit(yes_text_render, (self.popup_remove_yes_button_rect.centerx - yes_text_render.get_width() // 2, self.popup_remove_yes_button_rect.centery - yes_text_render.get_height() // 2))
-        pygame.draw.rect(self.screen, self.color_popup_button, self.popup_remove_no_button_rect)
-        pygame.draw.rect(self.screen, self.color_popup_button_border, self.popup_remove_no_button_rect, 2)
-        no_text_render = self.font_default.render(self.popup_remove_text_no, True, self.color_popup_text)
-        self.screen.blit(no_text_render, (self.popup_remove_no_button_rect.centerx - no_text_render.get_width() // 2, self.popup_remove_no_button_rect.centery - no_text_render.get_height() // 2))
+
+        pygame.draw.rect(
+            self.screen, self.color_popup_background, self.popup_remove_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_border, self.popup_remove_rect, 5
+        )
+
+        popup_text_render = self.font_default.render(
+            self.popup_remove_text, True, self.color_popup_text_button
+        )
+        self.screen.blit(
+            popup_text_render,
+            (
+                self.popup_remove_rect.centerx - popup_text_render.get_width() // 2,
+                self.popup_remove_rect.centery - 40
+            )
+        )
+
+        pygame.draw.rect(
+            self.screen, self.color_popup_button, self.popup_remove_yes_button_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_button_border,
+            self.popup_remove_yes_button_rect, 2
+        )
+
+        yes_text_render = self.font_default.render(
+            self.popup_remove_text_yes, True, self.color_popup_text
+        )
+        self.screen.blit(
+            yes_text_render,
+            (
+                self.popup_remove_yes_button_rect.centerx - yes_text_render.get_width() // 2,
+                self.popup_remove_yes_button_rect.centery - yes_text_render.get_height() // 2
+            )
+        )
+
+        pygame.draw.rect(
+            self.screen, self.color_popup_button, self.popup_remove_no_button_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_button_border,
+            self.popup_remove_no_button_rect, 2
+        )
+
+        no_text_render = self.font_default.render(
+            self.popup_remove_text_no, True, self.color_popup_text
+        )
+        self.screen.blit(
+            no_text_render,
+            (
+                self.popup_remove_no_button_rect.centerx - no_text_render.get_width() // 2,
+                self.popup_remove_no_button_rect.centery - no_text_render.get_height() // 2
+            )
+        )
 
     def draw_popup_bot_difficulty(self):
         """
-        Draw the bot difficulty selection popup
+        Draw the bot difficulty selection popup.
 
-        Displays a popup with three difficulty options: EASY, MEDIUM, HARD
+        Displays a popup with three difficulty options: EASY, MEDIUM, HARD.
         """
         s = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         s.fill((0, 0, 0, 128))
         self.screen.blit(s, (0, 0))
-        pygame.draw.rect(self.screen, self.color_popup_background, self.popup_bot_difficulty_rect)
-        pygame.draw.rect(self.screen, self.color_popup_border, self.popup_bot_difficulty_rect, 5)
-        popup_text_render = self.font_default.render("GAME DIFFICULTY SELECTION", True, self.color_popup_text_button)
-        self.screen.blit(popup_text_render, (self.popup_bot_difficulty_rect.centerx - popup_text_render.get_width() // 2, self.popup_bot_difficulty_rect.centery - 40))
-        for button, text in [(self.popup_bot_difficulty_easy_button_rect, "EASY"), (self.popup_bot_difficulty_medium_button_rect, "MEDIUM"), (self.popup_bot_difficulty_hard_button_rect, "HARD")]:
+
+        pygame.draw.rect(
+            self.screen, self.color_popup_background, self.popup_bot_difficulty_rect
+        )
+        pygame.draw.rect(
+            self.screen, self.color_popup_border, self.popup_bot_difficulty_rect, 5
+        )
+
+        popup_text_render = self.font_default.render(
+            "GAME DIFFICULTY SELECTION", True, self.color_popup_text_button
+        )
+        self.screen.blit(
+            popup_text_render,
+            (
+                self.popup_bot_difficulty_rect.centerx - popup_text_render.get_width() // 2,
+                self.popup_bot_difficulty_rect.centery - 40
+            )
+        )
+
+        for button, text in [
+            (self.popup_bot_difficulty_easy_button_rect, "EASY"),
+            (self.popup_bot_difficulty_medium_button_rect, "MEDIUM"),
+            (self.popup_bot_difficulty_hard_button_rect, "HARD")
+        ]:
             pygame.draw.rect(self.screen, self.color_popup_button, button)
-            pygame.draw.rect(self.screen, self.color_popup_button_border, button, 2)
-            button_text = self.font_default.render(text, True, self.color_popup_text)
+            pygame.draw.rect(
+                self.screen, self.color_popup_button_border, button, 2
+            )
+            button_text = self.font_default.render(
+                text, True, self.color_popup_text
+            )
             text_rect = button_text.get_rect(center=button.center)
             self.screen.blit(button_text, text_rect)
 
@@ -836,6 +981,7 @@ class GameProgress:
         if self.side_status == 1 and not self.game_paused:
             current_word = "".join(self.word_cards).lower()
             print(f"[handle_bot_turn] Current Word: {str(current_word).upper()}")
+
             bot_output = self.bot.play_turn(current_word, self.timer_seconds)
 
             match bot_output:
@@ -861,6 +1007,7 @@ class GameProgress:
                             print(f"[handle_bot_turn] Computer Cards (after removed Used Card): {self.bot.cards}")
                         self.deck.append(computer_used_card)
                         print(f"[handle_bot_turn] Card {computer_used_card} returned to Deck")
+
                     self.timer_seconds = 0
 
                     if self.computer_points == 3:
@@ -871,50 +1018,54 @@ class GameProgress:
 
     def handle_button_click(self, mouse_x, mouse_y):
         """
-        Handle all button click events
+        Handle all button click events.
 
         Parameters:
-            mouse_x (int): X coordinate of mouse click
-            mouse_y (int): Y coordinate of mouse click
+            mouse_x (int): X coordinate of mouse click.
+            mouse_y (int): Y coordinate of mouse click.
 
         Returns:
-            bool: False if quit button is clicked, True otherwise
+            bool: False if quit button is clicked, True otherwise.
 
         Processes clicks on:
-            - Welcome page and story pages
-            - Back button
-            - Rules button
-            - Quit button
-            - Game_Paused button
-            - Confirm button
-            - Sound toggle button
-            - Remove button (Developing)
+            - Welcome page and story pages.
+            - Back button.
+            - Rules button.
+            - Quit button.
+            - Game_Paused button.
+            - Confirm button.
+            - Sound toggle button.
+            - Remove button (developing).
         """
-        # Theme_0_Button
-        if self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button:
-            if pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 1:
+        if (self.x_min_theme_0_button <= mouse_x <= self.x_max_theme_0_button and
+                self.y_min_theme_0_button <= mouse_y <= self.y_max_theme_0_button):
+            if (pygame.mouse.get_pressed()[0] and self.show_options_page and
+                    self.theme_setting == 1):
                 self.button_sound.play()
                 print(f"[handle_button_click] Button (Theme-0) was clicked")
                 self.theme_setting = 0
                 self.update_theme()
 
-            elif pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 0:
+            elif (pygame.mouse.get_pressed()[0] and self.show_options_page and
+                  self.theme_setting == 0):
                 self.button_sound.play()
                 pass
 
-        # Theme_1_Button
-        if self.x_min_theme_1_button <= mouse_x <= self.x_max_theme_1_button and self.y_min_theme_1_button <= mouse_y <= self.y_max_theme_1_button:
-            if pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 0:
+        if (self.x_min_theme_1_button <= mouse_x <= self.x_max_theme_1_button and
+                self.y_min_theme_1_button <= mouse_y <= self.y_max_theme_1_button):
+            if (pygame.mouse.get_pressed()[0] and self.show_options_page and
+                    self.theme_setting == 0):
                 self.button_sound.play()
                 self.theme_setting = 1
                 self.update_theme()
                 print(f"[handle_button_click] Button (Theme-1) was clicked")
 
-            elif pygame.mouse.get_pressed()[0] and self.show_options_page and self.theme_setting == 1:
+            elif (pygame.mouse.get_pressed()[0] and self.show_options_page and
+                  self.theme_setting == 1):
                 self.button_sound.play()
                 pass
 
-        # Click sound button
+        # Click sound button.
         if self.x_min_click_sound_button <= mouse_x <= self.x_max_click_sound_button and self.y_min_click_sound_button <= mouse_y <= self.y_max_click_sound_button:
             if pygame.mouse.get_pressed()[0] and self.show_options_page:
                 self.button_sound.play()
