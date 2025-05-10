@@ -137,13 +137,11 @@ while True:
 
     # Check if anyone has won.
     if player1.won_game():
-
         # Player1 wins.
         print(f"{player1.name} won the game!")
         winner = player1.name
         break
     elif player2.won_game():
-
         # Bot wins.
         print("The bot has won the game!")
         winner = player2
@@ -166,10 +164,9 @@ while True:
         if time_taken <= 15:
 
             # Check if the new word is valid and differs by 1 letter.
-            if game.check_exists(new_word) and game.is_one_letter_dif(
-                    current_word, new_word
-            ):
-                changed = False
+            if (game.check_exists(new_word) and
+                    game.is_one_letter_dif(current_word, new_word)):
+                word_changed = False
 
                 # Go through the letters.
                 for i in range(3) :
@@ -193,10 +190,14 @@ while True:
 
                             # Add it to used words.
                             player1.used_words.add(current_word)
-                            changed = True
+                            word_changed = True
                             break
-                if not changed:
+
+                # If no valid change was made, and the deck is empty,
+                # shuffle used cards and put them back into the deck.
+                if not word_changed:
                     if not deck:
+                        # Shuffle used cards and put them back into the deck.
                         deck = game.fisher_shuffle(used_cards.copy())
                         used_cards = []
 
@@ -209,38 +210,35 @@ while True:
                     current_player = player2
 
             else:
-
                 # The player entered an invalid word.
                 if not deck:
-
                     # Shuffle used cards and put them back into the deck.
                     deck = game.fisher_shuffle(used_cards.copy())
                     used_cards = []
+
                 player1.add_card(deck.pop())
                 print(f"{player1.name} entered an invalid word.")
                 game.quicksort(player1.cards)
 
                 # Switch turns.
                 current_player = player2
-        else:
 
+        else:
             # The player took too long.
             if not deck:
-
                 # Shuffle used cards and put them back into the deck.
                 deck = game.fisher_shuffle(used_cards.copy())
                 used_cards = []
+
             player1.add_card(deck.pop())
             print(f"{player1.name} got a penalty card for taking too long.")
             game.quicksort(player1.cards)
             current_player = player2
 
-
     # Bot's turn.
     elif current_player == player2:
         print(f"Bot's current cards: {player2.cards}")
         print(f"It's the bot's turn. The word is: {current_word}")
-        # inside if loop
 
         # Timer for the bot.
         current_timer = 0
@@ -266,25 +264,29 @@ while True:
         else:
             bot_answer = bot_word
 
+        # If bot did not answer, it gets a penalty card.
         if not bot_answer:
             if not deck:
+                # Shuffle used cards and put them back into the deck.
                 deck = game.fisher_shuffle(used_cards.copy())
                 used_cards = []
+
             player2.add_card(deck.pop())
             print("The bot failed to change the word.")
             game.quicksort(player2.cards)
+
+            # Switch turns.
             current_player = player1
             player2.end_turn()
             continue
 
         # Wait a bit to make it feel more natural.
         time.sleep(0.5)
-        changed = False
+        word_changed = False
 
         # Check if the word is valid and differs by only 1 letter.
-        if bot_answer and game.check_exists(bot_answer) and game.is_one_letter_dif(
-                current_word, bot_answer
-        ):
+        if (bot_answer and game.check_exists(bot_answer) and
+                game.is_one_letter_dif(current_word, bot_answer)):
 
                 # Go through the letters.
             for i in range(3):
@@ -303,9 +305,12 @@ while True:
                         print(f"The current word is: {current_word}")
                         current_player = player1
                         player2.end_turn()
-                        changed = True
+                        word_changed = True
                         break
-            if not changed:
+
+            # If no valid change was made, and the deck is empty,
+            # shuffle used cards and put them back into the deck.
+            if not word_changed:
                 if not deck:
                     deck = game.fisher_shuffle(used_cards.copy())
                     used_cards = []
