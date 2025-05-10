@@ -221,7 +221,7 @@ class Game:
                     return random_word
 
     # Check if the word real or not after the player change it.
-    def check_exists(self,player_word):
+    def check_exists(self,player_word,original_word=None):
         """
         Checks if the word that the player changed is in the words list
             and it handel both word with a star and word without a star.
@@ -230,6 +230,8 @@ class Game:
             for i in range(97,123):  # Letters from the letter a to letter z.
                 letter=chr(i)
                 check_word=player_word.replace("*",chr(i),1) # It is replacing the star with letter.
+                if original_word is not None and check_word == original_word:
+                    continue
                 if check_word in self.words:
                     return True
             return False
@@ -242,12 +244,11 @@ class Game:
     # Decide who play first.
     def coin_flip(self):
         """
-        Decide who play first human or bot
+        Decide who play first human or bot.
         """
         value = random.randint(0,1)
         if value == 0:
             return "Head"
         else:
             return "Tail"
-
 
