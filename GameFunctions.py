@@ -151,7 +151,7 @@ class Game:
         Returns a star card or a useful letter random for the stack.
         """
         value = random.randint(0,10)
-        if value <=8:
+        if value <=7:
             return "*"
         else:
             l=random.randint(1,3)
@@ -171,10 +171,10 @@ class Game:
         letters = list(string.ascii_lowercase)
         list_range = range(0,len(letters))
         cards = []
-        for i in range(0,30):
+        for i in range(0,33):
             random_letter = random.choice(letters)
             cards.append(random_letter)
-        for i in range(0,10):
+        for i in range(0,7):
             cards.append(self.star_card())  # it adds a * card you might  get * or useful letter
         return self.fisher_shuffle(cards)
 
