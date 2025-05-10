@@ -2,8 +2,10 @@
 import os
 import sys
 import math
-import pygame
 import random
+
+import pygame
+
 from BotFunctions import Bot
 from GameFunctions import Game
 from GameSettings import GameSettings
@@ -12,110 +14,132 @@ from NotificationBar import NotificationBar
 
 class GameProgress:
     """
-    Card Game User Interface Class
+    Card Game User Interface Class.
 
-    This class manages the game's graphical interface, event handling, and game states.
+    Manages the game's graphical interface, event handling, and game states.
     Contains all visual elements, audio controls, and interaction logic.
-    Implements single-player vs computer turn-based gameplay with multiple themes and difficulty settings.
+    Implements single-player vs computer turn-based gameplay with multiple
+    themes and difficulty settings.
 
-    Main Attributes:
-        screen_width (int): Game window width, default 800 pixels
-        screen_height (int): Game window height, default 600 pixels
-        show_popup (bool): Whether to display popup
-        game_paused (bool): Whether game is paused
-        current_round (int): Current round number
-        side_status (int): Current active player (0 for player, 1 for computer)
-        points (int): Current player score
-        theme_setting (int): Theme setting (0 for default theme, 1 for dark theme)
-        sound_enabled (bool): Whether sound is enabled
+    Attributes:
+    -----------
+        screen_width : int
+            Game window width, default 800 pixels.
+        screen_height : int
+            Game window height, default 600 pixels.
+        show_popup : bool
+            Whether to display popup.
+        game_paused : bool
+            Whether the game is paused.
+        current_round : int
+            Current round number.
+        side_status : int
+            Current active player (0 for player, 1 for computer).
+        points : int
+            Current player score.
+        theme_setting : int
+            Theme setting (0 for default theme, 1 for dark theme).
+        sound_enabled : bool
+            Whether sound is enabled.
 
-    Main Methods:
-        draw(): Render all game elements to screen
-            - Draw background, UI elements, cards
-            - Display popups and special interfaces based on game state
-            - Update display content
-
-        draw_cards(): Draw player's hand cards
-            - Center display remaining cards
-            - Exclude used cards
-            - Update click areas
-
-        handle_card_click(mouse_x, mouse_y): Handle card selection events
-            - Calculate valid click areas
-            - Filter used cards
-            - Update selection status
-
-        organize_cards(): Rearrange card positions
-            - Move cards to fill empty slots
-            - Maintain relative order
-            - Update usage status
-
-        add_penalty_card(): Draw new card from deck
-            - Randomly select unused letter
-            - Place in player's hand empty slot
-            - Update deck status
-
-        run(): Launch and maintain main game loop
-            - Continuously process events and update display
-            - Control game flow
-            - Handle game end
+    Methods:
+    --------
+        draw():
+            Render all game elements to screen
+        draw_cards():
+            Draw player's hand cards
+        handle_card_click(mouse_x, mouse_y):
+            Handle card selection events
+        organize_cards():
+            Rearrange card positions
+        add_penalty_card():
+            Draw new card from deck
+        run():
+            Launch and maintain main game loop
     """
 
     def __init__(self):
-        # Initialize Pygame
+        # Initialize pygame.
         pygame.init()
         pygame.mixer.init()
 
-        # Configure Screen settings
+        # Set up screen configuration.
         self.screen_width = 800
         self.screen_height = 600
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.screen = pygame.display.set_mode(
+            (self.screen_width, self.screen_height)
+        )
         pygame.display.set_caption("Word Battle")
 
-        # Configure Instances settings
+        # Initialize game logic and settings.
         self.logic = Game()
         self.game_settings = GameSettings()
-        self.notification = NotificationBar(self.screen_width, self.screen_height)
+        self.notification = NotificationBar(
+            self.screen_width, self.screen_height
+        )
+
+        # Prepare card deck.
         self.card_stack = self.logic.card_stack()
         self.deck = self.card_stack
         print(f"\n[__init__] --- Game Initialization in progress ---")
         print(f"[__init__] Initial Deck content:", self.card_stack)
 
-        # Configure initial Word
+        # Initialize the word generator.
         self.word = self.logic.word_generator().upper()
         self.word_cards = list(self.word)
         self.word = self.logic.word_generator().upper()
         self.word_cards = list(self.word)
 
-        # Configure Cards
-        self.player_cards_initial = [self.card_stack.pop().upper() for _ in range(self.game_settings.START_CARDS_AMOUNT)]
+        # Pass cards for player 1 and player 2.
+        self.player_cards_initial = [
+            self.card_stack.pop().upper()
+            for _ in range(self.game_settings.START_CARDS_AMOUNT)
+        ]
         print(f"[__init__] Player's Cards: {self.player_cards_initial}")
-        self.computer_cards_initial = [self.card_stack.pop().lower() for _ in range(self.game_settings.START_CARDS_AMOUNT)]
+
+        self.computer_cards_initial = [
+            self.card_stack.pop().lower()
+            for _ in range(self.game_settings.START_CARDS_AMOUNT)
+        ]
         print(f"[__init__] Computer's Cards: {self.computer_cards_initial}")
 
-        # Configure Player's Cards filling
+        # Configure 15 card slots for the player.
         self.player_cards = [''] * 15
         for i in range(len(self.player_cards_initial)):
             self.player_cards[i] = self.player_cards_initial[i]
+
+        # Set up card display positions.
         self.card_positions = []
         self.player_card_x = 28
         self.player_card_y = 449
         self.player_card_width = 49
         self.player_card_spacing = 1
+
         for i in range(15):
-            self.card_positions.append((self.player_card_x + i * (self.player_card_width + self.player_card_spacing), self.player_card_y))
+            self.card_positions.append(
+                (
+                    self.player_card_x + i * (
+                        self.player_card_width + self.player_card_spacing
+                    ),
+                    self.player_card_y
+                )
+            )
         
-        # Configure Card click area
+        # Configure card click areas.
         self.card_click_areas = []
         for i in range(15):
-            x = self.player_card_x + i * (self.player_card_width + self.player_card_spacing)
+            x = self.player_card_x + i * (
+                    self.player_card_width + self.player_card_spacing
+            )
             y = self.player_card_y
-            self.card_click_areas.append((x, y, self.player_card_width, self.player_card_width))
+            self.card_click_areas.append(
+                (x, y, self.player_card_width, self.player_card_width)
+            )
 
-        # Initialize Bot
+        # Initialize the bot.
         self.bot = Bot(Bot.Difficulty.EASY, self.computer_cards_initial)
 
-        # Configure initial variables
+        # Configure initial variables.
         self.points = 1
         self.side_status = 0
         self.computer_points = 0
@@ -125,7 +149,7 @@ class GameProgress:
         self.computer_answer_status = None
         self.game_paused = False
 
-        # Configure initial page
+        # Configure initial page.
         self.show_welcome_page = True
         self.show_options_page = False
         self.show_rules_page = False
@@ -142,7 +166,7 @@ class GameProgress:
         self.show_victory_page = False
         self.show_defeat_page = False
 
-        # Configure Default Theme Settings
+        # Configure default theme settings.
         self.color_text_coordinate = (33, 33, 33)
         self.color_text_timer = (33, 33, 33)
         self.color_text_side_box = (33, 33, 33)
@@ -160,37 +184,93 @@ class GameProgress:
         self.color_point_block = (188, 173, 119)
         self.color_option_button = (188, 173, 119)
 
-        # Load images
-        self.image_background_0 = pygame.image.load("data/image/background_0.png")
-        self.image_background_1 = pygame.image.load("data/image/background_1.png")
-        self.image_background_mute_0 = pygame.image.load("data/image/background_mute_0.png")
-        self.image_background_mute_1 = pygame.image.load("data/image/background_mute_1.png")
-        self.image_welcome_page_0 = pygame.image.load("data/image/welcome_page_0.png")
-        self.image_welcome_page_1 = pygame.image.load("data/image/welcome_page_1.png")
-        self.image_rules_page_0 = pygame.image.load("data/image/rules_page_0.png")
-        self.image_rules_page_1 = pygame.image.load("data/image/rules_page_1.png")
-        self.image_options_page_0 = pygame.image.load("data/image/options_page_0.png")
-        self.image_options_page_1 = pygame.image.load("data/image/options_page_1.png")
-        self.image_credits_page_0 = pygame.image.load("data/image/credits_page_0.png")
-        self.image_credits_page_1 = pygame.image.load("data/image/credits_page_1.png")
-        self.image_player_first_0 = pygame.image.load("data/image/player_first_0.png")
-        self.image_player_first_1 = pygame.image.load("data/image/player_first_1.png")
-        self.image_computer_first_0 = pygame.image.load("data/image/computer_first_0.png")
-        self.image_computer_first_1 = pygame.image.load("data/image/computer_first_1.png")
-        self.image_remove_page_0 = pygame.image.load("data/image/remove_page_0.png")
-        self.image_remove_page_mode_0 = pygame.image.load("data/image/remove_page_mode_0.png")
-        self.image_remove_page_1 = pygame.image.load("data/image/remove_page_1.png")
-        self.image_remove_page_mode_1 = pygame.image.load("data/image/remove_page_mode_1.png")
-        self.image_game_paused_page_0 = pygame.image.load("data/image/game_paused_page_0.png")
-        self.image_game_paused_page_1 = pygame.image.load("data/image/game_paused_page_1.png")
-        self.image_rules_main_page_0 = pygame.image.load("data/image/rules_main_page_0.png")
-        self.image_rules_main_page_1 = pygame.image.load("data/image/rules_main_page_1.png")
-        self.image_victory_page_0 = pygame.image.load("data/image/victory_0.png")
-        self.image_victory_page_1 = pygame.image.load("data/image/victory_1.png")
-        self.image_defeat_page_0 = pygame.image.load("data/image/defeat_0.png")
-        self.image_defeat_page_1 = pygame.image.load("data/image/defeat_1.png")
+        # Load images.
+        self.image_background_0 = pygame.image.load(
+            "data/image/background_0.png"
+        )
+        self.image_background_1 = pygame.image.load(
+            "data/image/background_1.png"
+        )
+        self.image_background_mute_0 = pygame.image.load(
+            "data/image/background_mute_0.png"
+        )
+        self.image_background_mute_1 = pygame.image.load(
+            "data/image/background_mute_1.png"
+        )
+        self.image_welcome_page_0 = pygame.image.load(
+            "data/image/welcome_page_0.png"
+        )
+        self.image_welcome_page_1 = pygame.image.load(
+            "data/image/welcome_page_1.png"
+        )
+        self.image_rules_page_0 = pygame.image.load(
+            "data/image/rules_page_0.png"
+        )
+        self.image_rules_page_1 = pygame.image.load(
+            "data/image/rules_page_1.png"
+        )
+        self.image_options_page_0 = pygame.image.load(
+            "data/image/options_page_0.png"
+        )
+        self.image_options_page_1 = pygame.image.load(
+            "data/image/options_page_1.png"
+        )
+        self.image_credits_page_0 = pygame.image.load(
+            "data/image/credits_page_0.png"
+        )
+        self.image_credits_page_1 = pygame.image.load(
+            "data/image/credits_page_1.png"
+        )
+        self.image_player_first_0 = pygame.image.load(
+            "data/image/player_first_0.png"
+        )
+        self.image_player_first_1 = pygame.image.load(
+            "data/image/player_first_1.png"
+        )
+        self.image_computer_first_0 = pygame.image.load(
+            "data/image/computer_first_0.png"
+        )
+        self.image_computer_first_1 = pygame.image.load(
+            "data/image/computer_first_1.png"
+        )
+        self.image_remove_page_0 = pygame.image.load(
+            "data/image/remove_page_0.png"
+        )
+        self.image_remove_page_mode_0 = pygame.image.load(
+            "data/image/remove_page_mode_0.png"
+        )
+        self.image_remove_page_1 = pygame.image.load(
+            "data/image/remove_page_1.png"
+        )
+        self.image_remove_page_mode_1 = pygame.image.load(
+            "data/image/remove_page_mode_1.png"
+        )
+        self.image_game_paused_page_0 = pygame.image.load(
+            "data/image/game_paused_page_0.png"
+        )
+        self.image_game_paused_page_1 = pygame.image.load(
+            "data/image/game_paused_page_1.png"
+        )
+        self.image_rules_main_page_0 = pygame.image.load(
+            "data/image/rules_main_page_0.png"
+        )
+        self.image_rules_main_page_1 = pygame.image.load(
+            "data/image/rules_main_page_1.png"
+        )
+        self.image_victory_page_0 = pygame.image.load(
+            "data/image/victory_0.png"
+        )
+        self.image_victory_page_1 = pygame.image.load(
+            "data/image/victory_1.png"
+        )
+        self.image_defeat_page_0 = pygame.image.load(
+            "data/image/defeat_0.png"
+        )
+        self.image_defeat_page_1 = pygame.image.load(
+            "data/image/defeat_1.png"
+        )
         
-        # Configure default images
+        # Configure default images.
         self.image_current_background = self.image_background_0
         self.image_current_background_mute = self.image_background_mute_0
         self.image_welcome_page = self.image_welcome_page_0
@@ -206,7 +286,7 @@ class GameProgress:
         self.image_victory_page = self.image_victory_page_0
         self.image_defeat_page = self.image_defeat_page_0
 
-        # Load audios
+        # Load audios.
         self.background_music_0 = "data/sound/background_music_0.wav"
         self.background_music_1 = "data/sound/background_music_1.wav"
         self.button_sound = pygame.mixer.Sound("data/sound/button_sound.wav")
@@ -215,7 +295,7 @@ class GameProgress:
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
 
-        # Configure fonts
+        # Configure fonts.
         self.font_size_default = 24
         self.font_size_timer = 88
         self.font_size_round = 34
@@ -245,14 +325,14 @@ class GameProgress:
         self.options_click_sound = 1
         self.options_background_music = 1
 
-        # Configure Timer
+        # Configure timer
         self.timer_x = 301
         self.timer_y = 248
         self.timer_event = pygame.USEREVENT + 1
         self.timer_seconds = self.game_settings.TURN_TIME_LIMIT
         pygame.time.set_timer(self.timer_event, 1000)
 
-        # Configure Popup
+        # Configure popup
         self.popup_side_changer_width = 800
         self.popup_side_changer_height = 123
         self.popup_side_changer_width_button = 260
@@ -270,7 +350,7 @@ class GameProgress:
         self.popup_side_changer_text_button_player = "COMPUTER'S TURN"
         self.popup_side_changer_text_button_computer = "START MY TURN"
 
-        # Configure Popup (Remove Mode)
+        # Configure popup (Remove Mode)
         self.popup_remove_width = 300
         self.popup_remove_height = 123
         self.popup_remove_width_button = 100
@@ -287,7 +367,7 @@ class GameProgress:
         self.popup_remove_text_no = "No"
         self.popup_remove_text_button = "OK"
         
-       # Configure Popup (Bot Difficulty)
+       # Configure popup (Bot Difficulty)
         self.popup_bot_difficulty_width = 800
         self.popup_bot_difficulty_height = 123
         self.popup_bot_difficulty_difficulty_button_width = 100
@@ -299,7 +379,7 @@ class GameProgress:
         self.popup_bot_difficulty_medium_button_rect = pygame.Rect(self.screen_width // 2 - 50, self.screen_height // 2 + 10, self.popup_bot_difficulty_difficulty_button_width, self.popup_bot_difficulty_difficulty_button_height)
         self.popup_bot_difficulty_hard_button_rect = pygame.Rect(self.screen_width // 2 + 70, self.screen_height // 2 + 10, self.popup_bot_difficulty_difficulty_button_width, self.popup_bot_difficulty_difficulty_button_height)
 
-        # Configure Word
+        # Configure word
         self.word_card_1 = self.word_cards[0]
         self.word_card_2 = self.word_cards[1]
         self.word_card_3 = self.word_cards[2]
@@ -318,11 +398,11 @@ class GameProgress:
                 self.word_click_areas.append((x, y, self.word_card_width, self.word_card_width))
                 self.selected_word_cards = []
 
-        # Configure Side Text Box
+        # Configure side text box
         self.side_text = None
         self.side_text_box_pos = (self.screen_width // 2, 0)
         
-        # Configure Selected Cards
+        # Configure selected cards
         self.selected_card = []
         self.original_cards = []
         self.replaced_positions = []
@@ -332,7 +412,7 @@ class GameProgress:
         self.previous_word_cards = self.word_cards.copy()
         self.previous_used_card_positions = self.used_card_positions.copy()
 
-        # Configure Points
+        # Configure points
         self.point_maximum = 3
         self.point_block_x = 238
         self.point_block_y = 570
@@ -340,12 +420,12 @@ class GameProgress:
         self.point_block_height = 17
         self.point_block_spacing = 3
 
-        # Configure Round Counter
+        # Configure round counter
         self.round = 1
         self.round_text_pos = (119, 559)
         self.round_counter_popup_click_count = 2
         
-        # Configure click area of Buttons
+        # Configure click area of buttons
         self.x_min_game_paused_page, self.y_min_game_paused_page = 472, 563
         self.x_max_game_paused_page, self.y_max_game_paused_page = 502, 593
         self.x_min_quit_button, self.y_min_quit_button = 508, 563
@@ -393,31 +473,47 @@ class GameProgress:
 
     def update_side_text(self):
         """
-        Update the display text for current active player
+        Update the display text for current active player.
 
-        Updates to show "YOUR TURN" or "COMPUTER'S TURN" based on side_status value
+        Updates to show "YOUR TURN" or "COMPUTER'S TURN" based on side_status value.
         """
         if self.side_status == 0:
             self.side_text_box = "YOUR TURN"
-            self.popup_side_changer_text_button = self.popup_side_changer_text_button_player
+            self.popup_side_changer_text_button = (
+                self.popup_side_changer_text_button_player
+            )
 
         elif self.side_status == 1:
             self.side_text_box = "COMPUTER'S TURN"
-            self.popup_side_changer_text_button = self.popup_side_changer_text_button_computer
+            self.popup_side_changer_text_button = (
+                self.popup_side_changer_text_button_computer
+            )
 
     def update_popup_text(self):
+        """
+        Update popup text for the latest player or computer action.
+
+        Shows whether the last attempt was successful or not.
+        """
         if self.side_status == 0:
             if self.player_answer_status == 0:
-                self.popup_side_changer_text_player = "YOU ANSWERED UNSUCCESSFULLY (+1 CARD)"
+                self.popup_side_changer_text_player = (
+                    "YOU ANSWERED UNSUCCESSFULLY (+1 CARD)"
+                )
             elif self.player_answer_status == 1:
                 self.popup_side_changer_text_player = "YOU ANSWERED SUCCESSFULLY"
             self.popup_side_changer_text = self.popup_side_changer_text_player
             print(f"[update_popup_text] Popup text (Player) updated")
+
         elif self.side_status == 1:
             if self.computer_answer_status == 0:
-                self.popup_side_changer_text_computer = "COMPUTER ANSWERED UNSUCCESSFULLY (+1 CARD)"
+                self.popup_side_changer_text_computer = (
+                    "COMPUTER ANSWERED UNSUCCESSFULLY (+1 CARD)"
+                )
             elif self.computer_answer_status == 1:
-                self.popup_side_changer_text_computer = "COMPUTER ANSWERED SUCCESSFULLY"
+                self.popup_side_changer_text_computer = (
+                    "COMPUTER ANSWERED SUCCESSFULLY"
+                )
             self.popup_side_changer_text = self.popup_side_changer_text_computer
             print(f"[update_popup_text] Popup text (Computer) updated")
 
@@ -589,11 +685,11 @@ class GameProgress:
         """
         for i in range(self.point_maximum):
 
-            # Calculate Block position
+            # Calculate block position
             x = self.point_block_x + i * (self.point_block_length + self.point_block_spacing)
             rect = pygame.Rect(x, self.point_block_y, self.point_block_length, self.point_block_height)
 
-            # Draw Blocks
+            # Draw blocks
             if i >= (self.point_maximum - (self.points - 1)):
                 pygame.draw.rect(self.screen, self.color_point_block, rect)
 
@@ -818,7 +914,7 @@ class GameProgress:
                 self.button_sound.play()
                 pass
 
-        # Click_Sound_Button
+        # Click sound button
         if self.x_min_click_sound_button <= mouse_x <= self.x_max_click_sound_button and self.y_min_click_sound_button <= mouse_y <= self.y_max_click_sound_button:
             if pygame.mouse.get_pressed()[0] and self.show_options_page:
                 self.button_sound.play()
