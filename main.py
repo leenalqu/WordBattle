@@ -1,4 +1,5 @@
-# Jiaxi Huang (5670238) & Leen Alqurashi (5663960)
+# World Battle Game.
+# Combined by Jiaxi Huang (5670238) & Leen Alqurashi (5663960)
 
 # Import libraries
 import sys
