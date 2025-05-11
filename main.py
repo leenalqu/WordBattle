@@ -1,3 +1,5 @@
+# Jiaxi Huang (5670238) & Leen Alqurashi (5663960)
+
 # Import libraries
 import os
 import sys
