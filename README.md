@@ -4,10 +4,10 @@
 - Fisher Yates [Game().fisher_shuffle()]
 - Quick Sort [Game().quicksort()]
 - Insertion Sort [Bot().letter_frequency_sort()]
-- Graph BFS [Game().valid_transformations() and Bot().next_word()]
+- Graph BFS [Game().valid_transformations() and Bot()._next_word()]
  
 # Implemented data structures:
-- Graph [Represented by the sets: Game().words & Bot().bot_words]
+- Graph [Represented by the sets: Game().words & Bot()._bot_words]
 - Queue
  
 # Uncommon data types:
