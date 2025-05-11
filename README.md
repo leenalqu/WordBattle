@@ -7,7 +7,7 @@
 - Graph BFS [Game().valid_transformations() and Bot().next_word()]
  
 # Implemented data structures:
-- Graph [Represented by the dictionaries: Game().words & Bot().bot_words]
+- Graph [Represented by the sets: Game().words & Bot().bot_words]
 - Queue
  
 # Uncommon data types:
