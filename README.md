@@ -29,7 +29,7 @@
 
 # My Role and Contributions:
 - Implemented main game loop and turn logic.
--Developed:
+- Developed:
   * Card interaction and reorganization system.
   * Penalty card distribution.
   * Managed player and bot turn switching logic.
