@@ -95,6 +95,9 @@ wish luck to be on your side 😊
 
 ##### Ready???? Let’s go 🤗
 
+[View the original group repository](https://github.com/hasanwazzan5/WordBattle)
+
+
 
 
 
