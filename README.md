@@ -27,6 +27,18 @@
 - Exception Handling
 - Print Statements
 
+# My Role and Contributions:
+- Implemented main game loop and turn logic.
+-Developed:
+  * Card interaction and reorganization system.
+  * Penalty card distribution.
+  * Managed player and bot turn switching logic.
+  * Integrated timer functionality for turn timeouts.
+  * Implemented word validation and transformation checks.
+  * Developed win condition detection.
+  * Standardized code style for consistency.
+  * Assisted with game logic integration.
+
 
 # Game Overview:
    [ The Word Battle 🃏
